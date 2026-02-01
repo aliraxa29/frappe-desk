@@ -5,3 +5,6 @@
 tags
 node_modules
 __pycache__
+desk/package-lock.json
+desktop/public/dashboard/
+desk/yarn.lock

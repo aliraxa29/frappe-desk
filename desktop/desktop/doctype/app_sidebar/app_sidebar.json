@@ -1,0 +1,89 @@
+{
+ "actions": [],
+ "creation": "2026-01-30 12:08:04.751463",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "app",
+  "is_standard",
+  "column_break_yifj",
+  "module",
+  "sidebar_items_section",
+  "items"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "no_copy": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "sidebar_items_section",
+   "fieldtype": "Section Break",
+   "label": "Sidebar Items"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "App Sidebar Item"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_standard",
+   "fieldtype": "Check",
+   "label": "Is Standard"
+  },
+  {
+   "fieldname": "column_break_yifj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.is_standard",
+   "fieldname": "module",
+   "fieldtype": "Link",
+   "label": "Module",
+   "mandatory_depends_on": "eval:doc.is_standard",
+   "options": "Module Def"
+  },
+  {
+   "fieldname": "app",
+   "fieldtype": "Select",
+   "label": "App",
+   "no_copy": 1,
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-02-01 12:54:01.658884",
+ "modified_by": "Administrator",
+ "module": "Desktop",
+ "name": "App Sidebar",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title"
+}

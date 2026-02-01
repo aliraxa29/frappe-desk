@@ -4,7 +4,8 @@ app_publisher = "Ali Raza"
 app_description = "A frontend that replaces the frappe desk ui"
 app_email = "ar.frappe.dev@gmail.com"
 app_license = "mit"
-
+app_cover_image = "/assets/desktop/images/no-image.png"
+app_icon = ""
 # Apps
 # ------------------
 
@@ -236,7 +237,7 @@ app_license = "mit"
 # ]
 
 # Automatically update python controller files with type annotations for this app.
-# export_python_type_annotations = True
+export_python_type_annotations = True
 
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs

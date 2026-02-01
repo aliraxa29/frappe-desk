@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="{{ lang }}" dir="{{ layout_direction }}">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="/assets/frappe/images/frappe-favicon.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ app_name }}</title>
+  <script type="module" crossorigin src="/assets/desktop/dashboard/assets/index-C1KJ-xg8.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/desktop/dashboard/assets/index-BXCXUbVU.css">
+</head>
+
+<body>
+  <div id="app"></div>
+  <script>
+    window.dash = window.dash || {};
+    window.dash.boot = {{ boot | json }};
+    window.dash._messages = window.dash.boot["__messages"];
+    window.dash.csrf_token = "{{ csrf_token }}";
+    window._version_number = "{{ build_version }}";
+  </script>
+</body>
+
+</html>
