@@ -34,7 +34,7 @@ export interface Field {
   options?: string
   reqd: boolean
   bold?: number
-  hidden?: number
+  hidden: number
   read_only: boolean
   depends_on?: string
   fetch_from?: string
