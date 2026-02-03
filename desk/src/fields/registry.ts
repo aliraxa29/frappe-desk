@@ -30,8 +30,23 @@ export const fieldComponentMap: Record<FieldType, string> = {
   'HTML': 'TextField',
   'Image': 'AttachField',
   'Heading': 'HeadingField',
-  'Column Break': 'TextField',
-  'Section Break': 'SectionBreakField'
+  'Column Break': 'ColumnBreakField',
+  'Section Break': 'SectionBreakField',
+  'Tab Break': 'TabBreakField'
+}
+
+// Layout field types that don't render as editable fields
+export const layoutFieldTypes = [
+  'Section Break',
+  'Column Break', 
+  'Tab Break',
+  'Heading',
+  'HTML'
+]
+
+// Check if a field type is a layout/structural field
+export function isLayoutField(fieldtype: FieldType): boolean {
+  return layoutFieldTypes.includes(fieldtype)
 }
 
 export function getFieldComponent(fieldtype: FieldType): string {

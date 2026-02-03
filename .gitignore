@@ -8,3 +8,5 @@ __pycache__
 desk/package-lock.json
 desktop/public/dashboard/
 desk/yarn.lock
+yarn.lock
+desktop/www/dashboard.html

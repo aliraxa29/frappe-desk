@@ -2,14 +2,13 @@
   <div v-if="loading" class="loading">Loading applications...</div>
   <div v-else class="desk-container">
     <Navbar />
-
     <div class="apps-section">
       <div class="section-header">
-        <h2>Your Applications</h2>
-        <p class="text-gray-400">Click on an application to view and manage its doctypes</p>
+        <h2>Your Apps</h2>
+        <p class="text-gray-400">Click on any app to view and manage</p>
       </div>
       <div v-if="apps.length === 0" class="empty-state">
-        <p>No applications found</p>
+        <p>No apps found</p>
       </div>
       <div v-else class="grid gap-6
          grid-cols-1
@@ -28,18 +27,22 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { AppInfo } from '../types'
 import { desktopAPI } from '../api/desktop'
-import Navbar from '../components/Navbar.vue'
+import { useBreadcrumbStore } from '../stores/breadcrumbs'
+import Navbar from '../layout/Navbar.vue'
 import AppCard from '../components/AppCard.vue'
 
 
 const router = useRouter()
 const route = useRoute()
+const breadcrumbStore = useBreadcrumbStore()
 const loading = ref(true)
 const apps = ref<AppInfo[]>([])
 
 const defaultApps: AppInfo[] = []
 
 onMounted(async () => {
+  // Clear breadcrumbs on home page
+  breadcrumbStore.clear()
   await getApps()
 })
 

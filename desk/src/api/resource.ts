@@ -1,5 +1,6 @@
-import type { APIResponse, ListResponse, DocTypeMeta, Document } from '../types'
+import type { APIResponse, ListResponse, DocTypeMeta, DocTypeMetaResponse, Document } from '../types'
 import { desk } from '../utils/desk'
+import { toast } from '../stores/toast'
 
 class FrappeClient {
   private getCookie(name: string): string {
@@ -9,17 +10,23 @@ class FrappeClient {
     return ''
   }
 
-  async getDocTypeMeta(doctype: string): Promise<DocTypeMeta> {
+  private handleError(message: string, error: any): void {
+    console.error(message, error)
+    const errorMsg = error?.message || error?.exc || String(error)
+    toast.error(message, errorMsg)
+  }
+
+  async getDocTypeMeta(doctype: string): Promise<DocTypeMetaResponse> {
     try {
       const response = await desk.get(
         `/api/method/desktop.doctype_scripts.get_doctype_with_scripts?doctype=${doctype}`
       )
       return {
-        docs: response.message?.docs || response.docs,
+        docs: response.message?.docs || response.docs || [],
         user_settings: response.message?.user_settings || response.user_settings
       }
     } catch (error) {
-      console.error(`Failed to fetch DocType meta for ${doctype}:`, error)
+      this.handleError(`Failed to fetch DocType meta for ${doctype}`, error)
       throw error
     }
   }
@@ -30,9 +37,21 @@ class FrappeClient {
       const response = await desk.get(
         `/api/resource/${doctype}/${name}`
       )
-      return response.message
+      
+      console.log('getDocument response for', doctype, name, ':', response)
+      
+      // Frappe REST API returns: { data: {...document...} }
+      // Handle different response formats
+      const doc = response.data || response.message || response
+      
+      if (!doc || typeof doc !== 'object') {
+        console.error('Invalid document response structure:', response)
+        throw new Error('Invalid document response')
+      }
+      
+      return doc
     } catch (error) {
-      console.error(`Failed to fetch ${doctype} ${name}:`, error)
+      this.handleError(`Failed to fetch ${doctype} "${name}"`, error)
       throw error
     }
   }
@@ -46,9 +65,10 @@ class FrappeClient {
           doc: { ...data, doctype }
         }
       })
+      toast.success(`${doctype} created successfully`)
       return response.message
     } catch (error) {
-      console.error(`Failed to create ${doctype}:`, error)
+      this.handleError(`Failed to create ${doctype}`, error)
       throw error
     }
   }
@@ -64,9 +84,10 @@ class FrappeClient {
           fieldname: data
         }
       })
+      toast.success(`${doctype} saved successfully`)
       return response.message
     } catch (error) {
-      console.error(`Failed to update ${doctype} ${name}:`, error)
+      this.handleError(`Failed to update ${doctype} "${name}"`, error)
       throw error
     }
   }
@@ -81,8 +102,9 @@ class FrappeClient {
           name
         }
       })
+      toast.success(`${doctype} "${name}" deleted`)
     } catch (error) {
-      console.error(`Failed to delete ${doctype} ${name}:`, error)
+      this.handleError(`Failed to delete ${doctype} "${name}"`, error)
       throw error
     }
   }
@@ -128,7 +150,7 @@ class FrappeClient {
       })
       return response.message
     } catch (error) {
-      console.error(`Failed to call method ${method}:`, error)
+      this.handleError(`Failed to call method ${method}`, error)
       throw error
     }
   }
@@ -145,7 +167,7 @@ class FrappeClient {
       })
       return (response.message || []).map((app: any) => app.name)
     } catch (error) {
-      console.error('Failed to fetch installed apps:', error)
+      this.handleError('Failed to fetch installed apps', error)
       return []
     }
   }
@@ -163,7 +185,7 @@ class FrappeClient {
       })
       return (response.message || []).map((item: any) => item.name)
     } catch (error) {
-      console.error(`Failed to fetch doctypes for ${app}:`, error)
+      this.handleError(`Failed to fetch doctypes for ${app}`, error)
       return []
     }
   }
@@ -198,7 +220,7 @@ class FrappeClient {
       })
       return response.message?.value
     } catch (error) {
-      console.error(`Failed to get value for ${doctype}.${name}.${field}:`, error)
+      this.handleError(`Failed to get value for ${doctype}.${name}.${field}`, error)
       throw error
     }
   }

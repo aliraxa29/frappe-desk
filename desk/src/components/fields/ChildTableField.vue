@@ -1,24 +1,24 @@
 <template>
   <div class="child-table-field-wrapper">
-    <label v-if="field.label" class="field-label">
-      {{ field.label }}
-      <span v-if="field.reqd" class="required">*</span>
-    </label>
-    <ChildTableEditor
-      :rows="rows"
-      :fields="childFields"
+    <ChildTableEditor 
+      :rows="rows" 
+      :child-meta="childMeta" 
       :field-label="field.label || field.fieldname"
-      @update:rows="updateRows"
+      :parent-doctype="ctx.doctype"
+      :parent-name="ctx.doc?.name"
+      @update:rows="updateRows" 
     />
-    <small v-if="field.description" class="field-description">{{ field.description }}</small>
+    <p v-if="field.description" class="field-description">{{ field.description }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import type { Field, FormContext, DocTypeMeta } from '@/types'
-import { useDoctypeStore } from '@/metadata/doctypeStore'
-import ChildTableEditor from '../ChildTableEditor.vue'
+import { model } from '@/data/model'
+import ChildTableEditor from '../ChildTableEditorNew.vue'
+
+declare const locals: any
 
 const props = defineProps<{ field: Field; ctx: FormContext }>()
 
@@ -26,7 +26,6 @@ const emit = defineEmits<{
   fieldChange: [value: any]
 }>()
 
-const doctypeStore = useDoctypeStore()
 const childMeta = ref<DocTypeMeta | null>(null)
 const rows = ref<Record<string, any>[]>([])
 
@@ -34,57 +33,84 @@ const childDoctype = computed(() => {
   return props.field.options || ''
 })
 
-const childFields = computed(() => {
-  return childMeta.value?.fields || []
-})
+// Load child doctype metadata
+function loadMeta(doctype: string): Promise<DocTypeMeta> {
+  return new Promise((resolve, reject) => {
+    model.with_doctype(doctype, (result: any) => {
+      if (result?.docs) {
+        const metaDoc = result.docs.find((doc: any) => doc.name === doctype)
+        if (metaDoc) {
+          resolve(metaDoc)
+          return
+        }
+      }
+      reject(new Error(`Failed to load metadata for ${doctype}`))
+    })
+  })
+}
 
 onMounted(async () => {
+  // Load child doctype metadata
   if (childDoctype.value) {
     try {
-      childMeta.value = await doctypeStore.loadMeta(childDoctype.value)
+      if (typeof locals !== 'undefined' && locals.DocType?.[childDoctype.value]) {
+        childMeta.value = locals.DocType[childDoctype.value]
+      } else {
+        childMeta.value = await loadMeta(childDoctype.value)
+      }
     } catch (error) {
       console.error(`Failed to load child doctype ${childDoctype.value}:`, error)
     }
   }
 
   // Initialize rows from context
-  if (Array.isArray(props.ctx.doc[props.field.fieldname])) {
-    rows.value = JSON.parse(JSON.stringify(props.ctx.doc[props.field.fieldname]))
-  }
+  initializeRows()
 })
+
+function initializeRows() {
+  const docRows = props.ctx.doc[props.field.fieldname]
+  if (Array.isArray(docRows)) {
+    rows.value = JSON.parse(JSON.stringify(docRows))
+  } else {
+    rows.value = []
+  }
+}
+
+// Watch for external changes to the doc
+watch(() => props.ctx.doc[props.field.fieldname], (newVal) => {
+  if (Array.isArray(newVal)) {
+    // Only update if different (avoid loops)
+    const newStr = JSON.stringify(newVal)
+    const currentStr = JSON.stringify(rows.value)
+    if (newStr !== currentStr) {
+      rows.value = JSON.parse(newStr)
+    }
+  }
+}, { deep: true })
 
 function updateRows(updatedRows: Record<string, any>[]) {
   rows.value = updatedRows
   // Update the context document
   props.ctx.doc[props.field.fieldname] = updatedRows
+  // Mark form as dirty
+  if (props.ctx.dirty !== undefined) {
+    props.ctx.dirty = true
+  }
   emit('fieldChange', updatedRows)
 }
 </script>
 
 <style scoped>
 .child-table-field-wrapper {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.field-label {
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
-  color: #b0bec5;
-}
-
-.required {
-  color: #ef4444;
-  margin-left: 0.25rem;
-}
-
 .field-description {
-  display: block;
-  color: #6b7280;
-  margin-top: 0.25rem;
-  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0.25rem 0 0 0;
+  font-size: 0.8125rem;
 }
 </style>

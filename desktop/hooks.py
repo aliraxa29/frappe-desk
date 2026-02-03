@@ -5,7 +5,7 @@ app_description = "A frontend that replaces the frappe desk ui"
 app_email = "ar.frappe.dev@gmail.com"
 app_license = "mit"
 app_cover_image = "/assets/desktop/images/no-image.png"
-app_icon = ""
+
 # Apps
 # ------------------
 

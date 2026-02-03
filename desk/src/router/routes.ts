@@ -15,12 +15,12 @@ export const routes = [
     name: 'ListView'
   },
   {
-    path: '/:app/:doctype([A-Za-z][A-Za-z0-9\\s-]*)/new-:hash',
+    path: '/:app/:doctype/new',
     component: () => import('../views/FormView.vue'),
     name: 'NewForm'
   },
   {
-    path: '/:app/:doctype([A-Za-z][A-Za-z0-9\\s-]*)/:name',
+    path: '/:app/:doctype/:name',
     component: () => import('../views/FormView.vue'),
     name: 'EditForm'
   },

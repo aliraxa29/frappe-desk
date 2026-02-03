@@ -1,10 +1,10 @@
-export function initializeGlobals() {
-    // Preserve boot data that's already set in the HTML
-    const existingBoot = window.desk?.boot;
-    const existingMessages = window.desk?._messages;
-    const existingCsrfToken = window.desk?.csrf_token;
+import { __, get_languages } from "./translate";
 
+export function initializeGlobals() {
     if (!window.desk) window.desk = {};
+    window.get_languages = get_languages
+
+    ;(globalThis as any).__ = __
 
     window.desk.provide = function (namespace: string) {
         // docs: create a namespace //
@@ -40,9 +40,4 @@ export function initializeGlobals() {
     window.desk.provide("desk.listview_settings");
     window.desk.provide("desk.tour");
     window.desk.provide("desk.listview_parent_route");
-
-    // Restore boot data that was set in the HTML before this function was called
-    if (existingBoot) window.desk.boot = existingBoot;
-    if (existingMessages) window.desk._messages = existingMessages;
-    if (existingCsrfToken) window.desk.csrf_token = existingCsrfToken;
 }

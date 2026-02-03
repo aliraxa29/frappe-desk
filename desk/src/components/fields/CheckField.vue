@@ -18,9 +18,18 @@
 </template>
 
 <script setup lang="ts">
-import type { Field, FormContext } from '@/types'
+import type { Field, FormContext } from '../../types'
 
-defineProps<{ field: Field; ctx: FormContext }>()
+const props = defineProps({
+  field: {
+    type: Object as () => Field,
+    required: true
+  },
+  ctx: {
+    type: Object as () => FormContext,
+    required: true
+  }
+})
 
 const emit = defineEmits<{
   fieldChange: [value: any]
@@ -28,7 +37,7 @@ const emit = defineEmits<{
 
 function updateValue(e: Event) {
   const value = (e.target as HTMLInputElement).checked ? 1 : 0
-  ctx.set_value(field.fieldname, value)
+  props.ctx.set_value(props.field.fieldname, value)
   emit('fieldChange', value)
 }
 </script>

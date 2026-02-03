@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
+import ToastContainer from './components/ToastContainer.vue'
+import DialogContainer from './components/DialogContainer.vue'
 </script>
 
 <template>
   <div id="app">
     <RouterView />
+    <ToastContainer />
+    <DialogContainer />
   </div>
 </template>
 

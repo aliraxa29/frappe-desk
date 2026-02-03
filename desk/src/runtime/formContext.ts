@@ -1,5 +1,7 @@
 import { reactive } from 'vue'
-import type { FormContext, Document, DocTypeMeta } from '@/types'
+import type { FormContext, Document, DocTypeMeta } from '../types'
+import { toast } from '../stores/toast'
+import { dialog } from '../stores/dialog'
 
 export function createFormContext(
   doctype: string,
@@ -34,18 +36,18 @@ export function createFormContext(
 
     throw(msg: string) {
       console.error('Form Error:', msg)
-      alert(msg)
+      dialog.error('Error', msg)
     },
 
-    notify(msg: string, type = 'info') {
-      console.log(`[${type}]`, msg)
+    notify(msg: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') {
+      toast[type](msg)
     },
 
     validate(): boolean {
       let isValid = true
       for (const field of this.meta.fields) {
         if (field.reqd && !this.doc[field.fieldname]) {
-          this.throw(`${field.label} is required`)
+          toast.error(`${field.label} is required`)
           isValid = false
           break
         }
@@ -55,19 +57,19 @@ export function createFormContext(
 
     async save() {
       if (!this.validate()) return
-      this.throw('Save functionality not yet implemented')
+      toast.warning('Save functionality not yet implemented')
     },
 
     async submit() {
-      this.throw('Submit functionality not yet implemented')
+      toast.warning('Submit functionality not yet implemented')
     },
 
     async amend() {
-      this.throw('Amend functionality not yet implemented')
+      toast.warning('Amend functionality not yet implemented')
     },
 
     async duplicate() {
-      this.throw('Duplicate functionality not yet implemented')
+      toast.warning('Duplicate functionality not yet implemented')
     }
   })
 

@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
-import RekaResolver from 'reka-ui/resolver'
 import Components from 'unplugin-vue-components/vite'
 
 
@@ -12,12 +11,6 @@ export default defineConfig({
   plugins: [
     vue(),
     tailwindcss(),
-    Components({
-      dts: true,
-      resolvers: [
-        RekaResolver()
-      ],
-    }),
   ],
   resolve: {
     alias: {

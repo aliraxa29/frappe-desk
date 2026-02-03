@@ -1,12 +1,15 @@
 <template>
-  <component :is="getFieldComponentName(field.fieldtype)" :field="field" :ctx="ctx"
-    @field-change="$emit('fieldChange', $event)" />
+  <component
+    :is="getFieldComponentName(field.fieldtype)"
+    :field="field" :ctx="ctx"
+    @field-change="$emit('fieldChange', $event)"
+  />
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue'
 import type { Field, FormContext, FieldType } from '../types'
 import { getFieldComponent } from '../fields/registry'
+import { defineAsyncComponent, onMounted } from 'vue';
 
 const props = defineProps({
   field: {
@@ -23,23 +26,52 @@ const emit = defineEmits<{
   fieldChange: [field: Field]
 }>()
 
-// Dynamically import field components
 const fieldComponents = {
-  TextField: defineAsyncComponent(() => import('../components/fields/TextField.vue')),
-  TextAreaField: defineAsyncComponent(() => import('../components/fields/TextAreaField.vue')),
-  CheckField: defineAsyncComponent(() => import('../components/fields/CheckField.vue')),
-  SelectField: defineAsyncComponent(() => import('../components/fields/SelectField.vue')),
-  LinkField: defineAsyncComponent(() => import('../components/fields/LinkField.vue')),
-  IntField: defineAsyncComponent(() => import('../components/fields/IntField.vue')),
-  FloatField: defineAsyncComponent(() => import('../components/fields/FloatField.vue')),
-  DateField: defineAsyncComponent(() => import('../components/fields/DateField.vue')),
-  TimeField: defineAsyncComponent(() => import('../components/fields/TimeField.vue')),
-  DateTimeField: defineAsyncComponent(() => import('../components/fields/DateTimeField.vue')),
-  ColorField: defineAsyncComponent(() => import('../components/fields/ColorField.vue')),
-  AttachField: defineAsyncComponent(() => import('../components/fields/AttachField.vue')),
-  SectionBreakField: defineAsyncComponent(() => import('../components/fields/SectionBreakField.vue')),
-  HeadingField: defineAsyncComponent(() => import('../components/fields/HeadingField.vue')),
-  ChildTableField: defineAsyncComponent(() => import('../components/fields/ChildTableField.vue'))
+  TextField: defineAsyncComponent(() =>
+    import('../components/fields/TextField.vue')
+  ),
+  TextAreaField: defineAsyncComponent(() =>
+    import('../components/fields/TextAreaField.vue')
+  ),
+  CheckField: defineAsyncComponent(() =>
+    import('../components/fields/CheckField.vue')
+  ),
+  SelectField: defineAsyncComponent(() =>
+    import('../components/fields/SelectField.vue')
+  ),
+  LinkField: defineAsyncComponent(() =>
+    import('../components/fields/LinkField.vue')
+  ),
+  IntField: defineAsyncComponent(() =>
+    import('../components/fields/IntField.vue')
+  ),
+  FloatField: defineAsyncComponent(() =>
+    import('../components/fields/FloatField.vue')
+  ),
+  DateField: defineAsyncComponent(() =>
+    import('../components/fields/DateField.vue')
+  ),
+  TimeField: defineAsyncComponent(() =>
+    import('../components/fields/TimeField.vue')
+  ),
+  DateTimeField: defineAsyncComponent(() =>
+    import('../components/fields/DateTimeField.vue')
+  ),
+  ColorField: defineAsyncComponent(() =>
+    import('../components/fields/ColorField.vue')
+  ),
+  AttachField: defineAsyncComponent(() =>
+    import('../components/fields/AttachField.vue')
+  ),
+  SectionBreakField: defineAsyncComponent(() =>
+    import('../components/fields/SectionBreakField.vue')
+  ),
+  HeadingField: defineAsyncComponent(() =>
+    import('../components/fields/HeadingField.vue')
+  ),
+  ChildTableField: defineAsyncComponent(() =>
+    import('../components/fields/ChildTableField.vue')
+  ),
 }
 
 function getFieldComponentName(fieldtype: FieldType): any {

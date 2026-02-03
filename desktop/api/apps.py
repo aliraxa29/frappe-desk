@@ -40,13 +40,8 @@ def get_installed_apps():
                     if app_hooks.get("app_cover_image")
                     else ""
                 )
-
-                app_icon = None
-                try:
-                    icon_path = f"/assets/{app_name}/icon.png"
-                    app_icon = icon_path
-                except:
-                    pass
+                
+                app_icon = app_hooks.get("app_icon", [""])[0] if app_hooks.get("app_icon") else ""
 
                 apps.append(
                     {

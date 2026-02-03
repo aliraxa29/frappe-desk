@@ -6,6 +6,7 @@
 export interface DeskCallOptions {
   method: string
   args?: Record<string, any>
+  type?: string,
   callback?: (response: any) => void
   error?: (error: any) => void
   freeze?: boolean
@@ -37,6 +38,7 @@ export async function call(options: DeskCallOptions): Promise<any> {
   const {
     method,
     args = {},
+    type = 'POST',
     callback,
     error: errorCallback,
     freeze = false,
@@ -54,7 +56,7 @@ export async function call(options: DeskCallOptions): Promise<any> {
 
   try {
     const response = await fetch(`/api/method/${method}`, {
-      method: 'POST',
+      method: type,
       headers,
       body: JSON.stringify(args),
       credentials: 'same-origin'

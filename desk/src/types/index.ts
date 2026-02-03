@@ -8,6 +8,7 @@ export interface DocTypeMeta {
   fields: Field[]
   permissions: Permission[]
   is_submittable: number
+  issingle?: number
   track_changes: number
   allow_rename: number
   autoname?: string
@@ -15,6 +16,15 @@ export interface DocTypeMeta {
   quick_entry?: number
   sort_field?: string
   sort_order?: string
+  title_field?: string
+  image_field?: string
+  show_title_field_in_link?: number
+}
+
+// DocType Meta Response from API
+export interface DocTypeMetaResponse {
+  docs: DocTypeMeta[]
+  user_settings?: Record<string, any>
 }
 
 export interface Field {
@@ -22,10 +32,10 @@ export interface Field {
   label: string
   fieldtype: FieldType
   options?: string
-  reqd?: number
+  reqd: boolean
   bold?: number
   hidden?: number
-  read_only?: number
+  read_only: boolean
   depends_on?: string
   fetch_from?: string
   fetch_if_empty?: number
@@ -35,6 +45,7 @@ export interface Field {
   precision?: number
   in_list_view?: number
   in_filter?: number
+  in_standard_filter?: number
   in_global_search?: number
   search_index?: number
   allow_bulk_edit?: number
@@ -48,6 +59,26 @@ export interface Field {
   unique?: number
   parent?: string
   idx?: number
+  width?: string
+  permlevel?: number
+}
+
+// List View Column definition
+export interface ListColumn {
+  type: 'Subject' | 'Status' | 'Tag' | 'Field'
+  df?: Field
+  label?: string
+  fieldname?: string
+  width?: string
+}
+
+// List View Settings from DocType
+export interface ListViewSettings {
+  total_fields?: number
+  fields?: string[]
+  add_fields?: string[]
+  filters?: any[]
+  page_length?: number
 }
 
 export type FieldType =
@@ -81,6 +112,7 @@ export type FieldType =
   | 'Heading'
   | 'Column Break'
   | 'Section Break'
+  | 'Tab Break'
 
 export interface Permission {
   role: string

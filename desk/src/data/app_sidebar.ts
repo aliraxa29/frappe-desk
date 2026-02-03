@@ -4,6 +4,7 @@ export interface SidebarItem {
   link_type?: string
   link_to?: string
   istable?: boolean
+  issingle?: boolean
   type?: string
   icon?: string
   route?: string
