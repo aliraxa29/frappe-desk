@@ -11,7 +11,7 @@
 
     <!-- Content -->
     <template #content>
-      <div class="relative pb-20">
+      <div class="relative pb-5">
         <FormRenderer 
           ref="formContext" 
           :doctype="doctype" 

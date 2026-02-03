@@ -14,8 +14,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import type { Field, FormContext, DocTypeMeta } from '@/types'
-import { model } from '@/data/model'
+import type { Field, FormContext, DocTypeMeta } from '../../types'
+import { model } from '../../data/model'
 import ChildTableEditor from '../ChildTableEditorNew.vue'
 
 declare const locals: any

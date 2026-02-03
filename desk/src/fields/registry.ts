@@ -17,7 +17,7 @@ export const fieldComponentMap: Record<FieldType, string> = {
   'Check': 'CheckField',
   'Small Text': 'TextAreaField',
   'Long Text': 'TextAreaField',
-  'Text Editor': 'TextAreaField',
+  'Text Editor': 'TextEditorField',
   'Code': 'TextAreaField',
   'Rating': 'TextField',
   'Color': 'ColorField',
