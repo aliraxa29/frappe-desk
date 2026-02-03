@@ -8,7 +8,7 @@ export const fieldComponentMap: Record<FieldType, string> = {
   'Attach': 'AttachField',
   'Currency': 'FloatField',
   'Date': 'DateField',
-  'DateTime': 'DateTimeField',
+  'Datetime': 'DateTimeField',
   'Time': 'TimeField',
   'Float': 'FloatField',
   'Int': 'IntField',

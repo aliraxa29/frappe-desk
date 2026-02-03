@@ -25,7 +25,7 @@
       <div
         v-if="showPicker"
         ref="pickerRef"
-        class="absolute top-full left-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg p-3 z-50"
+        class="absolute top-full left-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg p-3 z-18"
         style="width: 240px"
       >
         <!-- Time Display -->
