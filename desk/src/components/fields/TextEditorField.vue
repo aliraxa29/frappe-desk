@@ -364,13 +364,13 @@ onMounted(() => {
     readOnly: !!props.field.read_only
   })
 
-  // Convert select to expandable picker for better UX with many options
+  
   setTimeout(() => {
     const selects = toolbarRef.value?.querySelectorAll('select.ql-size, select.ql-font, select.ql-header') || []
     selects.forEach((select: any) => {
       const pickers = select.parentElement?.querySelectorAll('.ql-picker') || []
       pickers.forEach((picker: any) => {
-        picker.classList.add('ql-expanded')
+        picker.classList.remove('ql-expanded')
         const options = picker.querySelector('.ql-picker-options')
         if (options) {
           options.style.maxHeight = '300px'
