@@ -1,41 +1,113 @@
 <template>
-  <div class="field-wrapper">
-    <label v-if="field.label" :for="`field-${field.fieldname}`" class="field-label">
+  <div class="mb-4 flex flex-col relative">
+    <label v-if="field.label" :for="`field-${field.fieldname}`" class="font-medium mb-1 text-sm text-slate-700">
       {{ field.label }}
-      <span v-if="field.reqd" class="required">*</span>
+      <span v-if="field.reqd" class="text-red-500 ml-1">*</span>
     </label>
-    <div class="link-field">
-      <input
-        :id="`field-${field.fieldname}`"
-        :value="ctx.doc[field.fieldname]"
-        :readonly="field.read_only"
-        :required="field.reqd"
-        type="text"
-        class="field-input"
-        :placeholder="`Select a ${field.options}`"
-        @input="onInput"
-      />
-      <div v-if="showDropdown && filteredOptions.length" class="dropdown">
-        <div
-          v-for="option in filteredOptions"
-          :key="option"
-          class="dropdown-item"
-          @click="selectOption(option)"
-        >
-          {{ option }}
+
+    <div class="relative">
+      <div class="flex items-center gap-1 border border-[#ddd] rounded bg-white overflow-hidden transition-colors duration-200 focus-within:border-[#0066cc] focus-within:shadow-[0_0_0_3px_rgba(0,102,204,0.1)]">
+        <input
+          autocomplete="off"
+          :id="`field-${field.fieldname}`"
+          v-model="searchText"
+          :readonly="field.read_only"
+          :required="field.reqd"
+          :placeholder="`Select a ${field.options || 'record'}...`"
+          type="text"
+          class="flex-1 px-3 py-2 outline-none text-[0.95rem] bg-white transition-colors duration-200 read-only:bg-gray-100 read-only:cursor-not-allowed"
+          @input="handleInput" @focus="handleFocus"
+          @keydown="handleKeydown" @blur="handleBlur"
+        />
+        <button v-if="currentValue && !field.read_only" 
+          class="px-2 py-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer" title="Open"
+          @click="openDocument">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </button>
+        <button v-if="currentValue && !field.read_only"
+          class="px-2 py-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer" title="Clear"
+          @click="clearValue">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <div v-if="loading" class="px-3 py-2">
+          <div class="w-4 h-4 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        </div>
+      </div>
+
+      <!-- Dropdown Options -->
+      <div v-if="showDropdown"
+        class="absolute top-full left-0 right-0 mt-1 bg-white border border-[#ddd] rounded shadow-lg z-18 max-h-87.5 overflow-y-auto">
+        <!-- Loading State -->
+        <div v-if="loading" class="p-3 text-center text-sm text-slate-500">
+          <div class="flex items-center justify-center gap-2">
+            <div class="w-4 h-4 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+            Loading options...
+          </div>
+        </div>
+
+        <!-- Options List -->
+        <div v-else-if="allItems.length > 0">
+          <!-- Search Results -->
+          <button v-for="(item, idx) in filteredResults" :key="`result-${item.value}`"
+            class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 transition-colors border-b border-slate-100 last:border-b-0 cursor-pointer"
+            :class="selectedIdx === idx ? 'bg-blue-100 text-blue-900' : 'text-slate-700'" @click="selectItem(item)"
+            @mouseenter="selectedIdx = idx">
+            <div class="font-medium">{{ item.label }}</div>
+            <div v-if="item.description" class="text-xs text-slate-500 mt-0.5">{{ item.description }}</div>
+          </button>
+
+          <!-- Action Options (Create, Advanced Search, etc) -->
+          <div v-if="actionItems.length > 0" class="border-t border-slate-200">
+            <button v-for="(item, idx) in actionItems" :key="`action-${item.value}`" type="button"
+              class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 transition-colors border-b border-slate-100 last:border-b-0 text-slate-600 flex items-center gap-2 cursor-pointer"
+              :class="selectedIdx === filteredResults.length + idx ? 'bg-blue-100 text-blue-900' : ''"
+              @click="selectItem(item)" @mouseenter="selectedIdx = filteredResults.length + idx">
+              <span v-if="item.icon" class="text-base">{{ item.icon }}</span>
+              <span>{{ item.label }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- No Results -->
+        <div v-else-if="!loading && searchText" class="p-3 text-center text-sm text-slate-500">
+          No results for "{{ searchText }}"
+        </div>
+
+        <!-- Empty State Hint -->
+        <div v-else class="p-3 text-center text-sm text-slate-500">
+          Start typing to search...
         </div>
       </div>
     </div>
-    <small v-if="field.description" class="field-description">{{ field.description }}</small>
+
+    <small v-if="field.description" class="block text-gray-600 mt-1 text-[0.85rem]">{{ field.description }}</small>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import type { Field, FormContext } from '../../types'
-import { frappeClient } from '../../api/resource'
+import { desk } from '../../utils/desk'
 
-const props = defineProps<{ field: Field; ctx: FormContext }>()
+interface Props {
+  field: Field
+  ctx: FormContext
+}
+
+interface LinkItem {
+  label: string
+  value: string
+  description?: string
+  html?: string
+  action?: (item: LinkItem) => void
+  icon?: string
+}
+
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
   fieldChange: [value: any]
@@ -43,105 +115,259 @@ const emit = defineEmits<{
 
 const searchText = ref('')
 const showDropdown = ref(false)
-const options = ref<string[]>([])
+const resultItems = ref<LinkItem[]>([])
+const loading = ref(false)
+const selectedIdx = ref(0)
 
-const filteredOptions = computed(() => {
-  return options.value.filter((opt) =>
-    opt.toLowerCase().includes(searchText.value.toLowerCase())
+let searchTimeout: NodeJS.Timeout | null = null
+
+const currentValue = computed(() => props.ctx.doc?.[props.field.fieldname] as string)
+
+const filteredResults = computed(() => {
+  if (!searchText.value) return resultItems.value
+  return resultItems.value.filter(item =>
+    item.label?.toLowerCase().includes(searchText.value.toLowerCase()) ||
+    item.description?.toLowerCase().includes(searchText.value.toLowerCase())
   )
 })
 
-async function onInput(e: Event) {
-  const value = (e.target as HTMLInputElement).value
-  searchText.value = value
-  props.ctx.set_value(props.field.fieldname, value)
+const actionItems = computed(() => {
+  const actions: LinkItem[] = []
+  actions.push({
+    label: `Create a new ${props.field.options}`,
+    value: 'create_new__link_option',
+    icon: '➕',
+    action: () => createNewDoc()
+  })
+  actions.push({
+    label: 'Advanced Search',
+    value: 'advanced_search__link_option',
+    icon: '🔍',
+    action: () => openAdvancedSearch()
+  })
+  return actions
+})
 
-  if (value && props.field.options) {
-    try {
-      const linkedDoctype = props.field.options
-      const list = await frappeClient.getList(linkedDoctype, {
-        fields: ['name'],
-        limit_page_length: 10
-      })
-      options.value = list.data.map((d: any) => d.name)
-      showDropdown.value = true
-    } catch (error) {
-      console.error('Failed to fetch linked options:', error)
+const allItems = computed(() => [
+  ...filteredResults.value,
+  ...actionItems.value
+])
+
+async function fetchOptions(search: string = '') {
+  if (!props.field.options) {
+    loading.value = false
+    return
+  }
+
+  loading.value = true
+  try {
+    const linkedDoctype = props.field.options
+
+    const response = await desk.call({
+      method: 'frappe.desk.search.search_link',
+      args: {
+        doctype: linkedDoctype,
+        txt: search,
+        limit_page_length: 20
+      }
+    })
+    if (response.exc) {
+      console.error('Server error:', response.exc)
+      resultItems.value = []
+      loading.value = false
+      return
     }
+
+    const data = response.message || []
+
+    if (Array.isArray(data)) {
+      resultItems.value = data
+        .filter((item: any) => {
+          return item && !item?.value?.includes('__link_option')
+        })
+        .map((item: any) => {
+          if (Array.isArray(item)) {
+            return {
+              label: item[1] || item[0],
+              value: item[0],
+              description: item[1] || ''
+            }
+          }
+          if (typeof item === 'object' && item !== null) {
+            return {
+              label: item.label || item.value || item.name || '',
+              value: item.value || item.name || '',
+              description: item.description || ''
+            }
+          }
+          if (typeof item === 'string') {
+            return {
+              label: item,
+              value: item,
+              description: ''
+            }
+          }
+          return null
+        })
+        .filter((item: any) => item && item.value)
+    } else {
+      console.warn('Response message is not an array:', data)
+      resultItems.value = []
+    }
+
+    selectedIdx.value = 0
+  } catch (error) {
+    console.error('Failed to fetch linked options:', error)
+    resultItems.value = []
+  } finally {
+    loading.value = false
   }
 }
 
-function selectOption(option: string) {
-  props.ctx.set_value(props.field.fieldname, option)
-  searchText.value = option
-  showDropdown.value = false
-  emit('fieldChange', option)
+function handleInput(e: Event) {
+  const value = (e.target as HTMLInputElement).value
+  searchText.value = value
+  selectedIdx.value = 0
+
+  // Debounce search
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    fetchOptions(value)
+    showDropdown.value = true
+  }, 300)
 }
+
+function handleFocus() {
+  showDropdown.value = true
+  if (!resultItems.value.length && !loading.value) {
+    fetchOptions('')
+  }
+}
+
+function handleBlur() {
+  // Delay to allow click on dropdown item to register
+  setTimeout(() => {
+    if (!showDropdown.value) return
+    showDropdown.value = false
+  }, 250)
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  if (!showDropdown.value) return
+
+  switch (e.key) {
+    case 'ArrowDown':
+      e.preventDefault()
+      selectedIdx.value = Math.min(selectedIdx.value + 1, allItems.value.length - 1)
+      break
+    case 'ArrowUp':
+      e.preventDefault()
+      selectedIdx.value = Math.max(selectedIdx.value - 1, 0)
+      break
+    case 'Enter':
+      e.preventDefault()
+      if (allItems.value[selectedIdx.value]) {
+        selectItem(allItems.value[selectedIdx.value])
+      }
+      break
+    case 'Escape':
+      e.preventDefault()
+      showDropdown.value = false
+      break
+  }
+}
+
+function selectItem(item: LinkItem) {
+  if (item.action) {
+    item.action(item)
+  } else {
+    props.ctx.set_value(props.field.fieldname, item.value)
+    searchText.value = item.label
+    showDropdown.value = false
+    emit('fieldChange', item.value)
+  }
+}
+
+function clearValue() {
+  props.ctx.set_value(props.field.fieldname, '')
+  searchText.value = ''
+  showDropdown.value = false
+  emit('fieldChange', '')
+}
+
+function openDocument() {
+  if (!currentValue.value || !props.field.options) return
+  // Open the document in a new tab
+  const url = `/app/${props.field.options}/${encodeURIComponent(currentValue.value)}`
+  window.open(url, '_blank')
+}
+
+function createNewDoc() {
+  // Open form to create new document
+  console.log('Create new', props.field.options)
+  // TODO: Implement navigation to create new document
+}
+
+function openAdvancedSearch() {
+  // Open advanced search dialog
+  console.log('Advanced search for', props.field.options)
+  // TODO: Implement advanced search modal
+}
+
+// Initialize with current value
+onMounted(() => {
+  const current = currentValue.value
+  if (current) {
+    searchText.value = current
+  }
+})
+
+// Watch for external changes (discard, reload, etc)
+watch(currentValue, (newVal) => {
+  if (newVal) {
+    searchText.value = newVal
+  } else {
+    searchText.value = ''
+  }
+})
+
+onBeforeUnmount(() => {
+  if (searchTimeout) clearTimeout(searchTimeout)
+})
 </script>
 
 <style scoped>
-.field-wrapper {
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
+/* Smooth transitions for dropdown animations */
+:deep(.dropdown-enter-active, .dropdown-leave-active) {
+  transition: all 0.2s ease;
 }
 
-.field-label {
-  font-weight: 500;
-  margin-bottom: 0.25rem;
-  font-size: 0.95rem;
+:deep(.dropdown-enter-from, .dropdown-leave-to) {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 
-.required {
-  color: #dc3545;
-  margin-left: 0.25rem;
+/* Custom scrollbar styling for dropdown */
+:deep(.dropdown::-webkit-scrollbar) {
+  width: 6px;
 }
 
-.link-field {
-  position: relative;
+:deep(.dropdown::-webkit-scrollbar-track) {
+  background: #f1f5f9;
 }
 
-.field-input {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  transition: border-color 0.2s;
+:deep(.dropdown::-webkit-scrollbar-thumb) {
+  background: #cbd5e1;
+  border-radius: 3px;
 }
 
-.field-input:focus {
-  outline: none;
-  border-color: #0066cc;
+:deep(.dropdown::-webkit-scrollbar-thumb:hover) {
+  background: #94a3b8;
+}
+
+/* Focus state - match other form fields */
+input:focus {
+  border-color: #0066cc !important;
   box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-}
-
-.dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-top: none;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 10;
-}
-
-.dropdown-item {
-  padding: 0.5rem 0.75rem;
-  cursor: pointer;
-}
-
-.dropdown-item:hover {
-  background-color: #f0f0f0;
-}
-
-.field-description {
-  display: block;
-  color: #666;
-  margin-top: 0.25rem;
-  font-size: 0.85rem;
 }
 </style>
