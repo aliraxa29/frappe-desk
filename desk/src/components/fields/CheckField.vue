@@ -1,39 +1,54 @@
 <template>
-  <div class="field-wrapper">
-    <label v-if="field.label" :for="`field-${field.fieldname}`" class="field-label">
-      {{ field.label }}
-      <span v-if="field.reqd" class="required">*</span>
+  <div class="mb-4">
+    <label :for="id" class="flex items-start gap-3 cursor-pointer select-none"
+      :class="field.read_only ? 'cursor-not-allowed opacity-60' : ''">
+      <div class="relative mt-0.5">
+        <input
+          :id="id"
+          type="checkbox"
+          class="sr-only peer"
+          :checked="modelValue"
+          :required="field.reqd"
+          :disabled="field.read_only"
+          @change="updateValue"
+        />
+        <div class="h-5 w-9 rounded-full transition bg-gray-300 peer-checked:bg-indigo-600 peer-focus:ring-2 peer-focus:ring-indigo-500 peer-focus:ring-offset-2">
+
+        </div>
+        <div class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-4"></div>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-sm font-medium text-gray-900">
+          {{ field.label }}
+          <span v-if="field.reqd" class="text-red-500">*</span>
+        </span>
+
+        <span v-if="field.description" class="text-xs text-gray-500 mt-0.5">
+          {{ field.description }}
+        </span>
+      </div>
     </label>
-    <input
-      :id="`field-${field.fieldname}`"
-      :value="ctx.doc[field.fieldname]"
-      :readonly="field.read_only"
-      :required="field.reqd"
-      type="checkbox"
-      class="field-checkbox"
-      @change="updateValue"
-    />
-    <small v-if="field.description" class="field-description">{{ field.description }}</small>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Field, FormContext } from '../../types'
 
-const props = defineProps({
-  field: {
-    type: Object as () => Field,
-    required: true
-  },
-  ctx: {
-    type: Object as () => FormContext,
-    required: true
-  }
-})
+const props = defineProps<{
+  field: Field
+  ctx: FormContext
+}>()
 
 const emit = defineEmits<{
-  fieldChange: [value: any]
+  fieldChange: [value: number]
 }>()
+
+const id = `field-${props.field.fieldname}`
+
+const modelValue = computed(() => {
+  return Boolean(props.ctx.doc[props.field.fieldname])
+})
 
 function updateValue(e: Event) {
   const value = (e.target as HTMLInputElement).checked ? 1 : 0
@@ -41,40 +56,3 @@ function updateValue(e: Event) {
   emit('fieldChange', value)
 }
 </script>
-
-<style scoped>
-.field-wrapper {
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.field-label {
-  font-weight: 500;
-  font-size: 0.95rem;
-}
-
-.required {
-  color: #dc3545;
-  margin-left: 0.25rem;
-}
-
-.field-checkbox {
-  width: 1.2rem;
-  height: 1.2rem;
-  cursor: pointer;
-}
-
-.field-checkbox:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.field-description {
-  display: block;
-  color: #666;
-  margin-top: 0.25rem;
-  font-size: 0.85rem;
-}
-</style>
