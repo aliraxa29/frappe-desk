@@ -1,26 +1,13 @@
 <template>
   <Transition name="slide-up">
-    <div 
-      v-if="show" 
-      class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg z-50 ml-64"
-    >
+    <div v-if="show" class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-lg z-50 ml-64">
       <div class="px-6 py-4 flex items-center justify-between">
         <p class="text-slate-700 font-medium">{{ message }}</p>
         <div class="flex gap-3">
-          <Button 
-            @click="$emit('discard')" 
-            variant="secondary" 
-            size="sm"
-            :disabled="loading"
-          >
+          <Button @click="$emit('discard')" variant="secondary" size="sm" :disabled="loading">
             {{ discardText }}
           </Button>
-          <Button 
-            @click="$emit('save')" 
-            variant="primary" 
-            size="sm"
-            :disabled="loading"
-          >
+          <Button @click="$emit('save')" size="sm" :disabled="loading">
             {{ loading ? loadingText : saveText }}
           </Button>
         </div>

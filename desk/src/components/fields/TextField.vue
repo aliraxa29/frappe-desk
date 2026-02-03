@@ -1,8 +1,8 @@
 <template>
-  <div class="field-wrapper">
-    <label v-if="field.label" :for="`field-${field.fieldname}`" class="field-label">
+  <div class="mb-4 flex flex-col">
+    <label v-if="field.label" :for="`field-${field.fieldname}`" class="font-medium mb-1 text-sm text-slate-700">
       {{ field.label }}
-      <span v-if="field.reqd" class="required">*</span>
+      <span v-if="field.reqd" class="text-red-500 ml-1">*</span>
     </label>
     <input
       :id="`field-${field.fieldname}`"
@@ -10,12 +10,11 @@
       :readonly="field.read_only"
       :required="field.reqd"
       type="text"
-      class="field-input"
-      @input="updateValue"
-      @blur="handleBlur"
+      class="w-full px-3 py-2 border border-[#ddd] rounded focus:outline-none focus:border-[#0066cc] focus:shadow-[0_0_0_3px_rgba(0,102,204,0.1)] read-only:bg-gray-100 read-only:cursor-not-allowed text-[0.95rem] transition-colors duration-200"
+      @input="updateValue" @blur="handleBlur"
     />
-    <small v-if="field.description" class="field-description">{{ field.description }}</small>
-    <small v-if="error" class="field-error">{{ error }}</small>
+    <small v-if="field.description" class="block text-gray-600 mt-1 text-[0.85rem]">{{ field.description }}</small>
+    <small v-if="error" class="text-red-500 mt-1 block text-[0.85rem]">{{ error }}</small>
   </div>
 </template>
 
@@ -46,55 +45,3 @@ function handleBlur() {
   // Validation can be added here
 }
 </script>
-
-<style scoped>
-.field-wrapper {
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-}
-
-.field-label {
-  font-weight: 500;
-  margin-bottom: 0.25rem;
-  font-size: 0.95rem;
-}
-
-.required {
-  color: #dc3545;
-  margin-left: 0.25rem;
-}
-
-.field-input {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  transition: border-color 0.2s;
-}
-
-.field-input:focus {
-  outline: none;
-  border-color: #0066cc;
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-}
-
-.field-input:readonly {
-  background-color: #f5f5f5;
-  cursor: not-allowed;
-}
-
-.field-description {
-  display: block;
-  color: #666;
-  margin-top: 0.25rem;
-  font-size: 0.85rem;
-}
-
-.field-error {
-  color: #dc3545;
-  margin-top: 0.25rem;
-  display: block;
-  font-size: 0.85rem;
-}
-</style>
