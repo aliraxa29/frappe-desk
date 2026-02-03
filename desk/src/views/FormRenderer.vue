@@ -372,7 +372,7 @@ function handleClose() {
 function loadMeta(doctype: string): Promise<DocTypeMeta> {
   return new Promise((resolve) => {
     model.with_doctype(doctype, (result: any) => {
-      const metaDoc = result.docs.find((doc: any) => doc.name === doctype)
+      const metaDoc = result.message as DocTypeMeta
       resolve(metaDoc)
     })
   })
@@ -386,15 +386,14 @@ async function onLoad() {
   try {
     // Load DocType metadata
     if (!locals.DocType[props.doctype]) {
-      console.log('Loading metadata for', props.doctype)
       meta.value = await loadMeta(props.doctype)
     } else {
       meta.value = locals.DocType[props.doctype]
     }
+    loadDoctypeScriptsFromMetadata(meta.value, 'form')
 
     // Check if this is a single doctype - redirect if necessary
     if (meta.value.issingle && props.docname !== props.doctype) {
-      console.log('Single doctype detected, redirecting to', props.doctype)
       router.push({
         name: 'EditForm',
         params: {
@@ -412,8 +411,6 @@ async function onLoad() {
     const isNewDocument = !props.docname || props.docname === 'new' || props.docname === null
 
     if (!isNewDocument && props.docname) {
-      // Load existing document
-      console.log('Loading existing document:', props.doctype, props.docname)
       doc = await frappeClient.getDocument(props.doctype, props.docname)
       
       // Validate document was loaded
@@ -429,8 +426,6 @@ async function onLoad() {
         originalDoc.value = { ...doc }
       }
     } else {
-      // Create new document with defaults
-      console.log('Creating new document:', props.doctype)
       doc = props.doc || createNewDocument(props.doctype, meta.value)
       
       // Store a deep copy for discard
@@ -468,7 +463,6 @@ watch(
   async (newParams, oldParams) => {
     // Only reload if doctype or name actually changed
     if (JSON.stringify(newParams) !== JSON.stringify(oldParams)) {
-      console.log('Route changed, reloading form:', newParams)
       await onLoad()
     }
   }
@@ -517,8 +511,6 @@ function handleDiscard() {
   // Reset to original document
   ctx.value.doc = JSON.parse(JSON.stringify(originalDoc.value))
   ctx.value.dirty = false
-  
-  console.log('Form discarded, reset to original state')
 }
 
 defineExpose({

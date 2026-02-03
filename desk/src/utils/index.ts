@@ -4,6 +4,8 @@ import * as model from "./model"
 import * as sync from "./locals/sync"
 import { getLocalsStore } from "./locals/localsGlobal"
 import * as _model from "../data/model"
+import { defineForm } from "../runtime/formContext"
+import { defineList } from "../runtime/listRuntime"
 
 window.desk = {
     dom,
@@ -14,4 +16,8 @@ window.desk = {
     },
     sync,
     _getLocalsStore: getLocalsStore,
+    script: {
+        defineForm,
+        defineList
+    }
 }

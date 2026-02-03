@@ -37,18 +37,16 @@ class FrappeClient {
       const response = await desk.get(
         `/api/resource/${doctype}/${name}`
       )
-      
-      console.log('getDocument response for', doctype, name, ':', response)
-      
+
       // Frappe REST API returns: { data: {...document...} }
       // Handle different response formats
       const doc = response.data || response.message || response
-      
+
       if (!doc || typeof doc !== 'object') {
         console.error('Invalid document response structure:', response)
         throw new Error('Invalid document response')
       }
-      
+
       return doc
     } catch (error) {
       this.handleError(`Failed to fetch ${doctype} "${name}"`, error)

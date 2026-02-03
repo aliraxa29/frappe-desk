@@ -1,5 +1,6 @@
 import { call } from "../utils/desk";
 import { __ } from "../utils/translate";
+import { loadDoctypeScriptsFromMetadata } from "../runtime/scriptLoader";
 
 export interface Model {
     all_fieldtypes: string[];
@@ -305,6 +306,10 @@ export const model: Model = {
 
             let cached_docs = desk.model.get_from_localstorage(doctype);
 
+            if (cached_docs && !Array.isArray(cached_docs)) {
+                cached_docs = [cached_docs];
+            }
+
             if (cached_docs) {
                 cached_doc = cached_docs.filter((doc: any) => doc.name === doctype)[0];
                 if (cached_doc) {
@@ -313,11 +318,9 @@ export const model: Model = {
             }
 
             return call({
-                method: "frappe.desk.form.load.getdoctype",
+                method: "desktop.meta.get_meta",
                 args: {
-                    doctype: doctype,
-                    with_parent: 1,
-                    cached_timestamp: cached_timestamp,
+                    doctype,
                 },
                 async: async,
                 callback: function (r) {
@@ -328,12 +331,29 @@ export const model: Model = {
                     if (r.message == "use_cache") {
                         desk.model.sync(cached_doc);
                     } else {
-                        desk.model.set_in_localstorage(doctype, r.docs);
+                        const docs = Array.isArray(r.message?.docs)
+                            ? r.message.docs
+                            : Array.isArray(r.message)
+                                ? r.message
+                                : [r.message];
+
+                        desk.model.set_in_localstorage(doctype, docs);
+
+                        for (const doc of docs) {
+                            if (doc?.doctype === "DocType" && doc?.name) {
+                                locals.DocType[doc.name] = doc;
+                            }
+                        }
+
+                        const primaryMeta = docs.find((doc: any) => doc?.name === doctype) || docs[0];
+                        if (primaryMeta) {
+                            r.message = primaryMeta;
+                        }
                     }
-                    
-                    r.docs.forEach((doc: any) => {
-                        locals.DocType[doc.name] = doc
-                    });
+
+                    if (r.message?.name) {
+                        locals.DocType[r.message.name] = r.message
+                    }
                     desk.model.init_doctype(doctype);
 
                     if (r.user_settings) {
@@ -361,6 +381,14 @@ export const model: Model = {
             }
         }
 
+        if (meta.__form_ts) {
+            loadDoctypeScriptsFromMetadata(meta, "form");
+        }
+
+        if (meta.__list_ts) {
+            loadDoctypeScriptsFromMetadata(meta, "list");
+        }
+
         if (meta.__templates) {
             Object.assign(desk.templates, meta.__templates);
         }
@@ -378,7 +406,7 @@ export const model: Model = {
                 resolve(desk.get_doc(doctype, name));
             } else {
                 return desk.call({
-                    method: "desk.desk.form.load.getdoc",
+                    method: "frappe.desk.form.load.getdoc",
                     type: "GET",
                     args: {
                         doctype: doctype,

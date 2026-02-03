@@ -1,4 +1,28 @@
+import ts from 'typescript'
+
 const loadedScripts = new Set<string>()
+
+function transpileScriptContent(content: string, scriptId: string): string {
+  try {
+    const result = ts.transpileModule(content, {
+      compilerOptions: {
+        target: ts.ScriptTarget.ES2017,
+        module: ts.ModuleKind.None,
+        removeComments: false,
+        sourceMap: false
+      }
+    })
+
+    if (result.diagnostics?.length) {
+      console.warn(`TypeScript diagnostics for ${scriptId}:`, result.diagnostics)
+    }
+
+    return result.outputText || content
+  } catch (e) {
+    console.error(`Failed to transpile script ${scriptId}:`, e)
+    return content
+  }
+}
 
 /**
  * Script Loader - Injects doctype scripts into the page
@@ -30,9 +54,10 @@ export function injectScript(
   }
 
   try {
+    const jsContent = transpileScriptContent(content, scriptId)
     const script = document.createElement('script')
     script.type = attributes?.type || 'text/javascript'
-    script.textContent = content
+    script.textContent = jsContent
 
     // Add any additional attributes
     if (attributes) {
@@ -82,10 +107,10 @@ export function loadDoctypeScriptsFromMetadata(
   let scriptId: string
 
   if (context === 'form') {
-    scriptContent = metadata.__ts_scripts
+    scriptContent = metadata.__form_ts
     scriptId = `doctype-form-scripts-${doctype}`
   } else if (context === 'list') {
-    scriptContent = metadata.__ts_list_scripts
+    scriptContent = metadata.__list_ts
     scriptId = `doctype-list-scripts-${doctype}`
   } else {
     console.warn(`Unknown context: ${context}`)

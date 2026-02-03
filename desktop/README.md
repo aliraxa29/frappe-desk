@@ -131,19 +131,27 @@ frappe.call({
 
 ```typescript
 // apps/erpnext/erpnext/doctype/invoice/invoice.form.ts
-import { useFormStore } from '@/stores/formStore';
+const doctype = 'Invoice'
 
-const store = useFormStore();
+desk.script.defineForm(doctype, {
+  setup(ctx) {
+    console.log(`[invoice.form.ts] setup for ${ctx.doctype}`)
+  },
 
-store.registerHandler('Invoice', 'beforeSave', (doc) => {
-  if (!doc.customer) {
-    throw new Error('Customer is required');
+  validate(ctx) {
+    if (!ctx.doc.customer) {
+      ctx.throw('Customer is required')
+      return false
+    }
+    return true
+  },
+
+  field_changed(ctx) {
+    if (ctx.field === 'customer') {
+      console.log('Customer changed:', ctx.value)
+    }
   }
-});
-
-store.registerHandler('Invoice', 'afterSave', (doc) => {
-  console.log('Invoice saved:', doc.name);
-});
+})
 ```
 
 **Result**: Auto-discovered and included in `__ts_scripts`
