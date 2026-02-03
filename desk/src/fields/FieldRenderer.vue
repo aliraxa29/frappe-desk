@@ -49,6 +49,9 @@ const fieldComponents = {
   FloatField: defineAsyncComponent(() =>
     import('../components/fields/FloatField.vue')
   ),
+  CurrencyField: defineAsyncComponent(() =>
+    import('../components/fields/CurrencyField.vue')
+  ),
   DateField: defineAsyncComponent(() =>
     import('../components/fields/DateField.vue')
   ),
@@ -95,6 +98,8 @@ function getFieldComponentName(fieldtype: FieldType): any {
       return fieldComponents.IntField
     case 'FloatField':
       return fieldComponents.FloatField
+    case 'CurrencyField':
+      return fieldComponents.CurrencyField
     case 'DateField':
       return fieldComponents.DateField
     case 'TimeField':

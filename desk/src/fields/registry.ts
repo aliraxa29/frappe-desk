@@ -6,7 +6,7 @@ export const fieldComponentMap: Record<FieldType, string> = {
   'Link': 'LinkField',
   'Select': 'SelectField',
   'Attach': 'AttachField',
-  'Currency': 'FloatField',
+  'Currency': 'CurrencyField',
   'Date': 'DateField',
   'Datetime': 'DateTimeField',
   'Time': 'TimeField',
