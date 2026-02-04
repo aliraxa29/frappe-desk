@@ -1,13 +1,7 @@
 <template>
     <div class="flex flex-col gap-1.5">
-        <!-- Label -->
-        <label v-if="label" class="flex items-center gap-2 text-sm font-medium text-slate-700 select-none">
-            <span>{{ label }}</span>
-            <span v-if="required" class="text-red-500">*</span>
-        </label>
-
-        <!-- Checkbox -->
-        <label class="inline-flex items-center gap-3 cursor-pointer"
+        <!-- Checkbox + Label -->
+        <label class="inline-flex items-center gap-3 cursor-pointer select-none"
             :class="{ 'cursor-not-allowed opacity-60': readonly }">
             <input type="checkbox" class="sr-only" :checked="modelValue" :disabled="readonly" :required="required"
                 @change="onChange" />
@@ -16,12 +10,9 @@
             <div class="flex h-5 w-5 items-center justify-center rounded-md border transition-all duration-200
                bg-white shadow-sm
                focus-within:ring-2 focus-within:ring-slate-900
-               hover:bg-slate-50" :class="[
-                modelValue
-                    ? 'border-slate-900 bg-slate-900 text-white'
-                    : 'border-slate-300',
-            ]">
-                <!-- Check Icon -->
+               hover:bg-slate-50" :class="modelValue
+                ? 'border-slate-900 bg-slate-900 text-white'
+                : 'border-slate-300'">
                 <svg v-if="modelValue" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20"
                     fill="currentColor">
                     <path fill-rule="evenodd"
@@ -29,6 +20,12 @@
                         clip-rule="evenodd" />
                 </svg>
             </div>
+
+            <!-- Label text (AFTER checkbox) -->
+            <span v-if="label" class="text-sm font-medium text-slate-700">
+                {{ label }}
+                <span v-if="required" class="text-red-500 ml-0.5">*</span>
+            </span>
         </label>
 
         <!-- Description -->

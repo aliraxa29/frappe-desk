@@ -33,8 +33,11 @@
     </div>
 
     <!-- Right - User -->
-    <div class="relative">
-      <button @click="toggleUserMenu" :title="`${userFullName} (${userEmail})`" class="flex items-center gap-3 px-4 py-2 rounded-lg text-white hover:bg-gray-800 transition">
+    <div class="relative user-profile-menu">
+      <button 
+        @click="toggleUserMenu" 
+        :title="`${userFullName} (${userEmail})`" 
+        class="user-profile-button flex items-center gap-3 px-4 py-2 rounded-lg text-white hover:bg-gray-800 transition cursor-pointer">
         <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold text-white shrink-0 bg-linear-to-br from-blue-500 to-purple-500">
           {{ userInitials }}
         </div>
@@ -51,7 +54,7 @@
 
       <!-- Dropdown -->
       <transition name="fade">
-        <div v-if="showUserMenu" class="absolute right-0 mt-2 w-64 z-50 bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-2">
+        <div v-if="showUserMenu" class="user-menu absolute right-0 mt-2 w-64 z-50 bg-gray-800 border border-gray-700 rounded-lg shadow-xl p-2">
           <div class="flex items-center gap-3 px-4 py-3">
             <div class="w-12 h-12 rounded-full flex items-center justify-center font-semibold text-white shrink-0 bg-linear-to-br from-blue-500 to-purple-500">
               {{ userInitials }}
@@ -69,7 +72,7 @@
 
           <div class="h-px bg-gray-700 my-2"></div>
 
-          <button @click="handleLogout" class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-700 transition">
+          <button @click="handleLogout" class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-gray-300 hover:text-white hover:bg-gray-700 transition cursor-pointer">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -86,7 +89,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { user } from '../utils/user'
-import { desk } from '../utils/desk'
+import { useAuthStore } from '../stores/auth'
 import { Icon } from "@iconify/vue";
 import { router } from '../router';
 import { useRoute } from 'vue-router';
@@ -98,6 +101,7 @@ const showUserMenu = ref(false)
 const userFullName = ref('User')
 const userEmail = ref('user@example.com')
 const commandDialogRef = ref<InstanceType<typeof CommandDialog>>()
+const authStore = useAuthStore()
 
 const route = useRoute()
 
@@ -122,6 +126,14 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 }
 
+const handleClickOutside = (e: Event) => {
+  const target = e.target as HTMLElement
+  // Check if click is outside the user profile menu
+  if (!target.closest('.user-profile-menu')) {
+    showUserMenu.value = false
+  }
+}
+
 onMounted(() => {
   try {
     userFullName.value = user.get_full_name()
@@ -131,10 +143,12 @@ onMounted(() => {
   }
 
   document.addEventListener('keydown', handleKeyDown)
+  document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeyDown)
+  document.removeEventListener('click', handleClickOutside)
 })
 
 const goHome = () => {
@@ -148,27 +162,16 @@ const toggleUserMenu = () => {
 }
 
 const handleLogout = async () => {
-  await desk.call({
-    method: 'logout',
-    args: {}
-  }).then(() => {
-    window.location.href = '/login'
-  }).catch((err) => {
+  showUserMenu.value = false
+  
+  try {
+    await authStore.logout()
+    router.push({ name: 'Login' })
+  } catch (err) {
     console.error('Logout failed:', err)
-  })
-}
-
-// Close menu when clicking outside
-const handleClickOutside = (e: Event) => {
-  const target = e.target as HTMLElement
-  if (!target.closest('.user-profile-button') && !target.closest('.user-menu')) {
-    showUserMenu.value = false
+    window.location.href = '/login'
   }
 }
-
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
 </script>
 
 <style scoped></style>
