@@ -1,4 +1,4 @@
-import type { ListContext } from '@/types'
+import type { ListContext } from '../types'
 
 export const listRegistry = {
   lists: {} as Record<string, any[]>

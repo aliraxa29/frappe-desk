@@ -1,10 +1,10 @@
 <template>
   <nav class="sticky top-0 z-40 flex items-center justify-between gap-6 px-6 py-2 bg-gray-900/90 backdrop-blur border-b border-gray-800">
     <div class="flex items-center min-w-0 gap-3">
-      <Button variant="outline" @click="goHome" class="text-white hover:text-gray-900 shrink-0">
+      <button @click="goHome" class="text-white hover:text-white shrink-0 w-20 flex items-center gap-2 py-2 rounded-lg hover:bg-gray-800 cursor-pointer transition">
         <Icon icon="material-symbols-light:grid-on-sharp" class="w-6 h-6" />
         <span class="hidden sm:inline text-lg font-semibold">Apps</span>
-      </Button>
+      </button>
       
       <!-- Breadcrumbs -->
       <div class="flex-1 min-w-0 overflow-hidden">
@@ -94,7 +94,6 @@ import { Icon } from "@iconify/vue";
 import { router } from '../router';
 import { useRoute } from 'vue-router';
 import CommandDialog from '../components/CommandDialog.vue';
-import Button from '../components/Button.vue';
 import Breadcrumbs from '../components/Breadcrumbs.vue';
 
 const showUserMenu = ref(false)

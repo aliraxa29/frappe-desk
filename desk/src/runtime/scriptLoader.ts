@@ -55,9 +55,10 @@ export function injectScript(
 
   try {
     const jsContent = transpileScriptContent(content, scriptId)
+    const wrappedContent = `(function(){\n${jsContent}\n})();\n//# sourceURL=${scriptId}.js`
     const script = document.createElement('script')
     script.type = attributes?.type || 'text/javascript'
-    script.textContent = jsContent
+    script.textContent = wrappedContent
 
     // Add any additional attributes
     if (attributes) {

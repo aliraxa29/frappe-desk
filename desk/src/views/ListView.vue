@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { DocTypeMeta, DocTypeMetaResponse } from '../types'
 import { frappeClient } from '../api/resource'
@@ -40,10 +40,13 @@ import { useBreadcrumbStore } from '../stores/breadcrumbs'
 import AppLayout from '../layout/AppLayout.vue'
 import ListView from '../components/list/ListView.vue'
 import Button from '../components/Button.vue'
+import { realtime } from '../utils/socketio/client'
+import { useToastStore } from '../stores/toast'
 
 const route = useRoute()
 const router = useRouter()
 const breadcrumbStore = useBreadcrumbStore()
+const toast = useToastStore()
 
 const doctype = computed(() => (route.params.doctype as string) || '')
 const app = computed(() => (route.params.app as string) || '')
@@ -51,6 +54,9 @@ const app = computed(() => (route.params.app as string) || '')
 const listViewRef = ref<InstanceType<typeof ListView> | null>(null)
 const meta = ref<DocTypeMeta | null>(null)
 const selectedRows = ref<string[]>([])
+
+// Realtime subscription tracking
+const unsubscribeList = ref<(() => void) | null>(null)
 
 // Get display label for doctype
 const doctypeLabel = computed(() => {
@@ -62,6 +68,60 @@ watch([doctypeLabel, app], () => {
   breadcrumbStore.setForList(app.value, doctype.value, doctypeLabel.value)
 }, { immediate: true })
 
+/**
+ * Setup realtime subscriptions for list updates
+ */
+function setupRealtimeSubscriptions() {
+  if (!doctype.value) return
+
+  const handleListUpdate = (data: any) => {
+    if (data.doctype === doctype.value) {
+      console.log('[Realtime] List update for', doctype.value)
+      
+      // Refresh the list view
+      if (listViewRef.value?.refresh) {
+        listViewRef.value.refresh()
+        toast.show(`List updated in realtime`, 'info')
+      }
+    }
+  }
+
+  const handleDocUpdate = (data: any) => {
+    if (data.doctype === doctype.value) {
+      console.log('[Realtime] Doc update for list', doctype.value)
+
+      if (listViewRef.value?.refresh) {
+        listViewRef.value.refresh()
+        toast.show(`List updated in realtime`, 'info')
+      }
+    }
+  }
+
+  // Register global event listener
+  realtime.on('list_update', handleListUpdate)
+  realtime.on('doc_update', handleDocUpdate)
+
+  // Subscribe to doctype list updates
+  realtime.doctypeSubscribe(doctype.value, handleListUpdate)
+
+  // Store cleanup function
+  unsubscribeList.value = () => {
+    realtime.off('list_update', handleListUpdate)
+    realtime.off('doc_update', handleDocUpdate)
+    realtime.doctypeUnsubscribe(doctype.value, handleListUpdate)
+  }
+}
+
+/**
+ * Cleanup realtime subscriptions
+ */
+function cleanupRealtimeSubscriptions() {
+  if (unsubscribeList.value) {
+    unsubscribeList.value()
+    unsubscribeList.value = null
+  }
+}
+
 onMounted(async () => {
   try {
     const response = await frappeClient.getDocTypeMeta(doctype.value)
@@ -69,9 +129,27 @@ onMounted(async () => {
     
     // Update breadcrumbs with proper label
     breadcrumbStore.setForList(app.value, doctype.value, meta.value?.label || doctype.value)
+
+    // Setup realtime subscriptions
+    setupRealtimeSubscriptions()
   } catch (err) {
     console.error('Failed to load doctype meta:', err)
   }
+})
+
+// Cleanup on route change
+watch(doctype, (newDoctype, oldDoctype) => {
+  if (oldDoctype) {
+    cleanupRealtimeSubscriptions()
+  }
+  if (newDoctype) {
+    setupRealtimeSubscriptions()
+  }
+})
+
+// Cleanup on component unmount
+onUnmounted(() => {
+  cleanupRealtimeSubscriptions()
 })
 
 function handleNewDocument() {

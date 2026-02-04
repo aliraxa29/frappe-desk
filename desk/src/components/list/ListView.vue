@@ -442,6 +442,11 @@ async function refresh() {
   }
 }
 
+defineExpose({
+  refresh,
+  loadMeta
+})
+
 async function fetchTotalCount(filters: Record<string, any>) {
   try {
     const response = await frappeClient.callMethod('frappe.client.get_count', {

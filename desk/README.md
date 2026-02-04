@@ -1,141 +1,277 @@
 # Desk Application
 
-A modern Vue 3 + TypeScript + Vite desktop application with an integrated locals system for document management.
+A modern Vue 3 + TypeScript + Vite desktop application with Socket.IO realtime integration and Frappe locals system.
 
-## Features
+## ✨ Key Features
 
 - 🚀 **Vue 3** with Composition API and `<script setup>`
 - 📘 **TypeScript** for type safety
 - ⚡ **Vite** for fast development and builds
 - 🏪 **Pinia** for state management
 - 💾 **Locals System** - In-memory document storage (Frappe-like)
+- 🔄 **Socket.IO Realtime** - Document & list updates in real-time
 - 📦 **Document Management** - Full CRUD operations for documents
-- 🔄 **Server Sync** - Easy integration with backend APIs
+- 🔌 **API Proxy** - Seamless Frappe backend integration
 - 🎨 **Reactive UI** - Automatic updates when data changes
 
-## Project Structure
+## 📂 Project Structure
 
 ```
 desk/
 ├── src/
-│   ├── stores/          # Pinia stores (locals, user, session)
-│   ├── types/           # TypeScript type definitions
-│   ├── utils/           # Utilities (sync, model, composables)
-│   ├── components/      # Vue components
-│   ├── views/           # Page components
-│   ├── router/          # Vue Router configuration
-│   ├── App.vue          # Root component
-│   └── main.ts          # Entry point
-├── public/              # Static assets
-├── SETUP.md             # Installation guide
-├── QUICK_START.md       # Quick examples
-├── LOCALS_DOCUMENTATION.md  # Complete API reference
-└── package.json         # Dependencies
+│   ├── stores/           # Pinia stores (locals, user, session)
+│   ├── types/            # TypeScript type definitions
+│   ├── utils/
+│   │   ├── socketio/     # Socket.IO client & composables ⭐ NEW
+│   │   ├── sync/         # Server sync utilities
+│   │   └── ...
+│   ├── components/       # Vue components
+│   ├── views/            # Page components
+│   ├── router/           # Vue Router configuration
+│   ├── App.vue           # Root component
+│   └── main.ts           # Entry point
+├── public/               # Static assets
+├── vite.config.ts        # Vite configuration (with proxies) ⭐ 
+├── index.html            # Entry HTML with boot data
+└── package.json          # Dependencies (socket.io-client added)
 ```
 
-## Locals System
+## 🚀 Quick Start
 
-The **locals** system is a powerful in-memory document store similar to Frappe's locals pattern, but with full Vue 3 reactivity and TypeScript support.
-
-### Quick Example
-
-```vue
-<script setup>
-import { useDoc } from "@/utils/useLocals";
-
-const { doc, isDirty, save } = useDoc("Customer", "CUST-001");
-</script>
-
-<template>
-  <div v-if="doc">
-    <h1>{{ doc.title }}</h1>
-    <button @click="save" :disabled="!isDirty">Save</button>
-  </div>
-</template>
+### 1. Install Dependencies
+```bash
+cd /home/erp/bench15/apps/desktop/desk
+yarn install
 ```
 
-### Key Files
+### 2. Start Services (3 terminals)
 
-- `src/stores/locals.ts` - Pinia store for document storage
-- `src/utils/sync.ts` - Server synchronization utilities
-- `src/utils/model.ts` - Document manipulation utilities
-- `src/utils/useLocals.ts` - Vue composables for components
-- `src/utils/localsAdvanced.ts` - Advanced operations (search, pagination, etc.)
+**Terminal 1: Frappe Backend**
+```bash
+cd /home/erp/bench15
+bench serve                    # :8000
+```
 
-### Documentation
+**Terminal 2: Frontend Dev**
+```bash
+cd /home/erp/bench15/apps/desktop/desk
+yarn dev                       # :5173
+```
 
-- **[SETUP.md](./SETUP.md)** - Installation and setup guide
-- **[QUICK_START.md](./QUICK_START.md)** - Quick examples and patterns (5-minute read)
+**Terminal 3: Redis (for realtime)**
+```bash
+redis-server config/redis_cache.conf
+```
+
+### 3. Open Application
+```
+http://localhost:5173
+```
+
+## 🔌 What's New: Socket.IO Realtime Integration
+
+### Automatic Features
+- ✅ Document updates sync in real-time across tabs
+- ✅ List updates when other users make changes
+- ✅ Form viewer tracking (see who's editing)
+- ✅ Task progress notifications
+- ✅ Global msgprint and progress handling
+
+### Usage in Components
+
+```typescript
+// Document realtime subscription
+import { useDocRealtime } from '@/utils/socketio'
+
+useDocRealtime(
+  () => doctype,
+  () => docname,
+  (data) => {
+    console.log('Document updated:', data)
+  }
+)
+
+// List realtime subscription
+import { useListRealtime } from '@/utils/socketio'
+
+useListRealtime(
+  () => doctype,
+  (data) => {
+    console.log('List updated:', data)
+  }
+)
+```
+
+See **SOCKETIO_QUICK_REFERENCE.md** for more examples.
+
+## 🔧 Configuration
+
+### Vite Proxy Setup
+
+All requests are properly routed:
+- Development: `localhost:5173` → Proxies to `localhost:8000` (Frappe)
+- Production: Served directly from `localhost:8000/assets/desktop/dashboard/`
+- Socket.IO: Proxied to `localhost:9000` for realtime
+
+**Proxied Routes**:
+- `/api/*` → Frappe API
+- `/method/*` → RPC calls
+- `/assets/*` → Static files
+- `/upload_file` → File uploads
+- `/socket.io/*` → WebSocket realtime
+
+See **VITE_PROXY_CONFIG.md** for detailed configuration.
+
+### Environment
+
+Create `.env` file if needed:
+
+```env
+VITE_APP_NAME=Desk
+NODE_ENV=development
+```
+
+## 📚 Documentation
+
+### Setup & Development
+- **[DEVELOPMENT_SETUP.md](./DEVELOPMENT_SETUP.md)** ⭐ START HERE - Complete development guide
+- **[VITE_SETUP_COMPLETE.md](./VITE_SETUP_COMPLETE.md)** - Vite configuration summary
+
+### Socket.IO Realtime
+- **[SOCKETIO_INTEGRATION.md](./SOCKETIO_INTEGRATION.md)** - Complete Socket.IO API reference
+- **[SOCKETIO_QUICK_REFERENCE.md](./SOCKETIO_QUICK_REFERENCE.md)** - Quick code examples
+
+### Proxy & Networking
+- **[VITE_PROXY_CONFIG.md](./VITE_PROXY_CONFIG.md)** - Detailed proxy configuration
+
+### Locals System (Legacy)
+- **[SETUP.md](./SETUP.md)** - Installation guide
+- **[QUICK_START.md](./QUICK_START.md)** - Quick examples
 - **[LOCALS_DOCUMENTATION.md](./LOCALS_DOCUMENTATION.md)** - Complete API reference
-- **[IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)** - What was implemented
 
-### Common Tasks
-
-#### Display a Document
-```typescript
-import { useDoc } from "@/utils/useLocals";
-
-const { doc } = useDoc("Customer", "CUST-001");
-```
-
-#### List Documents
-```typescript
-import { useDocType } from "@/utils/useLocals";
-
-const { docs } = useDocType("Customer");
-```
-
-#### Sync from Server
-```typescript
-import { syncDocuments } from "@/utils/sync";
-
-const response = await fetch("/api/resource/Customer/CUST-001");
-const data = await response.json();
-syncDocuments({ docs: [data] });
-```
-
-#### Save Changes
-```typescript
-const { doc, save } = useDoc("Customer", "CUST-001");
-doc.title = "New Name";
-await save();
-```
-
-## Development
+## 💻 Development Commands
 
 ### Install Dependencies
 ```bash
 yarn install
-# or
-npm install
 ```
 
 ### Run Development Server
 ```bash
 yarn dev
-# or
-npm run dev
+# Runs on http://localhost:5173
+# With hot reload and proxy to :8000
 ```
 
 ### Build for Production
 ```bash
 yarn build
-# or
-npm run build
+# Output: ../../desktop/desktop/public/dashboard/
+```
+
+### Preview Production Build
+```bash
+yarn preview
 ```
 
 ### Type Check
 ```bash
 yarn type-check
-# or
-npm run type-check
 ```
 
-## Technologies
+## 🏗️ Architecture
+
+### Development Server Flow
+```
+Browser :5173
+    ↓
+Vite Dev Server (hot reload)
+    ├─ Serves frontend code
+    ├─ Proxies /api → :8000
+    ├─ Proxies /socket.io → :9000
+    └─ Reloads on file changes
+```
+
+### Production Flow
+```
+Browser
+    ↓
+Frappe :8000
+    ├─ Serves built assets from /assets/desktop/dashboard/
+    ├─ Handles /api calls
+    └─ Socket.IO connects to :9000
+```
+
+## 🎯 Real-time Features
+
+### Document Subscriptions
+```typescript
+realtime.docSubscribe(doctype, docname, callback)
+realtime.docOpen(doctype, docname)          // Track viewers
+realtime.docClose(doctype, docname)         // Stop tracking
+```
+
+### List Subscriptions
+```typescript
+realtime.doctypeSubscribe(doctype, callback)
+```
+
+### Task Progress
+```typescript
+realtime.taskSubscribe(taskId, callback)
+```
+
+### Global Events
+```typescript
+realtime.on('msgprint', (data) => {})
+realtime.on('progress', (data) => {})
+realtime.on('doc_update', (data) => {})
+realtime.on('list_update', (data) => {})
+```
+
+See **SOCKETIO_QUICK_REFERENCE.md** for complete API.
+
+## 🔍 Debugging
+
+### Check Services
+```bash
+# Frappe backend
+curl http://localhost:8000
+
+# Frontend dev
+curl http://localhost:5173
+
+# Socket.IO
+curl http://localhost:9000/socket.io
+```
+
+### Browser Console
+```javascript
+// Check realtime connection
+console.log('Connected:', window.dash.realtime?.isConnected?.())
+
+// View boot data
+console.log(window.dash.boot)
+
+// Manual event test
+window.dash.realtime?.on('doc_update', console.log)
+```
+
+### View Logs
+```bash
+# Frappe logs
+tail -f /home/erp/bench15/logs/frappe.log
+
+# Dev server console (Terminal 2)
+# Shows Vite messages and proxy activity
+```
+
+## 📦 Technologies
 
 - **Vue 3** - Progressive JavaScript framework
 - **TypeScript** - Typed JavaScript
 - **Vite** - Next generation frontend tooling
+
 - **Pinia** - State management (Vue 3)
 - **Vue Router** - Official router for Vue
 

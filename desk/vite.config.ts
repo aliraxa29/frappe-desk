@@ -19,19 +19,41 @@ export default defineConfig({
     }
   },
   server: {
+    port: 5173,
+    middlewareMode: false,
     proxy: {
       '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api')
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
+            console.log('[Proxy] API Request:', req.method, req.url)
+          })
+        }
       },
       '/method': {
         target: 'http://localhost:8000',
-        changeOrigin: true
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/method/, '/method')
       },
       '/assets': {
         target: 'http://localhost:8000',
         changeOrigin: true
+      },
+      '/upload_file': {
+        target: 'http://localhost:8000',
+        changeOrigin: true
+      },
+      '/api/resource': {
+        target: 'http://localhost:8000',
+        changeOrigin: true
+      },
+      '/socket.io': {
+        target: 'http://localhost:9000',
+        changeOrigin: true,
+        ws: true,
+        rewrite: (path) => path.replace(/^\/socket.io/, '/socket.io')
       },
       '/src/apps': {
         target: 'http://localhost:5173',
@@ -47,13 +69,22 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    exclude: ['@vite/client', '@vite/env']
+    exclude: ['@vite/client', '@vite/env'],
+    include: ['socket.io-client']
   },
   build: {
     outDir: path.resolve(__dirname, '../../desktop/desktop/public/dashboard'),
     emptyOutDir: true,
+    sourcemap: true,
     rollupOptions: {
       input: path.resolve(__dirname, 'index.html'),
+      output: {
+        manualChunks: {
+          'vendor-vue': ['vue', 'vue-router', 'pinia'],
+          'vendor-socketio': ['socket.io-client'],
+          'vendor-ui': ['tailwindcss']
+        }
+      }
     }
   }
 })

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, markRaw, type Component } from 'vue'
 
-export type DialogType = 'confirm' | 'alert' | 'prompt' | 'error' | 'custom'
+export type DialogType = 'confirm' | 'alert' | 'prompt' | 'error' | 'custom' | 'progress'
 
 export interface DialogButton {
   label: string
@@ -19,6 +19,8 @@ export interface DialogOptions {
   secondaryButton?: DialogButton
   showClose?: boolean
   size?: 'sm' | 'md' | 'lg' | 'xl'
+  // For progress dialogs
+  percent?: number
   // For prompt dialogs
   inputLabel?: string
   inputPlaceholder?: string
@@ -59,7 +61,7 @@ export const useDialogStore = defineStore('dialog', () => {
   }
 
   function close(id: string, result?: any) {
-    const index = dialogs.value.findIndex(d => d.id === id)
+    const index = dialogs.value.findIndex((d: any) => d.id === id)
     if (index > -1) {
       const dialog = dialogs.value[index]
       if (dialog) {
@@ -70,7 +72,7 @@ export const useDialogStore = defineStore('dialog', () => {
   }
 
   function cancel(id: string) {
-    const index = dialogs.value.findIndex(d => d.id === id)
+    const index = dialogs.value.findIndex((d: any) => d.id === id)
     if (index > -1) {
       const dialog = dialogs.value[index]
       if (dialog) {
@@ -81,7 +83,7 @@ export const useDialogStore = defineStore('dialog', () => {
   }
 
   function updateInputValue(id: string, value: string) {
-    const dialog = dialogs.value.find(d => d.id === id)
+    const dialog = dialogs.value.find((d: any) => d.id === id)
     if (dialog) {
       dialog.inputValue = value
     }
@@ -221,6 +223,25 @@ export const useDialogStore = defineStore('dialog', () => {
     })
   }
 
+  // Progress dialog: create or update an in-flight progress dialog
+  function progress(options: { title: string; message?: string; percent?: number }): Promise<void> {
+    const existing = dialogs.value.find((d: any) => d.type === 'progress' && d.title === options.title)
+    if (existing) {
+      existing.message = options.message ?? existing.message
+      existing.percent = options.percent ?? existing.percent ?? 0
+      return Promise.resolve()
+    }
+    return open({
+      type: 'progress',
+      title: options.title,
+      message: options.message,
+      icon: 'info',
+      size: 'sm',
+      showClose: false,
+      percent: options.percent ?? 0
+    }).then(() => { })
+  }
+
   return {
     dialogs,
     open,
@@ -234,7 +255,8 @@ export const useDialogStore = defineStore('dialog', () => {
     warning,
     prompt,
     confirmDelete,
-    custom
+    custom,
+    progress
   }
 })
 
@@ -255,5 +277,6 @@ export const dialog = {
     component: Component,
     props?: Record<string, any>,
     options?: Partial<DialogOptions>
-  ) => getDialogStore().custom(component, props, options)
+  ) => getDialogStore().custom(component, props, options),
+  progress: (opts: { title: string; message?: string; percent?: number }) => getDialogStore().progress(opts)
 }

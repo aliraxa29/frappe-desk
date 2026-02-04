@@ -65,6 +65,14 @@ app_cover_image = "/assets/desktop/images/no-image.png"
 # 	"Role": "home_page"
 # }
 
+# Website Route Rules
+# -------------------
+# Serve the Dashboard SPA for deep links under /dashboard
+website_route_rules = [
+	{"from_route": "/dashboard", "to_route": "dashboard"},
+	{"from_route": "/dashboard/<path:app_path>", "to_route": "dashboard"},
+]
+
 # Generators
 # ----------
 
