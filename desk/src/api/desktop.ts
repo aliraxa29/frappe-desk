@@ -82,6 +82,62 @@ class DesktopAPI {
   }
 
   /**
+   * Get bench apps that are not installed on this site
+   */
+  async getAvailableApps(): Promise<AppInfo[]> {
+    try {
+      const response = await desk.call({
+        method: 'desktop.api.apps.get_available_apps'
+      })
+
+      if (response.message) {
+        return response.message
+      }
+
+      return []
+    } catch (error) {
+      console.error('Failed to fetch available apps:', error)
+      return []
+    }
+  }
+
+  /**
+   * Install an app from bench
+   */
+  async installApp(app: string): Promise<any> {
+    const response = await desk.call({
+      method: 'desktop.api.apps.install_app',
+      args: { app },
+      freeze: true,
+      freeze_message: `Installing ${app}...`
+    })
+
+    // Clear all caches to ensure new doctypes appear immediately
+    this.appsCache = null
+    this.searchDataCache = null
+    this.lastFetchTime = 0
+    return response.message
+  }
+
+  /**
+   * Uninstall an app from this site
+   */
+  async uninstallApp(app: string): Promise<any> {
+    const response = await desk.call({
+      method: 'desktop.api.apps.uninstall_app',
+      args: { app },
+      freeze: true,
+      freeze_message: `Uninstalling ${app}...`
+    })
+
+    // Clear all caches to ensure removed doctypes disappear immediately
+    this.appsCache = null
+    this.searchDataCache = null
+    this.lastFetchTime = 0
+    return response.message
+  }
+
+  /**
    * Get all searchable items (doctypes, modules, workspaces, etc.)
    * This is loaded once and cached for the search dialog
    */

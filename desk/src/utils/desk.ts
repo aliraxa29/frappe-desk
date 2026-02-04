@@ -3,6 +3,8 @@
  * Similar to frappe.call but using raw fetch and returning promises
  */
 
+import { useFreezeStore } from '../stores/freeze'
+
 export interface DeskCallOptions {
   method: string
   args?: Record<string, any>
@@ -10,6 +12,7 @@ export interface DeskCallOptions {
   callback?: (response: any) => void
   error?: (error: any) => void
   freeze?: boolean
+  freeze_message?: string
   async?: boolean
   statusCode?: Record<number, (response: any) => void>
 }
@@ -42,6 +45,7 @@ export async function call(options: DeskCallOptions): Promise<any> {
     callback,
     error: errorCallback,
     freeze = false,
+    freeze_message = 'Loading...',
     statusCode = {}
   } = options
 
@@ -52,6 +56,13 @@ export async function call(options: DeskCallOptions): Promise<any> {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     'X-Frappe-CSRF-Token': getCookie('frappe_csrf_token') || ''
+  }
+
+  // Freeze if requested
+  let freezeStore: ReturnType<typeof useFreezeStore> | null = null
+  if (freeze) {
+    freezeStore = useFreezeStore()
+    freezeStore.freeze(freeze_message)
   }
 
   try {
@@ -104,6 +115,11 @@ export async function call(options: DeskCallOptions): Promise<any> {
       errorCallback(err)
     }
     throw err
+  } finally {
+    // Always unfreeze
+    if (freeze && freezeStore) {
+      freezeStore.unfreeze()
+    }
   }
 }
 
@@ -165,5 +181,35 @@ export const desk = {
   call,
   post,
   get,
-  buildUrl
+  buildUrl,
+  // Expose freeze functions for custom scripting
+  freeze: (message?: string) => {
+    const freezeStore = useFreezeStore()
+    let finalMessage = message || 'Loading...'
+
+    // Try to get translated message if available
+    try {
+      const __ = (window as any).__
+      if (typeof __ === 'function') {
+        finalMessage = message || __('Loading...')
+      }
+    } catch (e) {
+      // Translation not available, use default
+    }
+
+    freezeStore.freeze(finalMessage)
+  },
+  unfreeze: () => {
+    const freezeStore = useFreezeStore()
+    freezeStore.unfreeze()
+  }
+}
+
+// Make desk available globally for custom scripting
+if (typeof window !== 'undefined' && window) {
+  try {
+    ; (window as any).desk = desk
+  } catch (e) {
+    console.warn('Could not set global desk object:', e)
+  }
 }

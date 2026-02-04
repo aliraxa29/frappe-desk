@@ -9,10 +9,10 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input v-model="searchQuery" type="text" placeholder="Search apps, doctypes, pages..." class="command-input"
-              @input="handleSearch" @keydown.down="selectNext" @keydown.up="selectPrev" @keydown.enter="selectCurrent"
-              @keydown.esc="close" ref="inputRef" autofocus />
-            <button @click="close" class="close-button" title="Close (ESC)">
+            <input v-model="searchQuery" type="text" :placeholder="__('Search or type command...')"
+              class="command-input" @input="handleSearch" @keydown.down="selectNext" @keydown.up="selectPrev"
+              @keydown.enter="selectCurrent" @keydown.esc="close" ref="inputRef" autofocus />
+            <button @click="close" class="close-button" :title="__('Close (ESC)')">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -23,25 +23,25 @@
           <div class="command-results">
             <!-- No results -->
             <div v-if="!loading && searchQuery && totalResults === 0" class="no-results">
-              <p>No results found for "{{ searchQuery }}"</p>
+              <p>{{ __('No results found for "{0}"', [searchQuery]) }}</p>
             </div>
 
             <!-- Empty state (no search query) -->
             <div v-else-if="!searchQuery && !loading" class="empty-state">
-              <p class="empty-hint">Start typing to search for doctypes, modules, and more...</p>
+              <p class="empty-hint">{{ __('Start typing to search for doctypes, modules, and more...') }}</p>
             </div>
 
             <!-- Loading -->
             <div v-if="loading" class="loading-state">
               <div class="spinner"></div>
-              <p>Searching...</p>
+              <p>{{ __('Searching...') }}</p>
             </div>
 
             <!-- Results groups -->
             <div v-else-if="totalResults > 0" class="results-container">
               <!-- DocTypes Group -->
               <div v-if="groupedResults.doctype.length > 0" class="result-group">
-                <div class="result-group-label">DocTypes</div>
+                <div class="result-group-label">{{ __('DocTypes') }}</div>
                 <button v-for="(item, index) in groupedResults.doctype" :key="`dt-${item.name}`"
                   :class="['result-item', { 'result-item-selected': selectedIndex === groupStartIndices.doctype + index }]"
                   @click="selectItem(item)" @mouseover="selectedIndex = groupStartIndices.doctype + index">
@@ -56,7 +56,7 @@
 
               <!-- Modules Group -->
               <div v-if="groupedResults.module.length > 0" class="result-group">
-                <div class="result-group-label">Apps/Modules</div>
+                <div class="result-group-label">{{ __('Apps/Modules') }}</div>
                 <button v-for="(item, index) in groupedResults.module" :key="`mod-${item.name}`"
                   :class="['result-item', { 'result-item-selected': selectedIndex === groupStartIndices.module + index }]"
                   @click="selectItem(item)" @mouseover="selectedIndex = groupStartIndices.module + index">
@@ -73,7 +73,7 @@
 
               <!-- Workspaces Group -->
               <div v-if="groupedResults.workspace.length > 0" class="result-group">
-                <div class="result-group-label">Workspaces</div>
+                <div class="result-group-label">{{ __('Workspaces') }}</div>
                 <button v-for="(item, index) in groupedResults.workspace" :key="`ws-${item.name}`"
                   :class="['result-item', { 'result-item-selected': selectedIndex === groupStartIndices.workspace + index }]"
                   @click="selectItem(item)" @mouseover="selectedIndex = groupStartIndices.workspace + index">
@@ -88,7 +88,7 @@
 
               <!-- Recent Group -->
               <div v-if="groupedResults.recent.length > 0 && !searchQuery" class="result-group">
-                <div class="result-group-label">Recently Used</div>
+                <div class="result-group-label">{{ __('Recently Used') }}</div>
                 <button v-for="(item, index) in groupedResults.recent" :key="`recent-${item.name}`"
                   :class="['result-item', { 'result-item-selected': selectedIndex === groupStartIndices.recent + index }]"
                   @click="selectItem(item)" @mouseover="selectedIndex = groupStartIndices.recent + index">
@@ -124,9 +124,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { searchManager, type SearchResult } from '../utils/searchManager'
+import { __ } from '../utils/translate';
 
 const emit = defineEmits<{
   close: []

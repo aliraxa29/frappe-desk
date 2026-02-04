@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full bg-white dark:bg-slate-900 rounded-lg">
+  <div class="w-full bg-white dark:bg-gray-950 rounded-lg">
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center h-64">
       <div class="text-sm text-slate-500">Loading list...</div>
@@ -107,7 +107,7 @@
             <tr
               v-for="row in rows"
               :key="row.name"
-              class="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+              class="hover:bg-slate-50 dark:hover:bg-[#383838] cursor-pointer transition-colors"
               @click="openDocument(row.name!)"
             >
               <!-- Checkbox -->
@@ -129,7 +129,7 @@
               >
                 <!-- Subject (title field + name) -->
                 <template v-if="col.type === 'Subject'">
-                  <div class="font-medium text-slate-900 hover:text-blue-600">
+                  <div class="font-medium text-slate-900 hover:text-blue-600 dark:text-white dark:hover:text-gray-400">
                     {{ getSubjectValue(row) }}
                   </div>
                   <div v-if="meta?.title_field && meta.title_field !== 'name'" class="text-xs text-slate-500">

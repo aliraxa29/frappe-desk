@@ -3,12 +3,9 @@
     <template #header>
       <div class="flex items-center justify-between gap-4 w-full my-3">
         <div class="flex items-center gap-3">
-          <h2 class="text-lg font-semibold text-slate-800">
+          <h2 class="text-lg font-semibold text-slate-800 dark:text-white">
             {{ doctypeLabel }}
           </h2>
-          <span v-if="meta" class="text-sm text-slate-500">
-            {{ meta.module }}
-          </span>
         </div>
         <div class="flex items-center gap-2">
           <Button @click="handleNewDocument" variant="primary" size="sm">
@@ -20,7 +17,7 @@
 
     <template #content>
       <!-- List Component -->
-      <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+      <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-gray-950 overflow-hidden mt-1">
         <ListView 
           ref="listViewRef"
           :doctype="doctype" 
@@ -34,7 +31,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { DocTypeMeta, DocTypeMetaResponse } from '../types'
+import type { DocTypeMeta } from '../types'
 import { frappeClient } from '../api/resource'
 import { useBreadcrumbStore } from '../stores/breadcrumbs'
 import AppLayout from '../layout/AppLayout.vue'

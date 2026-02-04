@@ -81,8 +81,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor-vue': ['vue', 'vue-router', 'pinia'],
-          'vendor-socketio': ['socket.io-client'],
-          'vendor-ui': ['tailwindcss']
+          'vendor-socketio': ['socket.io-client']
         }
       }
     }

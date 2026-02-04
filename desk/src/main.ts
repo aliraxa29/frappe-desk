@@ -10,6 +10,8 @@ import desk_object from "./plugins/desk_object"
 import { realtime } from './utils/socketio/client'
 import { initializeRealtimeNotifications } from './utils/socketio/notifications'
 import { useThemeStore } from './stores/theme'
+import { useTranslationStore } from './stores/translation'
+import './utils/translate' // Import to register global __ function
 
 initializeGlobals()
 
@@ -25,6 +27,17 @@ themeStore.initializeTheme()
 themeStore.watchSystemTheme()
 
 const bootData = (window as any).dash?.boot || {}
+
+// Initialize translations
+try {
+  const translationStore = useTranslationStore(pinia)
+  if (bootData.__messages) {
+    translationStore.loadTranslations(bootData.__messages, bootData.lang)
+  }
+} catch (error) {
+  console.warn('Failed to initialize translations:', error)
+}
+
 realtime.init(bootData)
 
 initializeRealtimeNotifications()

@@ -1,22 +1,68 @@
 <template>
-  <div v-if="loading" class="loading">Loading applications...</div>
-  <div v-else class="desk-container">
+  <!-- Loading state -->
+  <div v-if="loading" class="flex items-center justify-center min-h-screen text-lg text-[--text-tertiary]">
+    {{ __('Loading applications...') }}
+  </div>
+
+  <!-- Main container -->
+  <div v-else
+    class="min-h-screen dark:bg-gray-950 dark:bg-none bg-[linear-gradient(135deg,var(--bg-primary)_0%,var(--bg-secondary)_50%,var(--bg-tertiary)_100%)]">
     <Navbar />
-    <div class="apps-section">
-      <div class="section-header">
-        <h2>Your Apps</h2>
-        <p class="text-gray-400">Click on any app to view and manage</p>
+
+    <!-- Apps section -->
+    <div class="px-6 py-8 md:px-6 md:py-8 sm:px-4 sm:py-6">
+      <!-- Installed apps -->
+      <div class="mb-10">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-[--text-primary] mb-2 dark:text-white">
+            {{ __('Installed Apps') }}
+          </h2>
+          <p class="text-[--text-secondary] dark:text-white">
+            {{ __('Click on any app to view and manage') }}
+          </p>
+        </div>
+
+        <!-- Empty state -->
+        <div v-if="installedApps.length === 0" class="text-center text-sm text-[var(--text-secondary)]">
+          {{ __('No apps installed') }}
+        </div>
+
+        <!-- Apps grid -->
+        <div v-else class="grid gap-6
+                 grid-cols-1
+                 sm:grid-cols-2
+                 md:grid-cols-3
+                 lg:grid-cols-4
+                 xl:grid-cols-5">
+          <AppCard v-for="app in installedApps" :key="app.name" :app="app" show-actions installed @select="selectApp"
+            @uninstall="confirmUninstall" />
+        </div>
       </div>
-      <div v-if="apps.length === 0" class="empty-state">
-        <p>No apps found</p>
-      </div>
-      <div v-else class="grid gap-6
-         grid-cols-1
-         sm:grid-cols-2
-         md:grid-cols-3
-         lg:grid-cols-4
-         xl:grid-cols-5">
-        <AppCard v-for="app in apps" :key="app.name" :app="app" @select="selectApp" />
+
+      <!-- Available apps (bench) -->
+      <div>
+        <div class="mb-6">
+          <h2 class="text-xl font-bold text-[--text-primary] mb-2 dark:text-white">
+            {{ __('Available Apps (Not Installed)') }}
+          </h2>
+          <p class="text-[--text-secondary] dark:text-white">
+            {{ __('Apps available on the site can be installed here') }}
+          </p>
+        </div>
+
+        <div v-if="availableApps.length === 0" class="text-center text-sm text-[var(--text-secondary)]">
+          {{ __('No available apps found') }}
+        </div>
+
+        <div v-else class="grid gap-6
+                 grid-cols-1
+                 sm:grid-cols-2
+                 md:grid-cols-3
+                 lg:grid-cols-4
+                 xl:grid-cols-5">
+          <AppCard v-for="app in availableApps" :key="app.name" :app="app" show-actions :installed="false"
+            :selectable="false" @install="confirmInstall" />
+        </div>
       </div>
     </div>
   </div>
@@ -28,20 +74,23 @@ import { useRouter, useRoute } from 'vue-router'
 import type { AppInfo } from '../types'
 import { desktopAPI } from '../api/desktop'
 import { useBreadcrumbStore } from '../stores/breadcrumbs'
+import { useDialogStore } from '../stores/dialog'
+import { __ } from '../utils/translate'
+import { getErrorMessage, formatErrorMessage } from '../utils/errorHandler'
 import Navbar from '../layout/Navbar.vue'
 import AppCard from '../components/AppCard.vue'
-
 
 const router = useRouter()
 const route = useRoute()
 const breadcrumbStore = useBreadcrumbStore()
+const dialogStore = useDialogStore()
 const loading = ref(true)
-const apps = ref<AppInfo[]>([])
+const installedApps = ref<AppInfo[]>([])
+const availableApps = ref<AppInfo[]>([])
 
 const defaultApps: AppInfo[] = []
 
 onMounted(async () => {
-  // Clear breadcrumbs on home page
   breadcrumbStore.clear()
   await getApps()
 })
@@ -49,18 +98,18 @@ onMounted(async () => {
 async function getApps() {
   try {
     loading.value = true
-    const apiApps = await desktopAPI.getInstalledApps()
+    const [apiApps, benchApps] = await Promise.all([
+      desktopAPI.getInstalledApps(),
+      desktopAPI.getAvailableApps()
+    ])
 
-    if (apiApps && apiApps.length > 0) {
-      apps.value = apiApps
-    } else {
-      apps.value = defaultApps
-    }
-
+    installedApps.value = apiApps && apiApps.length > 0 ? apiApps : defaultApps
+    availableApps.value = benchApps || []
     loading.value = false
   } catch (error) {
     console.error('Failed to load apps:', error)
-    apps.value = defaultApps
+    installedApps.value = defaultApps
+    availableApps.value = []
     loading.value = false
   }
 }
@@ -72,6 +121,90 @@ async function selectApp(app_name: string) {
   })
 }
 
+async function confirmInstall(app_name: string) {
+  const app = availableApps.value.find((item) => item.name === app_name)
+  const label = app?.title || app_name
+
+  const confirmed = await dialogStore.confirm(
+    __('Install App'),
+    __('Are you sure you want to install {0}?', { 0: label })
+  )
+
+  if (!confirmed) {
+    return
+  }
+
+  try {
+    const response = await desktopAPI.installApp(app_name)
+    
+    if (response && response.message) {
+      await dialogStore.alert(
+        __('Installation Successful'),
+        response.message
+      )
+    } else {
+      await dialogStore.alert(
+        __('Installation Successful'),
+        __('App {0} has been installed successfully.', { 0: label })
+      )
+    }
+    
+    // Hard refresh to reload all metadata and boot data from server
+    window.location.href = window.location.href
+  } catch (error: any) {
+    // Extract error from response data if available (Frappe API error response)
+    const frappeError = error?.response?.data || error
+    const rawErrorMessage = getErrorMessage(frappeError)
+    const errorMessage = formatErrorMessage(rawErrorMessage)
+    await dialogStore.error(
+      __('Installation Failed'),
+      errorMessage
+    )
+  }
+}
+
+async function confirmUninstall(app_name: string) {
+  const app = installedApps.value.find((item) => item.name === app_name)
+  const label = app?.title || app_name
+
+  const confirmed = await dialogStore.warning(
+    __('Uninstall App'),
+    __('Are you sure you want to uninstall {0}? This action cannot be undone.', { 0: label })
+  )
+
+  if (!confirmed) {
+    return
+  }
+
+  try {
+    const response = await desktopAPI.uninstallApp(app_name)
+    
+    if (response && response.message) {
+      await dialogStore.alert(
+        __('Uninstallation Successful'),
+        response.message
+      )
+    } else {
+      await dialogStore.alert(
+        __('Uninstallation Successful'),
+        __('App {0} has been uninstalled successfully.', { 0: label })
+      )
+    }
+    
+    // Hard refresh to reload all metadata and boot data from server
+    window.location.href = window.location.href
+  } catch (error: any) {
+    // Extract error from response data if available (Frappe API error response)
+    const frappeError = error?.response?.data || error
+    const rawErrorMessage = getErrorMessage(frappeError)
+    const errorMessage = formatErrorMessage(rawErrorMessage)
+    await dialogStore.error(
+      __('Uninstallation Failed'),
+      errorMessage
+    )
+  }
+}
+
 watch(
   () => route.fullPath,
   async () => {
@@ -79,186 +212,3 @@ watch(
   }
 )
 </script>
-
-<style scoped>
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  font-size: 1.2rem;
-  color: var(--text-tertiary);
-}
-
-.desk-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
-}
-
-.section-header {
-  margin-bottom: 1.5rem;
-}
-
-.section-header h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
-  margin-top: 0;
-}
-
-.apps-section {
-  padding: 2rem 1.5rem;
-}
-
-.apps-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1.5rem;
-}
-
-@media (max-width: 768px) {
-  .apps-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (min-width: 768px) {
-  .apps-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  }
-}
-
-@media (min-width: 1024px) {
-  .apps-grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  }
-}
-
-.app-card {
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.app-card:hover {
-  border-color: var(--button-primary);
-  box-shadow: 0 20px 25px -5px rgba(59,130,246,0.08);
-  transform: scale(1.05);
-}
-
-.app-icon {
-  width: 4rem;
-  height: 4rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #a855f7 100%);
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  font-weight: 700;
-  color: white;
-  margin-bottom: 1rem;
-  transition: all 0.3s;
-}
-
-.app-card:hover .app-icon {
-  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-  transform: scale(1.1);
-}
-
-.app-card h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 1rem 0 0.5rem 0;
-}
-
-.app-card p {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-}
-
-.doctypes-section {
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border);
-  margin: 2rem 1.5rem;
-  border-radius: 0.75rem;
-  padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
-}
-
-.doctypes-section .section-header h2 {
-  font-size: 1.5rem;
-}
-
-.doctypes-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  max-height: 24rem;
-  overflow-y: auto;
-}
-
-.doctypes-list::-webkit-scrollbar {
-  width: 0.5rem;
-}
-
-.doctypes-list::-webkit-scrollbar-track {
-  background-color: var(--bg-primary);
-  border-radius: 0.25rem;
-}
-
-.doctypes-list::-webkit-scrollbar-thumb {
-  background-color: var(--border);
-  border-radius: 0.25rem;
-}
-
-.doctypes-list::-webkit-scrollbar-thumb:hover {
-  background-color: #6b7280;
-}
-
-.doctype-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  background-color: var(--bg-tertiary);
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  border-left: 4px solid transparent;
-}
-
-.doctype-item:hover {
-  background-color: var(--button-primary);
-  border-left-color: var(--button-primary);
-  transform: translateX(0.25rem);
-}
-
-.doctype-name {
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.doctype-action {
-  color: var(--button-primary);
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-@media (max-width: 768px) {
-  .apps-section {
-    padding: 1.5rem 1rem;
-  }
-
-  .doctypes-section {
-    margin: 1.5rem 1rem;
-    padding: 1.5rem;
-  }
-}
-</style>

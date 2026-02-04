@@ -1,9 +1,9 @@
 <template>
   <AppLayout>
     <template #header>
-      <div class="flex items-center justify-between gap-4 w-full my-3">
+      <div class="flex items-center justify-between gap-4 w-full my-4">
         <div class="flex items-center gap-3">
-          <h2 class="text-lg font-semibold text-slate-800">
+          <h2 class="text-lg font-semibold text-slate-800 dark:text-white">
             {{ formatLabel(moduleName) }}
           </h2>
           <span class="text-sm text-slate-500">

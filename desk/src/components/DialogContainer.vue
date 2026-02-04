@@ -92,7 +92,7 @@
                 :class="[`btn-${dialog.secondaryButton.variant || 'secondary'}`]"
                 @click="handleSecondaryAction(dialog)"
               >
-                {{ dialog.secondaryButton.label }}
+                {{ __(dialog.secondaryButton.label) }}
               </button>
               <button
                 v-if="dialog.primaryButton"
@@ -100,7 +100,7 @@
                 :class="[`btn-${dialog.primaryButton.variant || 'primary'}`]"
                 @click="handlePrimaryAction(dialog)"
               >
-                {{ dialog.primaryButton.label }}
+                {{ __(dialog.primaryButton.label) }}
               </button>
             </div>
           </div>
@@ -113,6 +113,7 @@
 <script setup lang="ts">
 import { useDialogStore, type Dialog } from '../stores/dialog'
 import { storeToRefs } from 'pinia'
+import { __ } from '../utils/translate'
 
 const dialogStore = useDialogStore()
 const { dialogs } = storeToRefs(dialogStore)

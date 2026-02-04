@@ -11,15 +11,15 @@
             <!-- Main Content -->
             <main class="flex-1 flex flex-col overflow-hidden">
                 <!-- Page Header - Fixed Position -->
-                <div class="fixed left-64 right-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 z-20" style="top: 64px;">
+                <div class="fixed left-64 top-14 right-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 z-20">
                     <!-- Header slot -->
-                    <div class="px-6 flex items-center justify-between">
+                    <div class="px-6 flex items-center justify-between dark:bg-gray-950">
                         <slot name="header" />
                     </div>
                 </div>
 
                 <!-- Page Content - Scrollable with margin for fixed header -->
-                <div class="flex-1 overflow-y-auto p-2 bg-transparent text-slate-900 dark:text-slate-100" style="margin-top: 60px;">
+                <div class="flex-1 overflow-y-auto p-2 bg-transparent text-slate-900 dark:bg-gray-950 mt-14">
                     <slot name="content" />
                 </div>
             </main>
@@ -29,7 +29,6 @@
 
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import AppSidebar from './AppSidebar.vue';
 import Navbar from './Navbar.vue';
 

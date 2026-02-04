@@ -2,6 +2,7 @@
 import { RouterView } from 'vue-router'
 import ToastContainer from './components/ToastContainer.vue'
 import DialogContainer from './components/DialogContainer.vue'
+import FreezeOverlay from './components/FreezeOverlay.vue'
 import { computed } from 'vue'
 import { useThemeStore } from './stores/theme'
 
@@ -14,6 +15,7 @@ const isDark = computed(() => themeStore.getEffectiveTheme() === 'dark')
     <RouterView />
     <ToastContainer />
     <DialogContainer />
+    <FreezeOverlay />
   </div>
 </template>
 

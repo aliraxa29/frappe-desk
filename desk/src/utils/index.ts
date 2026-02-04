@@ -20,4 +20,7 @@ window.desk = {
         defineForm,
         defineList
     }
-}
+};
+
+(window as any).defineForm = defineForm;
+(window as any).defineList = defineList;

@@ -186,6 +186,18 @@ website_route_rules = [
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "desktop.event.get_events"
 # }
+
+# Whitelisted methods for API endpoints
+whitelisted_methods = {
+	"desktop.api.apps.get_installed_apps": "desktop.api.apps.get_installed_apps",
+	"desktop.api.apps.get_available_apps": "desktop.api.apps.get_available_apps",
+	"desktop.api.apps.install_app": "desktop.api.apps.install_app",
+	"desktop.api.apps.uninstall_app": "desktop.api.apps.uninstall_app",
+	"desktop.api.apps.get_search_data": "desktop.api.apps.get_search_data",
+	"desktop.api.apps.get_module_doctypes": "desktop.api.apps.get_module_doctypes",
+	"desktop.api.apps.search_doctypes": "desktop.api.apps.search_doctypes",
+	"desktop.api.apps.get_module_sidebar": "desktop.api.apps.get_module_sidebar",
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,

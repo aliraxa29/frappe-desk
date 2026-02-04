@@ -1,8 +1,8 @@
 <template>
-    <aside class="fixed left-0 top-16 w-64 h-[calc(100vh-64px)] flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 z-30">
+    <aside class="fixed left-0 top-14 bottom-0 w-64 flex flex-col bg-white dark:bg-gray-950 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 z-30">
         <!-- Sidebar Header -->
-        <div class="px-6 py-4 border-b border-slate-200 shrink-0">
-            <h2 class="text-lg font-semibold text-slate-800 truncate">
+        <div class="px-6 py-4 border-b border-slate-200 dark:border-gray-800 shrink-0">
+            <h2 class="text-lg font-semibold text-slate-800 dark:text-white truncate">
                 {{ route.params.app }}
             </h2>
         </div>
@@ -15,7 +15,7 @@
         </div>
 
         <!-- Sidebar Content - Scrollable -->
-        <div ref="sidebarContentRef" class="flex-1 overflow-y-auto px-2 py-3">
+        <div ref="sidebarContentRef" class="flex-1 overflow-y-auto px-2 py-3 dark:bg-gray-950">
             <!-- Empty -->
             <div v-if="allSidebarEmpty" class="py-10 text-center text-sm text-slate-400">
                 No sidebar items

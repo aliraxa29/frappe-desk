@@ -1,9 +1,9 @@
 <template>
-  <nav class="sticky top-0 z-40 flex items-center justify-between gap-6 px-6 py-2 bg-slate-900/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-800 dark:border-slate-700 text-white transition-colors">
+  <nav class="sticky top-0 z-40 flex items-center justify-between gap-6 px-6 py-1 bg-slate-900/90 dark:bg-gray-950 backdrop-blur border-b border-slate-800 dark:border-slate-700 text-white transition-colors">
     <div class="flex items-center min-w-0 gap-3">
       <button @click="goHome" class="text-white hover:text-white shrink-0 w-20 flex items-center gap-2 py-2 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 cursor-pointer transition">
         <Icon icon="material-symbols-light:grid-on-sharp" class="w-6 h-6" />
-        <span class="hidden sm:inline text-lg font-semibold">Apps</span>
+        <span class="hidden sm:inline text-lg font-semibold">{{ __('Apps') }}</span>
       </button>
       
       <!-- Breadcrumbs -->
@@ -11,7 +11,7 @@
         <Breadcrumbs />
       </div>
     </div>
-    <div class="hidden md:flex flex-1 max-w-md mx-auto">
+    <div class="hidden md:flex flex-1 max-w-sm mx-auto">
       <div class="relative w-full cursor-pointer" @click="openCommandDialog">
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor"
           viewBox="0 0 24 24">
@@ -21,12 +21,12 @@
 
         <input
           type="text"
-          placeholder="Search apps, doctypes... (Ctrl+K)"
+          :placeholder="__('Search or type command... (Ctrl+K)')"
           readonly
           @focus="openCommandDialog"
-          class="w-full rounded-lg bg-slate-800 dark:bg-slate-700 border border-slate-700 dark:border-slate-600 pl-10 pr-14 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition"
+          class="w-full rounded-lg bg-slate-800 dark:bg-gray-900 border border-slate-700 dark:border-gray-900 pl-10 pr-14 py-1 text-white placeholder-slate-400 dark:placeholder-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition"
         />
-        <span class="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs font-mono text-slate-400 bg-slate-700 dark:bg-slate-600 border border-slate-600 dark:border-slate-500 rounded">
+        <span class="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs font-mono text-slate-400 bg-slate-700 dark:bg-slate-600 border border-slate-600 dark:border-slate-500 rounded dark:text-white">
           ⌘K
         </span>
       </div>
@@ -87,7 +87,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            Logout
+            {{ __('Logout') }}
           </button>
         </div>
       </transition>
@@ -106,6 +106,7 @@ import { router } from '../router';
 import { useRoute } from 'vue-router';
 import CommandDialog from '../components/CommandDialog.vue';
 import Breadcrumbs from '../components/Breadcrumbs.vue';
+import { __ } from '../utils/translate';
 
 const showUserMenu = ref(false)
 const userFullName = ref('User')

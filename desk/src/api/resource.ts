@@ -1,4 +1,4 @@
-import type { APIResponse, ListResponse, DocTypeMeta, DocTypeMetaResponse, Document } from '../types'
+import type { ListResponse, DocTypeMetaResponse, Document } from '../types'
 import { desk } from '../utils/desk'
 import { toast } from '../stores/toast'
 
