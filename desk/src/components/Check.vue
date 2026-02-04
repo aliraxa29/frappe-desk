@@ -8,7 +8,7 @@
 
             <!-- Custom checkbox -->
             <div class="flex h-5 w-5 items-center justify-center rounded-md border transition-all duration-200
-               bg-white shadow-sm
+               bg-white dark:bg-slate-800 shadow-sm
                focus-within:ring-2 focus-within:ring-slate-900
                hover:bg-slate-50" :class="modelValue
                 ? 'border-slate-900 bg-slate-900 text-white'

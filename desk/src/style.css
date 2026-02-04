@@ -1,1 +1,72 @@
 @import "tailwindcss";
+
+/* Light mode colors (default) */
+:root,
+html.light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-hover: #e2e8f0;
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  
+  --border: #e2e8f0;
+  --border-light: #f1f5f9;
+  
+  --navbar-bg: #1e293b;
+  --navbar-border: #334155;
+  --navbar-text: #ffffff;
+  --navbar-hover: #334155;
+  
+  --sidebar-bg: #ffffff;
+  --sidebar-text: #0f172a;
+  --sidebar-hover: #f1f5f9;
+  --sidebar-border: #e2e8f0;
+  
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --input-text: #0f172a;
+  --input-placeholder: #94a3b8;
+  
+  --button-primary: #3b82f6;
+  --button-primary-hover: #2563eb;
+  --button-secondary: #e2e8f0;
+  --button-secondary-text: #0f172a;
+}
+
+/* Dark mode colors */
+html.dark {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --bg-hover: #475569;
+  
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #94a3b8;
+  
+  --border: #334155;
+  --border-light: #1e293b;
+  
+  --navbar-bg: #1e293b;
+  --navbar-border: #334155;
+  --navbar-text: #f1f5f9;
+  --navbar-hover: #334155;
+  
+  --sidebar-bg: #0f172a;
+  --sidebar-text: #f1f5f9;
+  --sidebar-hover: #1e293b;
+  --sidebar-border: #334155;
+  
+  --input-bg: #1e293b;
+  --input-border: #475569;
+  --input-text: #f1f5f9;
+  --input-placeholder: #64748b;
+  
+  --button-primary: #3b82f6;
+  --button-primary-hover: #2563eb;
+  --button-secondary: #334155;
+  --button-secondary-text: #f1f5f9;
+}

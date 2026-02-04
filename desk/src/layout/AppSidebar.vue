@@ -1,5 +1,5 @@
 <template>
-    <aside class="fixed left-0 top-16 w-64 h-[calc(100vh-64px)] flex flex-col bg-white border-r border-slate-200 z-30">
+    <aside class="fixed left-0 top-16 w-64 h-[calc(100vh-64px)] flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 z-30">
         <!-- Sidebar Header -->
         <div class="px-6 py-4 border-b border-slate-200 shrink-0">
             <h2 class="text-lg font-semibold text-slate-800 truncate">
@@ -8,9 +8,9 @@
         </div>
 
         <!-- Search -->
-        <div class="px-4 py-3 border-b border-slate-200 shrink-0">
-            <input v-model="searchQuery" type="text" placeholder="Search…" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm
-               text-slate-700 placeholder-slate-400
+        <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-800 shrink-0">
+            <input v-model="searchQuery" type="text" placeholder="Search…" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm
+               text-slate-700 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500
                focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900" />
         </div>
 
@@ -29,7 +29,7 @@
                     </h4>
 
                     <div v-for="item in groupedSidebar.doctypes" :key="`doctype-${item.name}`"
-                        @click="handleDoctypeClick(item)" :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition cursor-pointer', isItemActive(item) ? 'bg-slate-200 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-100']"><span class="text-base">
+                        @click="handleDoctypeClick(item)" :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition cursor-pointer', isItemActive(item) ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800']"><span class="text-base">
                             {{ item.icon || '📄' }}
                         </span>
                         <span class="truncate">
@@ -45,7 +45,7 @@
                     </h4>
 
                     <router-link v-for="item in groupedSidebar.pages" :key="`page-${item.name}`" :to="getRoute(item)"
-                        :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', isPageActive(item) ? 'bg-slate-200 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-100']"><span class="text-base">
+                        :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', isPageActive(item) ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800']"><span class="text-base">
                             {{ item.icon || '📄' }}
                         </span>
                         <span class="truncate">
@@ -61,7 +61,7 @@
                     </h4>
 
                     <router-link v-for="item in groupedSidebar.reports" :key="`report-${item.name}`"
-                        :to="getRoute(item)" :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', isPageActive(item) ? 'bg-slate-200 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-100']"><span class="text-base">
+                        :to="getRoute(item)" :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', isPageActive(item) ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800']"><span class="text-base">
                             {{ item.icon || '�' }}
                         </span>
                         <span class="truncate">
@@ -77,7 +77,7 @@
                     </h4>
 
                     <router-link v-for="item in groupedSidebar.dashboards" :key="`dashboard-${item.name}`"
-                        :to="getRoute(item)" :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', isPageActive(item) ? 'bg-slate-200 text-slate-900 font-semibold' : 'text-slate-700 hover:bg-slate-100']"><span class="text-base">
+                        :to="getRoute(item)" :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', isPageActive(item) ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800']"><span class="text-base">
                             {{ item.icon || '📈' }}
                         </span>
                         <span class="truncate">

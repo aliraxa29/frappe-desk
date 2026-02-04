@@ -1,8 +1,8 @@
 <template>
-    <div @click="selectApp(app.name)" class="group cursor-pointer overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 transition-all duration-300
-         hover:-translate-y-1 hover:scale-[1.02] hover:border-violet-500 hover:shadow-2xl hover:shadow-violet-500/20">
+        <div @click="selectApp(app.name)" class="group cursor-pointer overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-all duration-300
+            hover:-translate-y-1 hover:scale-[1.02] hover:border-violet-500 hover:shadow-2xl hover:shadow-violet-500/20">
         <!-- Cover / Image -->
-        <div class="relative h-28 bg-linear-to-br from-slate-800 to-slate-950">
+        <div class="relative h-28 bg-linear-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-950">
             <img :src="app.image || '/assets/desktop/images/no-image.png'" alt=""
                 class="h-full w-full object-cover opacity-70" />
 
@@ -16,11 +16,11 @@
 
         <!-- Content -->
         <div class="px-5 pb-5 pt-8">
-            <h3 class="truncate text-base font-semibold text-slate-100">
+            <h3 class="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
                 {{ app.title }}
             </h3>
 
-            <p class="mt-1 line-clamp-2 text-sm text-slate-400">
+            <p class="mt-1 line-clamp-2 text-sm text-slate-600 dark:text-slate-400">
                 {{ app.description || 'No description available' }}
             </p>
         </div>

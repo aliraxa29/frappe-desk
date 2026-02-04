@@ -6,7 +6,7 @@
     </label>
 
     <div class="relative">
-      <div class="flex items-center gap-1 border border-[#ddd] rounded bg-white overflow-hidden transition-colors duration-200 focus-within:border-[#0066cc] focus-within:shadow-[0_0_0_3px_rgba(0,102,204,0.1)]">
+      <div class="flex items-center gap-1 border border-[#ddd] dark:border-slate-700 rounded bg-white dark:bg-slate-800 overflow-hidden transition-colors duration-200 focus-within:border-[#0066cc] focus-within:shadow-[0_0_0_3px_rgba(0,102,204,0.1)]">
         <input
           autocomplete="off"
           :id="`field-${field.fieldname}`"
@@ -15,19 +15,19 @@
           :required="field.reqd"
           :placeholder="`Select a ${field.options || 'record'}...`"
           type="text"
-          class="flex-1 px-3 py-2 outline-none text-[0.95rem] bg-white transition-colors duration-200 read-only:bg-gray-100 read-only:cursor-not-allowed"
+          class="flex-1 px-3 py-2 outline-none text-[0.95rem] bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-200 read-only:bg-gray-100 read-only:dark:bg-slate-700 read-only:cursor-not-allowed"
           @input="handleInput" @focus="handleFocus"
           @keydown="handleKeydown" @blur="handleBlur"
         />
         <button v-if="currentValue && !field.read_only" 
-          class="px-2 py-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer" title="Open"
+          class="px-2 py-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer" title="Open"
           @click="openDocument">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
         </button>
         <button v-if="currentValue && !field.read_only"
-          class="px-2 py-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer" title="Clear"
+          class="px-2 py-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer" title="Clear"
           @click="clearValue">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -40,7 +40,7 @@
 
       <!-- Dropdown Options -->
       <div v-if="showDropdown"
-        class="absolute top-full left-0 right-0 mt-1 bg-white border border-[#ddd] rounded shadow-lg z-18 max-h-87.5 overflow-y-auto">
+        class="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-[#ddd] dark:border-slate-700 rounded shadow-lg z-18 max-h-87.5 overflow-y-auto">
         <!-- Loading State -->
         <div v-if="loading" class="p-3 text-center text-sm text-slate-500">
           <div class="flex items-center justify-center gap-2">
@@ -50,21 +50,21 @@
         </div>
 
         <!-- Options List -->
-        <div v-else-if="allItems.length > 0">
+            <div v-else-if="allItems.length > 0">
           <!-- Search Results -->
-          <button v-for="(item, idx) in filteredResults" :key="`result-${item.value}`"
-            class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 transition-colors border-b border-slate-100 last:border-b-0 cursor-pointer"
-            :class="selectedIdx === idx ? 'bg-blue-100 text-blue-900' : 'text-slate-700'" @click="selectItem(item)"
+            <button v-for="(item, idx) in filteredResults" :key="`result-${item.value}`"
+            class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-b-0 cursor-pointer"
+            :class="selectedIdx === idx ? 'bg-blue-100 text-blue-900 dark:text-blue-200' : 'text-slate-700 dark:text-slate-200'" @click="selectItem(item)"
             @mouseenter="selectedIdx = idx">
             <div class="font-medium">{{ item.label }}</div>
             <div v-if="item.description" class="text-xs text-slate-500 mt-0.5">{{ item.description }}</div>
           </button>
 
           <!-- Action Options (Create, Advanced Search, etc) -->
-          <div v-if="actionItems.length > 0" class="border-t border-slate-200">
+            <div v-if="actionItems.length > 0" class="border-t border-slate-200 dark:border-slate-700">
             <button v-for="(item, idx) in actionItems" :key="`action-${item.value}`" type="button"
-              class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 transition-colors border-b border-slate-100 last:border-b-0 text-slate-600 flex items-center gap-2 cursor-pointer"
-              :class="selectedIdx === filteredResults.length + idx ? 'bg-blue-100 text-blue-900' : ''"
+              class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-b-0 text-slate-600 dark:text-slate-200 flex items-center gap-2 cursor-pointer"
+              :class="selectedIdx === filteredResults.length + idx ? 'bg-blue-100 text-blue-900 dark:text-blue-200' : ''"
               @click="selectItem(item)" @mouseenter="selectedIdx = filteredResults.length + idx">
               <span v-if="item.icon" class="text-base">{{ item.icon }}</span>
               <span>{{ item.label }}</span>

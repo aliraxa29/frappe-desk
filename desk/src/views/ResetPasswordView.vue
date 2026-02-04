@@ -50,10 +50,10 @@ function goBackToLogin() {
 
     <!-- Reset password card -->
     <div class="relative w-full max-w-md">
-      <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden text-slate-900 dark:text-slate-100">
         <!-- Header -->
         <div class="bg-linear-to-r from-blue-600 to-indigo-600 px-8 py-12 text-center">
-          <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+          <div class="w-12 h-12 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
@@ -67,7 +67,7 @@ function goBackToLogin() {
         <!-- Form content -->
         <div class="px-8 py-10">
           <!-- Success message -->
-          <div v-if="submitted" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div v-if="submitted" class="mb-6 p-4 bg-green-50 dark:bg-emerald-900/20 border border-green-200 dark:border-emerald-700 rounded-lg">
             <div class="flex items-start gap-3">
               <svg class="w-5 h-5 text-green-600 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd"
@@ -75,8 +75,8 @@ function goBackToLogin() {
                   clip-rule="evenodd"></path>
               </svg>
               <div>
-                <p class="font-medium text-green-900">Reset link sent!</p>
-                <p class="text-sm text-green-800 mt-1">Check your email for a password reset link. Redirecting you back
+                <p class="font-medium text-green-900 dark:text-emerald-300">Reset link sent!</p>
+                <p class="text-sm text-green-800 dark:text-emerald-200 mt-1">Check your email for a password reset link. Redirecting you back
                   to login in a few seconds...</p>
               </div>
             </div>
@@ -84,23 +84,23 @@ function goBackToLogin() {
 
           <!-- Error message -->
           <div v-else-if="errorMessage"
-            class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+            class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg flex items-start gap-3">
             <svg class="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                 clip-rule="evenodd"></path>
             </svg>
-            <p class="text-sm text-red-800">{{ errorMessage }}</p>
+            <p class="text-sm text-red-800 dark:text-red-300">{{ errorMessage }}</p>
           </div>
 
           <!-- Form -->
           <div v-if="!submitted" class="space-y-6">
             <!-- Login ID field -->
             <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-2">Email or Username</label>
+              <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Email or Username</label>
               <input v-model="loginId" type="text" placeholder="you@example.com or username" :disabled="isLoading"
                 @keydown.enter="handleResetRequest"
-                class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition disabled:bg-slate-100 disabled:cursor-not-allowed" />
+                class="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 disabled:bg-slate-100 disabled:dark:bg-slate-700 disabled:cursor-not-allowed" />
               <p class="mt-2 text-xs text-slate-500">Enter the email address or username associated with your account
               </p>
             </div>
@@ -121,7 +121,7 @@ function goBackToLogin() {
 
             <!-- Back to login -->
             <button @click="goBackToLogin" :disabled="isLoading" type="button"
-              class="w-full py-2 px-4 text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+              class="w-full py-2 px-4 text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
               ← Back to Sign In
             </button>
           </div>
@@ -136,19 +136,19 @@ function goBackToLogin() {
         </div>
 
         <!-- Footer -->
-        <div class="px-8 py-4 bg-slate-50 border-t border-slate-200">
-          <p class="text-xs text-slate-500 text-center">
+        <div class="px-8 py-4 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
+          <p class="text-xs text-slate-500 dark:text-slate-300 text-center">
             Didn't receive an email?
-            <a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium">Check your spam folder or contact
+            <a href="#" class="text-indigo-600 hover:text-indigo-700 dark:text-indigo-300 font-medium">Check your spam folder or contact
               support</a>
           </p>
         </div>
       </div>
 
       <!-- Additional help -->
-      <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h3 class="text-sm font-semibold text-blue-900 mb-2">Didn't work?</h3>
-        <p class="text-sm text-blue-800">If you're still having trouble accessing your account, please contact our
+      <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-2">Didn't work?</h3>
+        <p class="text-sm text-blue-800 dark:text-blue-200">If you're still having trouble accessing your account, please contact our
           support team.</p>
       </div>
     </div>

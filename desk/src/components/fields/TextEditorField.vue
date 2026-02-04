@@ -1,14 +1,14 @@
 <template>
   <div class="mb-4 flex flex-col relative">
-    <label v-if="field.label" class="font-medium mb-1 text-sm text-slate-700">
+    <label v-if="field.label" class="font-medium mb-1 text-sm text-slate-700 dark:text-slate-200">
       {{ field.label }}
       <span v-if="field.reqd" class="text-red-500 ml-1">*</span>
     </label>
 
-    <div class="border border-[#ddd] rounded bg-white overflow-hidden">
+    <div class="border border-[#ddd] dark:border-slate-700 rounded bg-white dark:bg-slate-800 overflow-hidden">
       <div
         ref="toolbarRef"
-        class="ql-toolbar ql-snow border-b border-[#ddd] bg-slate-50"
+        class="ql-toolbar ql-snow border-b border-[#ddd] dark:border-slate-700 bg-slate-50 dark:bg-slate-800"
       >
         <!-- Font and Size -->
         <span class="ql-formats">
@@ -117,7 +117,7 @@
         </span>
       </div>
 
-      <div ref="editorRef" class="min-h-[300px] text-[0.95rem] leading-relaxed"></div>
+      <div ref="editorRef" class="min-h-[300px] text-[0.95rem] leading-relaxed text-slate-900 dark:text-slate-100"></div>
     </div>
 
     <small v-if="field.description" class="block text-gray-600 mt-1 text-[0.85rem]">{{ field.description }}</small>

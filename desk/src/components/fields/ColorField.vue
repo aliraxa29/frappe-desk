@@ -8,7 +8,7 @@
     <div class="relative">
       <input ref="inputRef" v-model="hexInput" type="text" :placeholder="field.description || 'Choose a color'"
         :disabled="field.read_only" :required="field.reqd && !field.read_only"
-        class="w-full pl-8 pr-3 py-2 border border-[#ddd] rounded focus:outline-none focus:border-[#0066cc] focus:shadow-[0_0_0_3px_rgba(0,102,204,0.1)] disabled:bg-gray-100 disabled:cursor-not-allowed text-[0.95rem] transition-colors duration-200"
+        class="w-full pl-8 pr-3 py-2 border border-[#ddd] dark:border-slate-700 rounded focus:outline-none focus:border-[#0066cc] focus:shadow-[0_0_0_3px_rgba(0,102,204,0.1)] disabled:bg-gray-100 disabled:dark:bg-slate-700 disabled:cursor-not-allowed text-[0.95rem] transition-colors duration-200 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
         @focus="showPicker = true" @input="handleHexInput" />
 
       <!-- Color preview circle -->
@@ -21,7 +21,7 @@
 
     <Transition name="picker">
       <div v-if="showPicker" ref="pickerRef"
-        class="absolute top-full left-0 mt-2 w-52.5 bg-white border border-gray-300 rounded-lg shadow-lg p-3 z-18">
+        class="absolute top-full left-0 mt-2 w-52.5 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg shadow-lg p-3 z-18">
         <!-- Swatches Section -->
         <div>
           <div class="text-xs text-gray-500 font-medium mb-2 uppercase tracking-wide">Swatches</div>

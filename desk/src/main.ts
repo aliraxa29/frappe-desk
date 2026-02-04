@@ -9,6 +9,7 @@ import { initializeLocalsGlobal } from "./utils/locals/localsGlobal"
 import desk_object from "./plugins/desk_object"
 import { realtime } from './utils/socketio/client'
 import { initializeRealtimeNotifications } from './utils/socketio/notifications'
+import { useThemeStore } from './stores/theme'
 
 initializeGlobals()
 
@@ -17,6 +18,11 @@ const pinia = createPinia()
 app.use(pinia)
 
 initializeLocalsGlobal(pinia)
+
+// Initialize theme
+const themeStore = useThemeStore(pinia)
+themeStore.initializeTheme()
+themeStore.watchSystemTheme()
 
 const bootData = (window as any).dash?.boot || {}
 realtime.init(bootData)

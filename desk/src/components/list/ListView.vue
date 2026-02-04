@@ -1,26 +1,26 @@
 <template>
-  <div class="w-full bg-white rounded-lg">
+  <div class="w-full bg-white dark:bg-slate-900 rounded-lg">
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center h-64">
       <div class="text-sm text-slate-500">Loading list...</div>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="p-4 rounded-lg border border-red-200 bg-red-50 text-sm text-red-700">
+    <div v-else-if="error" class="p-4 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-700 text-sm text-red-700 dark:text-red-300">
       {{ error }}
     </div>
 
     <!-- List Content -->
     <template v-else>
       <!-- Filters Bar -->
-      <div class="flex items-center gap-3 p-4 border-b border-slate-200">
+      <div class="flex items-center gap-3 p-4 border-b border-slate-200 dark:border-slate-800">
         <!-- Search -->
         <div class="flex-1 max-w-sm">
           <input
             v-model="searchQuery"
             type="text"
             placeholder="Search..."
-            class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
           />
         </div>
 
@@ -29,7 +29,7 @@
           <select
             v-if="filter.fieldtype === 'Select'"
             v-model="activeFilters[filter.fieldname]"
-            class="px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             @change="applyFilters"
           >
             <option value="">{{ filter.label }}</option>
@@ -40,7 +40,7 @@
             v-model="activeFilters[filter.fieldname]"
             type="text"
             :placeholder="filter.label"
-            class="px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             @change="applyFilters"
           />
         </div>
@@ -49,7 +49,7 @@
         <button
           v-if="hasActiveFilters"
           @click="clearFilters"
-          class="px-3 py-2 text-sm text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+          class="px-3 py-2 text-sm text-slate-600 hover:text-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
         >
           Clear
         </button>
@@ -57,7 +57,7 @@
         <!-- Refresh -->
         <button
           @click="refresh"
-          class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+          class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
           title="Refresh"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,7 +69,7 @@
       <!-- Table -->
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-slate-50 border-b border-slate-200">
+          <thead class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800">
             <tr>
               <!-- Checkbox column -->
               <th class="w-10 px-4 py-3">
@@ -84,7 +84,7 @@
               <th
                 v-for="col in columns"
                 :key="col.fieldname || col.type"
-                class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 select-none"
+                class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 select-none"
                 :class="{ 'w-64': col.type === 'Subject' }"
                 @click="toggleSort(col)"
               >
@@ -103,11 +103,11 @@
             </tr>
           </thead>
 
-          <tbody class="divide-y divide-slate-200">
+          <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
             <tr
               v-for="row in rows"
               :key="row.name"
-              class="hover:bg-slate-50 cursor-pointer transition-colors"
+              class="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
               @click="openDocument(row.name!)"
             >
               <!-- Checkbox -->
@@ -175,7 +175,7 @@
       </div>
 
       <!-- Pagination -->
-      <div class="flex items-center justify-between px-4 py-3 border-t border-slate-200">
+      <div class="flex items-center justify-between px-4 py-3 border-t border-slate-200 dark:border-slate-700">
         <div class="text-sm text-slate-600">
           Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ totalCount }} entries
         </div>
@@ -184,7 +184,7 @@
           <!-- Page size selector -->
           <select
             v-model="pageLength"
-            class="px-2 py-1 text-sm border border-slate-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="px-2 py-1 text-sm border border-slate-300 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             @change="refresh"
           >
             <option :value="20">20</option>
@@ -197,14 +197,14 @@
             <button
               @click="prevPage"
               :disabled="currentPage === 0"
-              class="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
             <button
               @click="nextPage"
               :disabled="!hasNextPage"
-              class="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>
@@ -529,20 +529,20 @@ function getStatusValue(row: Document): string {
 function getStatusClass(row: Document): string {
   const status = getStatusValue(row).toLowerCase()
   const statusClasses: Record<string, string> = {
-    'draft': 'bg-slate-100 text-slate-700',
-    'open': 'bg-blue-100 text-blue-700',
-    'pending': 'bg-yellow-100 text-yellow-700',
-    'submitted': 'bg-green-100 text-green-700',
-    'completed': 'bg-green-100 text-green-700',
-    'closed': 'bg-slate-100 text-slate-700',
-    'cancelled': 'bg-red-100 text-red-700',
-    'overdue': 'bg-red-100 text-red-700',
-    'active': 'bg-green-100 text-green-700',
-    'inactive': 'bg-slate-100 text-slate-700',
-    'enabled': 'bg-green-100 text-green-700',
-    'disabled': 'bg-slate-100 text-slate-700'
+    'draft': 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300',
+    'open': 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200',
+    'pending': 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-200',
+    'submitted': 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200',
+    'completed': 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200',
+    'closed': 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300',
+    'cancelled': 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200',
+    'overdue': 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200',
+    'active': 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200',
+    'inactive': 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300',
+    'enabled': 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200',
+    'disabled': 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
   }
-  return statusClasses[status] || 'bg-slate-100 text-slate-700'
+  return statusClasses[status] || 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
 }
 
 function getCellClass(col: ListColumn): string {
@@ -552,7 +552,7 @@ function getCellClass(col: ListColumn): string {
   if (col.df?.fieldtype === 'Check') {
     return 'text-center'
   }
-  return 'text-slate-700'
+  return 'text-slate-700 dark:text-slate-200'
 }
 
 function getCellComponent(df: Field) {

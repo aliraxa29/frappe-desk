@@ -21,10 +21,10 @@
         </div>
 
         <!-- Empty State -->
-        <div v-else-if="groupedSidebar.doctypes.length === 0 && groupedSidebar.pages.length === 0 && groupedSidebar.reports.length === 0" class="flex flex-col items-center justify-center h-64 text-center">
+        <div v-else-if="groupedSidebar.doctypes.length === 0 && groupedSidebar.pages.length === 0 && groupedSidebar.reports.length === 0" class="flex flex-col items-center justify-center h-64 text-center text-slate-900 dark:text-slate-100">
           <div class="text-5xl mb-4">📦</div>
-          <h3 class="text-lg font-semibold text-slate-700">No Items Found</h3>
-          <p class="text-sm text-slate-500 mt-1">This module has no doctypes or pages available</p>
+          <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-100">No Items Found</h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">This module has no doctypes or pages available</p>
         </div>
 
         <!-- Content Grid -->
@@ -37,10 +37,10 @@
                 v-for="item in groupedSidebar.doctypes"
                 :key="item.name"
                 @click="navigateToDoctype(item)"
-                class="group flex flex-col items-center gap-3 p-5 bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
+                class="group flex flex-col items-center gap-3 p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
               >
                 <span class="text-3xl">{{ item.icon || '📄' }}</span>
-                <span class="text-sm font-medium text-slate-700 text-center group-hover:text-blue-600 transition-colors">
+                <span class="text-sm font-medium text-slate-700 dark:text-slate-200 text-center group-hover:text-blue-600 transition-colors">
                   {{ item.label || item.name }}
                 </span>
               </div>
@@ -55,7 +55,7 @@
                 v-for="item in groupedSidebar.pages"
                 :key="item.name"
                 :to="getPageRoute(item)"
-                class="group flex flex-col items-center gap-3 p-5 bg-white rounded-xl border border-slate-200 hover:border-green-300 hover:shadow-md transition-all"
+                class="group flex flex-col items-center gap-3 p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-green-300 hover:shadow-md transition-all"
               >
                 <span class="text-3xl">{{ item.icon || '📑' }}</span>
                 <span class="text-sm font-medium text-slate-700 text-center group-hover:text-green-600 transition-colors">
@@ -73,7 +73,7 @@
                 v-for="item in groupedSidebar.reports"
                 :key="item.name"
                 :to="getReportRoute(item)"
-                class="group flex flex-col items-center gap-3 p-5 bg-white rounded-xl border border-slate-200 hover:border-purple-300 hover:shadow-md transition-all"
+                class="group flex flex-col items-center gap-3 p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-purple-300 hover:shadow-md transition-all"
               >
                 <span class="text-3xl">{{ item.icon || '📊' }}</span>
                 <span class="text-sm font-medium text-slate-700 text-center group-hover:text-purple-600 transition-colors">
@@ -91,7 +91,7 @@
                 v-for="item in groupedSidebar.dashboards"
                 :key="item.name"
                 :to="getDashboardRoute(item)"
-                class="group flex flex-col items-center gap-3 p-5 bg-white rounded-xl border border-slate-200 hover:border-orange-300 hover:shadow-md transition-all"
+                class="group flex flex-col items-center gap-3 p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-orange-300 hover:shadow-md transition-all"
               >
                 <span class="text-3xl">{{ item.icon || '📈' }}</span>
                 <span class="text-sm font-medium text-slate-700 text-center group-hover:text-orange-600 transition-colors">

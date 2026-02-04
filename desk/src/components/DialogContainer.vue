@@ -174,14 +174,15 @@ async function handleSecondaryAction(dialog: Dialog) {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(2,6,23,0.6);
   backdrop-filter: blur(2px);
 }
 
 .dialog-container {
-  background: #fff;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #0f172a);
   border-radius: 0.75rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 50px -12px rgba(2,6,23,0.45);
   max-height: calc(100vh - 2rem);
   overflow: hidden;
   display: flex;
@@ -193,242 +194,53 @@ async function handleSecondaryAction(dialog: Dialog) {
 .dialog-lg { width: 100%; max-width: 42rem; }
 .dialog-xl { width: 100%; max-width: 56rem; }
 
-.dialog-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-}
+.dialog-header { display:flex; align-items:flex-start; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid var(--border, #e2e8f0) }
+.dialog-header-content { display:flex; align-items:center; gap:0.75rem }
+.dialog-icon { display:flex; align-items:center; justify-content:center; width:2.5rem; height:2.5rem; border-radius:9999px; flex-shrink:0 }
+.dialog-icon svg { width:1.5rem; height:1.5rem }
 
-.dialog-header-content {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
+.icon-success { background:#dcfce7; color:#22c55e }
+.icon-error { background:#fee2e2; color:#ef4444 }
+.icon-warning { background:#fef3c7; color:#f59e0b }
+.icon-question { background:#dbeafe; color:#3b82f6 }
+.icon-info { background:#e0e7ff; color:#6366f1 }
 
-.dialog-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 9999px;
-  flex-shrink: 0;
-}
+.dialog-title { font-size:1.125rem; font-weight:600; margin:0; line-height:1.4; color:var(--text-primary,#0f172a) }
 
-.dialog-icon svg {
-  width: 1.5rem;
-  height: 1.5rem;
-}
+.dialog-close { display:flex; align-items:center; justify-content:center; width:2rem; height:2rem; padding:0; background:none; border:none; color:var(--text-tertiary,#94a3b8); cursor:pointer; border-radius:0.375rem; flex-shrink:0; transition:all 0.15s }
+.dialog-close:hover { color:var(--text-secondary,#64748b); background:var(--bg-tertiary,#f1f5f9) }
+.dialog-close svg { width:1.25rem; height:1.25rem }
 
-.icon-success {
-  background: #dcfce7;
-  color: #22c55e;
-}
+.dialog-body { padding:1.5rem; overflow-y:auto }
+.dialog-message { font-size:0.9375rem; color:var(--text-secondary,#475569); margin:0; line-height:1.6 }
 
-.icon-error {
-  background: #fee2e2;
-  color: #ef4444;
-}
+.dialog-input-wrapper { margin-top:1rem }
+.dialog-input-label { display:block; font-size:0.875rem; font-weight:500; color:var(--text-secondary,#374151); margin-bottom:0.5rem }
 
-.icon-warning {
-  background: #fef3c7;
-  color: #f59e0b;
+.dialog-input, .dialog-textarea {
+  width:100%; padding:0.625rem 0.875rem; font-size:0.9375rem; color:var(--input-text,#0f172a); background:var(--input-bg,#fff); border:1px solid var(--input-border,#d1d5db); border-radius:0.5rem; transition:all 0.15s
 }
+.dialog-input:focus, .dialog-textarea:focus { outline:none; border-color:var(--button-primary,#3b82f6); box-shadow:0 0 0 3px rgba(59,130,246,0.08) }
+.dialog-textarea { resize:vertical; min-height:5rem }
 
-.icon-question {
-  background: #dbeafe;
-  color: #3b82f6;
-}
+.dialog-footer { display:flex; align-items:center; justify-content:flex-end; gap:0.75rem; padding:1rem 1.5rem; border-top:1px solid var(--border,#e2e8f0); background:var(--bg-secondary,#f8fafc) }
 
-.icon-info {
-  background: #e0e7ff;
-  color: #6366f1;
-}
-
-.dialog-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0;
-  line-height: 1.4;
-}
-
-.dialog-close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  background: none;
-  border: none;
-  color: #94a3b8;
-  cursor: pointer;
-  border-radius: 0.375rem;
-  flex-shrink: 0;
-  transition: all 0.15s;
-}
-
-.dialog-close:hover {
-  color: #64748b;
-  background: #f1f5f9;
-}
-
-.dialog-close svg {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.dialog-body {
-  padding: 1.5rem;
-  overflow-y: auto;
-}
-
-.dialog-message {
-  font-size: 0.9375rem;
-  color: #475569;
-  margin: 0;
-  line-height: 1.6;
-}
-
-.dialog-input-wrapper {
-  margin-top: 1rem;
-}
-
-.dialog-input-label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 0.5rem;
-}
-
-.dialog-input,
-.dialog-textarea {
-  width: 100%;
-  padding: 0.625rem 0.875rem;
-  font-size: 0.9375rem;
-  color: #1e293b;
-  background: #fff;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  transition: all 0.15s;
-}
-
-.dialog-input:focus,
-.dialog-textarea:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.dialog-textarea {
-  resize: vertical;
-  min-height: 5rem;
-}
-
-.dialog-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #e2e8f0;
-  background: #f8fafc;
-}
-
-.dialog-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.15s;
-  border: 1px solid transparent;
-}
-
-.btn-primary {
-  background: #3b82f6;
-  color: #fff;
-}
-
-.btn-primary:hover {
-  background: #2563eb;
-}
-
-.btn-secondary {
-  background: #fff;
-  color: #374151;
-  border-color: #d1d5db;
-}
-
-.btn-secondary:hover {
-  background: #f9fafb;
-  border-color: #9ca3af;
-}
-
-.btn-danger {
-  background: #ef4444;
-  color: #fff;
-}
-
-.btn-danger:hover {
-  background: #dc2626;
-}
-
-.btn-ghost {
-  background: transparent;
-  color: #64748b;
-}
-
-.btn-ghost:hover {
-  background: #f1f5f9;
-  color: #334155;
-}
+.dialog-btn { display:inline-flex; align-items:center; justify-content:center; padding:0.5rem 1rem; font-size:0.875rem; font-weight:500; border-radius:0.5rem; cursor:pointer; transition:all 0.15s; border:1px solid transparent }
+.btn-primary { background:var(--button-primary,#3b82f6); color:#fff }
+.btn-primary:hover { background:var(--button-primary-hover,#2563eb) }
+.btn-secondary { background:var(--button-secondary,#fff); color:var(--button-secondary-text,#374151); border-color:var(--input-border,#d1d5db) }
+.btn-secondary:hover { background:var(--bg-tertiary,#f9fafb); border-color:var(--border,#9ca3af) }
+.btn-danger { background:#ef4444; color:#fff }
+.btn-danger:hover { background:#dc2626 }
+.btn-ghost { background:transparent; color:var(--text-tertiary,#64748b) }
+.btn-ghost:hover { background:var(--bg-tertiary,#f1f5f9); color:var(--text-primary,#334155) }
 
 /* Transitions */
-.dialog-backdrop-enter-active,
-.dialog-backdrop-leave-active {
-  transition: opacity 0.2s ease;
-}
+.dialog-backdrop-enter-active, .dialog-backdrop-leave-active { transition: opacity 0.2s ease }
+.dialog-backdrop-enter-from, .dialog-backdrop-leave-to { opacity:0 }
+.dialog-enter-active { animation: dialogIn 0.25s ease-out }
+.dialog-leave-active { animation: dialogOut 0.15s ease-in }
 
-.dialog-backdrop-enter-from,
-.dialog-backdrop-leave-to {
-  opacity: 0;
-}
-
-.dialog-enter-active {
-  animation: dialogIn 0.25s ease-out;
-}
-
-.dialog-leave-active {
-  animation: dialogOut 0.15s ease-in;
-}
-
-@keyframes dialogIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes dialogOut {
-  from {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.95) translateY(-10px);
-  }
-}
+@keyframes dialogIn { from { opacity:0; transform:scale(0.95) translateY(-10px) } to { opacity:1; transform:scale(1) translateY(0) } }
+@keyframes dialogOut { from { opacity:1; transform:scale(1) translateY(0) } to { opacity:0; transform:scale(0.95) translateY(-10px) } }
 </style>

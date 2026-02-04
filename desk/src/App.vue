@@ -2,10 +2,15 @@
 import { RouterView } from 'vue-router'
 import ToastContainer from './components/ToastContainer.vue'
 import DialogContainer from './components/DialogContainer.vue'
+import { computed } from 'vue'
+import { useThemeStore } from './stores/theme'
+
+const themeStore = useThemeStore()
+const isDark = computed(() => themeStore.getEffectiveTheme() === 'dark')
 </script>
 
 <template>
-  <div id="app">
+  <div id="app" :class="{ dark: isDark, light: !isDark }">
     <RouterView />
     <ToastContainer />
     <DialogContainer />
@@ -30,7 +35,26 @@ body,
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  background-color: #f5f5f5;
+body,
+#app {
+  background-color: #ffffff;
+  color: #000000;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark,
+.dark {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+/* Tailwind dark mode support */
+html.dark {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
 }
 </style>
+

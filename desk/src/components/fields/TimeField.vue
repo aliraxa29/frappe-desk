@@ -13,7 +13,7 @@
       :disabled="field.read_only"
       :required="field.reqd && !field.read_only"
       type="text"
-      class="w-full px-3 py-2 border border-[#ddd] rounded focus:outline-none focus:border-[#0066cc] focus:shadow-[0_0_0_3px_rgba(0,102,204,0.1)] disabled:bg-gray-100 disabled:cursor-not-allowed text-[0.95rem] transition-colors duration-200"
+      class="w-full px-3 py-2 border border-[#ddd] rounded focus:outline-none focus:border-[#0066cc] focus:shadow-[0_0_0_3px_rgba(0,102,204,0.1)] disabled:bg-gray-100 disabled:cursor-not-allowed text-[0.95rem] transition-colors duration-200 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
       readonly
       @focus="showPicker = true"
     />
@@ -25,7 +25,7 @@
       <div
         v-if="showPicker"
         ref="pickerRef"
-        class="absolute top-full left-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg p-3 z-18"
+        class="absolute top-full left-0 mt-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg shadow-lg p-3 z-18"
         style="width: 240px"
       >
         <!-- Time Display -->

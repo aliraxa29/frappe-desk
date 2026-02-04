@@ -11,7 +11,7 @@
             <!-- Main Content -->
             <main class="flex-1 flex flex-col overflow-hidden">
                 <!-- Page Header - Fixed Position -->
-                <div class="fixed left-64 right-0 bg-white border-b border-gray-200 z-20" style="top: 64px;">
+                <div class="fixed left-64 right-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 z-20" style="top: 64px;">
                     <!-- Header slot -->
                     <div class="px-6 flex items-center justify-between">
                         <slot name="header" />
@@ -19,7 +19,7 @@
                 </div>
 
                 <!-- Page Content - Scrollable with margin for fixed header -->
-                <div class="flex-1 overflow-y-auto p-2" style="margin-top: 60px;">
+                <div class="flex-1 overflow-y-auto p-2 bg-transparent text-slate-900 dark:text-slate-100" style="margin-top: 60px;">
                     <slot name="content" />
                 </div>
             </main>

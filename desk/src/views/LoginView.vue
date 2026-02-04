@@ -53,10 +53,10 @@ function goToResetPassword() {
 
     <!-- Login card -->
     <div class="relative w-full max-w-md">
-      <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden text-slate-900 dark:text-slate-100">
         <!-- Header -->
         <div class="bg-linear-to-r from-blue-600 to-indigo-600 px-8 py-12 text-center">
-          <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+          <div class="w-12 h-12 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
@@ -70,32 +70,32 @@ function goToResetPassword() {
         <!-- Form content -->
         <div class="px-8 py-10">
           <!-- Error message -->
-          <div v-if="errorMessage" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <div v-if="errorMessage" class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg flex items-start gap-3">
             <svg class="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                 clip-rule="evenodd"></path>
             </svg>
-            <p class="text-sm text-red-800">{{ errorMessage }}</p>
+            <p class="text-sm text-red-800 dark:text-red-300">{{ errorMessage }}</p>
           </div>
 
           <!-- Email field -->
           <div class="mb-6">
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Email or Username</label>
+            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Email or Username</label>
             <input v-model="email" type="text" placeholder="you@example.com" :disabled="isLoading"
               @keydown.enter="handleLogin"
-              class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition disabled:bg-slate-100 disabled:cursor-not-allowed" />
+              class="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 disabled:bg-slate-100 disabled:dark:bg-slate-700 disabled:cursor-not-allowed" />
           </div>
 
           <!-- Password field -->
           <div class="mb-2">
             <label class="block text-sm font-semibold text-slate-700 mb-2">Password</label>
-            <div class="relative">
+              <div class="relative">
               <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="••••••••"
                 :disabled="isLoading" @keydown.enter="handleLogin"
-                class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition disabled:bg-slate-100 disabled:cursor-not-allowed" />
+                class="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 disabled:bg-slate-100 disabled:dark:bg-slate-700 disabled:cursor-not-allowed" />
               <button @click="showPassword = !showPassword" :disabled="isLoading" type="button"
-                class="absolute right-3 top-4 text-slate-500 hover:text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+                class="absolute right-3 top-4 text-slate-500 dark:text-slate-300 hover:text-slate-700 dark:hover:text-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
                 <svg v-if="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -119,8 +119,8 @@ function goToResetPassword() {
           <!-- Remember me checkbox -->
           <div class="mb-6 flex items-center">
             <input v-model="rememberMe" type="checkbox" id="rememberMe" :disabled="isLoading"
-              class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed" />
-            <label for="rememberMe" class="ml-2 text-sm text-slate-600">Remember me</label>
+              class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed" />
+            <label for="rememberMe" class="ml-2 text-sm text-slate-600 dark:text-slate-300">Remember me</label>
           </div>
 
           <!-- Login button -->
@@ -140,22 +140,22 @@ function goToResetPassword() {
           <!-- Divider -->
           <div class="mt-8 relative">
             <div class="absolute inset-0 flex items-center">
-              <div class="w-full border-t border-slate-300"></div>
+              <div class="w-full border-t border-slate-300 dark:border-slate-700"></div>
             </div>
             <div class="relative flex justify-center text-sm">
-              <span class="px-2 bg-white text-slate-500">Don't have an account?</span>
+              <span class="px-2 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-300">Don't have an account?</span>
             </div>
           </div>
 
           <!-- Forgot password link -->
           <button @click="goToResetPassword" :disabled="isLoading" type="button"
-            class="w-full mt-6 py-2 px-4 text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+            class="w-full mt-6 py-2 px-4 text-sm font-medium text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
             Forgot your password?
           </button>
         </div>
 
         <!-- Footer -->
-        <div class="px-8 py-4 bg-slate-50 border-t border-slate-200 text-center text-xs text-slate-500">
+        <div class="px-8 py-4 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500 dark:text-slate-300">
           <p>By signing in, you agree to our Terms of Service and Privacy Policy</p>
         </div>
       </div>
