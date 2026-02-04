@@ -79,9 +79,20 @@ export default defineConfig({
     rollupOptions: {
       input: path.resolve(__dirname, 'index.html'),
       output: {
-        manualChunks: {
-          'vendor-vue': ['vue', 'vue-router', 'pinia'],
-          'vendor-socketio': ['socket.io-client']
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return
+
+          if (id.includes('node_modules/vue') || id.includes('node_modules/vue-router') || id.includes('node_modules/pinia')) {
+            return 'vendor-vue'
+          }
+
+          if (id.includes('node_modules/socket.io-client')) {
+            return 'vendor-socketio'
+          }
+
+          const parts = id.split('node_modules/')[1]?.split('/') || []
+          const pkg = parts[0]?.startsWith('@') ? `${parts[0]}/${parts[1]}` : parts[0]
+          return pkg ? `vendor-${pkg}` : 'vendor'
         }
       }
     }
