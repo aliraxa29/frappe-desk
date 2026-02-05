@@ -20,7 +20,7 @@
               :default-open="!section.collapsed"
               :class="getAccordionClasses(tab.sections, sectionIdx)"
             >
-              <div class="flex flex-col md:flex-row gap-6">
+              <div class="flex flex-col md:flex-row gap-6 mx-2">
                 <div v-for="(column, colIdx) in section.columns" :key="colIdx"
                   class="flex-1 flex flex-col gap-4 min-w-0">
                   <FieldRenderer v-for="field in column.fields" :key="field.fieldname" :field="field" :ctx="ctx"
@@ -35,7 +35,7 @@
                 <h3 class="text-sm font-semibold text-slate-800 m-0">{{ section.label }}</h3>
                 <p v-if="section.description" class="text-xs text-slate-500 mt-1 m-0">{{ section.description }}</p>
               </div>
-              <div class="flex flex-col md:flex-row gap-6">
+              <div class="flex flex-col md:flex-row gap-6 mx-2">
                 <div v-for="(column, colIdx) in section.columns" :key="colIdx"
                   class="flex-1 flex flex-col gap-4 min-w-0">
                   <FieldRenderer v-for="field in column.fields" :key="field.fieldname" :field="field" :ctx="ctx"
@@ -58,7 +58,7 @@
           :default-open="!section.collapsed"
           :class="getAccordionClasses(parsedSections, sectionIdx)"
         >
-          <div class="flex flex-col md:flex-row gap-6">
+          <div class="flex flex-col md:flex-row gap-6 mx-2">
             <div v-for="(column, colIdx) in section.columns" :key="colIdx" class="flex-1 flex flex-col gap-4 min-w-0">
               <FieldRenderer v-for="field in column.fields" :key="field.fieldname" :field="field" :ctx="ctx"
                 @field-change="onFieldChange" />
@@ -72,7 +72,7 @@
             <h3 class="text-sm font-semibold text-slate-800 m-0">{{ section.label }}</h3>
             <p v-if="section.description" class="text-xs text-slate-500 mt-1 m-0">{{ section.description }}</p>
           </div>
-          <div class="flex flex-col md:flex-row gap-6">
+          <div class="flex flex-col md:flex-row gap-6 mx-2 mt-2">
             <div v-for="(column, colIdx) in section.columns" :key="colIdx" class="flex-1 flex flex-col gap-4 min-w-0">
               <FieldRenderer v-for="field in column.fields" :key="field.fieldname" :field="field" :ctx="ctx"
                 @field-change="onFieldChange" />

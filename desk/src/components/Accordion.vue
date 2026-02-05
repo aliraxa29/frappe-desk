@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 overflow-hidden"
+    class="border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 overflow-hidden mx-2"
   >
     <button
       type="button"
@@ -33,7 +33,7 @@
     </button>
     
     <div v-if="isOpen" class="overflow-hidden">
-      <div class="p-4">
+      <div class="py-2">
         <slot />
       </div>
     </div>
