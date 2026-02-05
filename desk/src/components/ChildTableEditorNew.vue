@@ -31,7 +31,7 @@
               {{ col.label || col.fieldname }}
               <span v-if="col.reqd" class="required-mark">*</span>
             </th>
-            <th class="col-actions">Actions</th>
+            <th class="col-actions-header">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -100,11 +100,11 @@
       <button type="button" class="btn-sm btn-danger" @click="deleteRow(selectedRowIndex)">Delete</button>
     </div>
 
-    <!-- Row Edit Modal -->
+    <!-- Row Edit Modal - Full Form Layout -->
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="showRowModal" class="modal-overlay" @click.self="closeRowModal">
-          <div class="modal-content">
+          <div class="modal-content modal-large">
             <div class="modal-header">
               <h2>{{ editingRowIndex >= 0 ? `Edit Row ${editingRowIndex + 1}` : 'New Row' }}</h2>
               <button type="button" class="btn-close" @click="closeRowModal">
@@ -115,17 +115,53 @@
             </div>
 
             <div class="modal-body">
-              <div 
-                v-for="field in editableFields" 
-                :key="field.fieldname" 
-                class="form-group"
-              >
-                <ModalFieldEditor
-                  :field="field"
-                  :value="editingRowData[field.fieldname]"
-                  :meta="childMeta"
-                  @update="editingRowData[field.fieldname] = $event"
-                />
+              <!-- Tab-based layout if tabs exist -->
+              <div v-if="formLayout.tabs.length > 1" class="form-tabs-container">
+                <div class="tabs-header" role="tablist">
+                  <button
+                    v-for="(tab, idx) in formLayout.tabs"
+                    :key="tab.fieldname || idx"
+                    class="tab-button"
+                    :class="{ 'tab-button-active': activeTab === idx }"
+                    role="tab"
+                    :aria-selected="activeTab === idx"
+                    @click="activeTab = idx"
+                  >
+                    {{ tab.label || `Tab ${idx + 1}` }}
+                  </button>
+                </div>
+                
+                <div class="tabs-content">
+                  <div
+                    v-for="(tab, tabIdx) in formLayout.tabs"
+                    v-show="activeTab === tabIdx"
+                    :key="tab.fieldname || tabIdx"
+                    class="tab-panel"
+                    role="tabpanel"
+                  >
+                    <!-- Render sections within tab -->
+                    <template v-for="(section, sectionIdx) in tab.sections" :key="`section-${tabIdx}-${sectionIdx}`">
+                      <FormSectionRenderer
+                        :section="section"
+                        :row-data="editingRowData"
+                        :child-meta="childMeta"
+                        @update="updateRowField"
+                      />
+                    </template>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Non-tabbed layout -->
+              <div v-else class="form-sections-container">
+                <template v-for="(section, sectionIdx) in formLayout.sections" :key="`section-${sectionIdx}`">
+                  <FormSectionRenderer
+                    :section="section"
+                    :row-data="editingRowData"
+                    :child-meta="childMeta"
+                    @update="updateRowField"
+                  />
+                </template>
               </div>
             </div>
 
@@ -188,7 +224,7 @@ import { ref, computed, watch } from 'vue'
 import type { Field, DocTypeMeta } from '../types'
 import CellDisplay from './childtable/CellDisplay.vue'
 import InlineCellEditor from './childtable/InlineCellEditor.vue'
-import ModalFieldEditor from './childtable/ModalFieldEditor.vue'
+import FormSectionRenderer from './childtable/FormSectionRenderer.vue'
 import { useDialogStore } from '../stores/dialog'
 
 export interface ChildRow {
@@ -196,6 +232,29 @@ export interface ChildRow {
   name?: string
   idx?: number
   __islocal?: number
+}
+
+interface FormSection {
+  label?: string
+  description?: string
+  collapsible?: boolean
+  collapsed?: boolean
+  columns: FormColumn[]
+}
+
+interface FormColumn {
+  fields: Field[]
+}
+
+interface FormTab {
+  fieldname?: string
+  label?: string
+  sections: FormSection[]
+}
+
+interface FormLayout {
+  tabs: FormTab[]
+  sections: FormSection[] // For non-tabbed layouts
 }
 
 const dialogStore = useDialogStore()
@@ -220,6 +279,7 @@ const showColumnSettings = ref(false)
 const editingRowIndex = ref(-1)
 const editingRowData = ref<ChildRow>({})
 const visibleColumnNames = ref<string[]>([])
+const activeTab = ref(0)
 
 // Computed: Get all fields suitable for table display
 const allTableFields = computed<Field[]>(() => {
@@ -240,7 +300,6 @@ const allTableFields = computed<Field[]>(() => {
 // Fields to display in table columns
 const displayColumns = computed<Field[]>(() => {
   if (visibleColumnNames.value.length === 0) {
-    // Default: show fields marked for list view, or first 5
     const listViewFields = allTableFields.value.filter(f => f.in_list_view)
     if (listViewFields.length > 0) {
       return listViewFields.slice(0, 7)
@@ -251,9 +310,132 @@ const displayColumns = computed<Field[]>(() => {
   return allTableFields.value.filter(f => visibleColumnNames.value.includes(f.fieldname))
 })
 
-// All editable fields for modal
-const editableFields = computed<Field[]>(() => {
-  return allTableFields.value.filter(f => !f.read_only)
+// Parse form layout from metadata (tabs, sections, columns)
+const formLayout = computed<FormLayout>(() => {
+  if (!props.childMeta?.fields) {
+    return { tabs: [], sections: [] }
+  }
+
+  const fields = props.childMeta.fields
+  const tabs: FormTab[] = []
+  const rootSections: FormSection[] = []
+  
+  let currentTab: FormTab | null = null
+  let currentSection: FormSection | null = null
+  let currentColumn: FormColumn | null = null
+
+  // Helper to create a default section
+  const createSection = (label?: string, description?: string, collapsible?: boolean, collapsed?: boolean): FormSection => ({
+    label,
+    description,
+    collapsible: collapsible || false,
+    collapsed: collapsed || false,
+    columns: []
+  })
+
+  // Helper to create a default column
+  const createColumn = (): FormColumn => ({ fields: [] })
+
+  // Start with a default section and column
+  currentSection = createSection()
+  currentColumn = createColumn()
+  currentSection.columns.push(currentColumn)
+
+  for (const field of fields) {
+    // Skip system fields
+    if (['name', 'parent', 'parenttype', 'parentfield', 'doctype', 'idx'].includes(field.fieldname)) {
+      continue
+    }
+
+    if (field.fieldtype === 'Tab Break') {
+      // Close current section if it has fields
+      if (currentSection && currentSection.columns.some(col => col.fields.length > 0)) {
+        if (currentTab) {
+          currentTab.sections.push(currentSection)
+        } else {
+          rootSections.push(currentSection)
+        }
+      }
+
+      // Close current tab
+      if (currentTab && currentTab.sections.length > 0) {
+        tabs.push(currentTab)
+      }
+
+      // Start new tab
+      currentTab = {
+        fieldname: field.fieldname,
+        label: field.label || 'Tab',
+        sections: []
+      }
+
+      // Start new section and column for this tab
+      currentSection = createSection()
+      currentColumn = createColumn()
+      currentSection.columns.push(currentColumn)
+    }
+    else if (field.fieldtype === 'Section Break') {
+      // Close current section if it has fields
+      if (currentSection && currentSection.columns.some(col => col.fields.length > 0)) {
+        if (currentTab) {
+          currentTab.sections.push(currentSection)
+        } else {
+          rootSections.push(currentSection)
+        }
+      }
+
+      // Start new section
+      currentSection = createSection(
+        field.label,
+        field.description,
+        field.collapsible === 1,
+        field.collapsed === 1
+      )
+      currentColumn = createColumn()
+      currentSection.columns.push(currentColumn)
+    }
+    else if (field.fieldtype === 'Column Break') {
+      // Start new column in current section
+      currentColumn = createColumn()
+      if (currentSection) {
+        currentSection.columns.push(currentColumn)
+      }
+    }
+    else if (!field.hidden && !['HTML', 'Button'].includes(field.fieldtype)) {
+      // Add field to current column
+      if (currentColumn) {
+        currentColumn.fields.push(field)
+      }
+    }
+  }
+
+  // Close final section
+  if (currentSection && currentSection.columns.some(col => col.fields.length > 0)) {
+    if (currentTab) {
+      currentTab.sections.push(currentSection)
+    } else {
+      rootSections.push(currentSection)
+    }
+  }
+
+  // Close final tab
+  if (currentTab && currentTab.sections.length > 0) {
+    tabs.push(currentTab)
+  }
+
+  // If no tabs, create a single default tab with all sections
+  if (tabs.length === 0 && rootSections.length > 0) {
+    tabs.push({
+      fieldname: 'default',
+      label: 'Details',
+      sections: rootSections
+    })
+  }
+
+  return {
+    tabs,
+    sections: rootSections
+  }
 })
 
 // Initialize visible columns from in_list_view fields
@@ -318,6 +500,7 @@ function addNewRow() {
   // Open modal for the new row
   editingRowIndex.value = updatedRows.length - 1
   editingRowData.value = { ...newRow }
+  activeTab.value = 0
   showRowModal.value = true
 }
 
@@ -343,7 +526,6 @@ async function deleteRow(index: number) {
   if (!confirmed) return
   
   const updatedRows = props.rows.filter((_, i) => i !== index)
-  // Re-index remaining rows
   updatedRows.forEach((row, i) => {
     row.idx = i + 1
   })
@@ -360,7 +542,6 @@ function moveRowUp() {
   updatedRows[idx] = updatedRows[idx - 1]!
   updatedRows[idx - 1] = temp
   
-  // Update idx values
   updatedRows.forEach((row, i) => {
     row.idx = i + 1
   })
@@ -378,7 +559,6 @@ function moveRowDown() {
   updatedRows[idx] = updatedRows[idx + 1]!
   updatedRows[idx + 1] = temp
   
-  // Update idx values
   updatedRows.forEach((row, i) => {
     row.idx = i + 1
   })
@@ -391,6 +571,7 @@ function moveRowDown() {
 function openRowModal(index: number) {
   editingRowIndex.value = index
   editingRowData.value = { ...props.rows[index] }
+  activeTab.value = 0
   showRowModal.value = true
 }
 
@@ -405,6 +586,10 @@ function saveRowModal() {
   updatedRows[editingRowIndex.value] = { ...editingRowData.value }
   emit('update:rows', updatedRows)
   closeRowModal()
+}
+
+function updateRowField(fieldname: string, value: any) {
+  editingRowData.value[fieldname] = value
 }
 
 // Column settings
@@ -441,9 +626,9 @@ function resetColumns() {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 0.5rem;
-  background: #fff;
+  background: var(--bg-primary, #fff);
   overflow: hidden;
 }
 
@@ -452,8 +637,8 @@ function resetColumns() {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--bg-secondary, #f8fafc);
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
 }
 
 .table-title {
@@ -465,13 +650,13 @@ function resetColumns() {
 .title-text {
   font-weight: 600;
   font-size: 0.875rem;
-  color: #1e293b;
+  color: var(--text-primary, #1e293b);
 }
 
 .row-count {
   font-size: 0.75rem;
-  color: #64748b;
-  background: #e2e8f0;
+  color: var(--text-secondary, #64748b);
+  background: var(--bg-tertiary, #e2e8f0);
   padding: 0.125rem 0.5rem;
   border-radius: 9999px;
 }
@@ -489,15 +674,15 @@ function resetColumns() {
   padding: 0.5rem;
   background: transparent;
   border: none;
-  color: #64748b;
+  color: var(--text-secondary, #64748b);
   border-radius: 0.375rem;
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .btn-icon:hover {
-  background: #e2e8f0;
-  color: #334155;
+  background: var(--bg-tertiary, #e2e8f0);
+  color: var(--text-primary, #334155);
 }
 
 .btn-icon svg {
@@ -510,7 +695,7 @@ function resetColumns() {
   align-items: center;
   gap: 0.375rem;
   padding: 0.5rem 0.875rem;
-  background: #3b82f6;
+  background: var(--primary, #3b82f6);
   color: #fff;
   border: none;
   border-radius: 0.375rem;
@@ -521,7 +706,7 @@ function resetColumns() {
 }
 
 .btn-add:hover {
-  background: #2563eb;
+  background: var(--primary-dark, #2563eb);
 }
 
 .btn-add svg {
@@ -540,28 +725,27 @@ function resetColumns() {
 }
 
 .child-table thead {
-  background: #f1f5f9;
+  background: var(--bg-secondary, #f1f5f9);
 }
 
 .child-table th {
   padding: 0.625rem 0.75rem;
   text-align: left;
   font-weight: 600;
-  color: #475569;
+  color: var(--text-secondary, #475569);
   white-space: nowrap;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
 }
 
 .col-index {
   width: 40px;
   text-align: center !important;
-  color: #94a3b8;
+  color: var(--text-muted, #94a3b8);
 }
 
-.col-actions {
+.col-actions-header {
   width: 100px;
   text-align: center !important;
-  margin: auto;
 }
 
 .required-mark {
@@ -570,21 +754,21 @@ function resetColumns() {
 }
 
 .child-table tbody tr {
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--border-light, #f1f5f9);
   transition: background 0.15s;
 }
 
 .child-table tbody tr:hover {
-  background: #f8fafc;
+  background: var(--bg-secondary, #f8fafc);
 }
 
 .child-table tbody tr.row-selected {
-  background: #eff6ff;
+  background: var(--primary-light, #eff6ff);
 }
 
 .child-table td {
   padding: 0.5rem 0.75rem;
-  color: #334155;
+  color: var(--text-primary, #334155);
   vertical-align: middle;
 }
 
@@ -617,7 +801,7 @@ function resetColumns() {
 .empty-state {
   text-align: center;
   padding: 2rem !important;
-  color: #64748b;
+  color: var(--text-secondary, #64748b);
 }
 
 .empty-icon {
@@ -631,7 +815,7 @@ function resetColumns() {
 
 .btn-add-first {
   padding: 0.5rem 1rem;
-  background: #3b82f6;
+  background: var(--primary, #3b82f6);
   color: #fff;
   border: none;
   border-radius: 0.375rem;
@@ -643,21 +827,22 @@ function resetColumns() {
   display: flex;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  background: var(--bg-secondary, #f8fafc);
+  border-top: 1px solid var(--border-color, #e2e8f0);
 }
 
 .btn-sm {
   padding: 0.375rem 0.75rem;
   font-size: 0.75rem;
-  border: 1px solid #e2e8f0;
-  background: #fff;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #334155);
   border-radius: 0.25rem;
   cursor: pointer;
 }
 
 .btn-sm:hover:not(:disabled) {
-  background: #f1f5f9;
+  background: var(--bg-secondary, #f1f5f9);
 }
 
 .btn-sm:disabled {
@@ -687,7 +872,7 @@ function resetColumns() {
 }
 
 .modal-content {
-  background: #fff;
+  background: var(--bg-primary, #fff);
   border-radius: 0.5rem;
   width: 100%;
   max-width: 32rem;
@@ -695,6 +880,10 @@ function resetColumns() {
   display: flex;
   flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modal-content.modal-large {
+  max-width: 56rem;
 }
 
 .modal-content.column-settings-modal {
@@ -706,14 +895,14 @@ function resetColumns() {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
 }
 
 .modal-header h2 {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-primary, #1e293b);
 }
 
 .btn-close {
@@ -723,14 +912,14 @@ function resetColumns() {
   padding: 0.375rem;
   background: transparent;
   border: none;
-  color: #64748b;
+  color: var(--text-secondary, #64748b);
   border-radius: 0.25rem;
   cursor: pointer;
 }
 
 .btn-close:hover {
-  background: #f1f5f9;
-  color: #334155;
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-primary, #334155);
 }
 
 .btn-close svg {
@@ -744,12 +933,83 @@ function resetColumns() {
   flex: 1;
 }
 
-.form-group {
-  margin-bottom: 1rem;
+/* Tabs in modal */
+.form-tabs-container {
+  display: flex;
+  flex-direction: column;
 }
 
-.form-group:last-child {
-  margin-bottom: 0;
+.tabs-header {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  padding: 0 0.5rem;
+  margin: -1.25rem -1.25rem 1.25rem -1.25rem;
+  padding: 0 1.25rem;
+  background: var(--bg-secondary, #f8fafc);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs-header::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-button {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #64748b);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.tab-button:hover {
+  color: var(--text-primary, #334155);
+}
+
+.tab-button-active {
+  color: var(--primary, #3b82f6);
+}
+
+.tab-button-active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary, #3b82f6);
+  border-radius: 2px 2px 0 0;
+}
+
+.tabs-content {
+  padding-top: 0.5rem;
+}
+
+.tab-panel {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-sections-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .columns-list {
@@ -764,15 +1024,15 @@ function resetColumns() {
   align-items: center;
   gap: 0.625rem;
   padding: 0.625rem 0.75rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--bg-secondary, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 0.375rem;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .column-item:hover {
-  background: #f1f5f9;
+  background: var(--bg-tertiary, #f1f5f9);
 }
 
 .column-checkbox {
@@ -784,7 +1044,7 @@ function resetColumns() {
 .column-name {
   flex: 1;
   font-size: 0.8125rem;
-  color: #334155;
+  color: var(--text-primary, #334155);
 }
 
 .required-badge {
@@ -800,7 +1060,7 @@ function resetColumns() {
   justify-content: flex-end;
   gap: 0.5rem;
   padding: 1rem 1.25rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border-color, #e2e8f0);
 }
 
 .btn {
@@ -814,25 +1074,25 @@ function resetColumns() {
 }
 
 .btn-primary {
-  background: #3b82f6;
+  background: var(--primary, #3b82f6);
   color: #fff;
 }
 
 .btn-primary:hover {
-  background: #2563eb;
+  background: var(--primary-dark, #2563eb);
 }
 
 .btn-secondary {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-secondary, #475569);
 }
 
 .btn-secondary:hover {
-  background: #e2e8f0;
+  background: var(--bg-tertiary, #e2e8f0);
 }
 
 .text-muted {
-  color: #64748b;
+  color: var(--text-secondary, #64748b);
   font-size: 0.8125rem;
   margin: 0;
 }
@@ -846,5 +1106,107 @@ function resetColumns() {
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
+}
+
+/* Dark mode */
+:global(html.dark) .child-table-editor {
+  background: var(--bg-primary, #0f172a);
+  border-color: var(--border-color, #334155);
+}
+
+:global(html.dark) .table-header {
+  background: var(--bg-secondary, #1e293b);
+  border-color: var(--border-color, #334155);
+}
+
+:global(html.dark) .title-text {
+  color: var(--text-primary, #e2e8f0);
+}
+
+:global(html.dark) .row-count {
+  background: var(--bg-tertiary, #334155);
+  color: var(--text-secondary, #94a3b8);
+}
+
+:global(html.dark) .child-table thead {
+  background: var(--bg-secondary, #1e293b);
+}
+
+:global(html.dark) .child-table th {
+  color: var(--text-secondary, #94a3b8);
+  border-color: var(--border-color, #334155);
+}
+
+:global(html.dark) .child-table tbody tr {
+  border-color: var(--border-color, #1e293b);
+}
+
+:global(html.dark) .child-table tbody tr:hover {
+  background: var(--bg-secondary, #1e293b);
+}
+
+:global(html.dark) .child-table tbody tr.row-selected {
+  background: var(--primary-dark, #1e3a5f);
+}
+
+:global(html.dark) .child-table td {
+  color: var(--text-primary, #e2e8f0);
+}
+
+:global(html.dark) .modal-content {
+  background: var(--bg-primary, #0f172a);
+}
+
+:global(html.dark) .modal-header {
+  border-color: var(--border-color, #334155);
+}
+
+:global(html.dark) .modal-header h2 {
+  color: var(--text-primary, #e2e8f0);
+}
+
+:global(html.dark) .modal-footer {
+  border-color: var(--border-color, #334155);
+}
+
+:global(html.dark) .tabs-header {
+  background: var(--bg-secondary, #1e293b);
+  border-color: var(--border-color, #334155);
+}
+
+:global(html.dark) .tab-button {
+  color: var(--text-secondary, #94a3b8);
+}
+
+:global(html.dark) .tab-button:hover {
+  color: var(--text-primary, #e2e8f0);
+}
+
+:global(html.dark) .tab-button-active {
+  color: var(--primary, #60a5fa);
+}
+
+:global(html.dark) .tab-button-active::after {
+  background: var(--primary, #60a5fa);
+}
+
+:global(html.dark) .bulk-actions {
+  background: var(--bg-secondary, #1e293b);
+  border-color: var(--border-color, #334155);
+}
+
+:global(html.dark) .btn-sm {
+  background: var(--bg-primary, #0f172a);
+  border-color: var(--border-color, #334155);
+  color: var(--text-primary, #e2e8f0);
+}
+
+:global(html.dark) .column-item {
+  background: var(--bg-secondary, #1e293b);
+  border-color: var(--border-color, #334155);
+}
+
+:global(html.dark) .column-name {
+  color: var(--text-primary, #e2e8f0);
 }
 </style>

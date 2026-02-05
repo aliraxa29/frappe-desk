@@ -50,6 +50,7 @@ export interface Field {
   search_index?: number
   allow_bulk_edit?: number
   collapsible?: number
+  collapsed?: number
   collapsible_depends_on?: string
   mandatory_depends_on?: string
   read_only_depends_on?: string
@@ -113,6 +114,7 @@ export type FieldType =
   | 'Column Break'
   | 'Section Break'
   | 'Tab Break'
+  | 'Button'
 
 export interface Permission {
   role: string

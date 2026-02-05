@@ -1,20 +1,20 @@
 <template>
-  <div class="form-section" :class="{ 'form-section-collapsible': collapsible }">
+  <div class="mb-6" :class="{ 'mb-4': collapsible }">
     <Accordion
       v-if="collapsible"
       :label="label || 'Section'"
       :default-open="!collapsed"
       :collapsible="true"
     >
-      <div class="section-columns">
+      <div class="flex gap-6 max-md:flex-col max-md:gap-4">
         <div
           v-for="(column, colIdx) in columns"
           :key="colIdx"
-          class="section-column"
+          class="flex flex-col gap-4 min-w-0 max-md:flex-1"
           :style="{ flex: column.flex || 1 }"
         >
           <slot :name="`column-${colIdx}`" :fields="column.fields">
-            <div v-for="field in column.fields" :key="field.fieldname" class="section-field">
+            <div v-for="field in column.fields" :key="field.fieldname">
               <slot name="field" :field="field">
                 <!-- Default field slot -->
               </slot>
@@ -25,20 +25,20 @@
     </Accordion>
 
     <template v-else>
-      <div v-if="label" class="section-header">
-        <h3 class="section-title">{{ label }}</h3>
-        <p v-if="description" class="section-description">{{ description }}</p>
+      <div v-if="label" class="mb-4 pb-3 border-b border-slate-200 dark:border-slate-700">
+        <h3 class="text-[0.9375rem] font-semibold text-slate-800 dark:text-slate-200 m-0">{{ label }}</h3>
+        <p v-if="description" class="text-[0.8125rem] text-slate-500 dark:text-slate-400 mt-1 mb-0">{{ description }}</p>
       </div>
       
-      <div class="section-columns">
+      <div class="flex gap-6 max-md:flex-col max-md:gap-4">
         <div
           v-for="(column, colIdx) in columns"
           :key="colIdx"
-          class="section-column"
+          class="flex flex-col gap-4 min-w-0 max-md:flex-1"
           :style="{ flex: column.flex || 1 }"
         >
           <slot :name="`column-${colIdx}`" :fields="column.fields">
-            <div v-for="field in column.fields" :key="field.fieldname" class="section-field">
+            <div v-for="field in column.fields" :key="field.fieldname">
               <slot name="field" :field="field">
                 <!-- Default field slot -->
               </slot>
@@ -59,7 +59,7 @@ export interface SectionColumn {
   flex?: number
 }
 
-const props = withDefaults(defineProps<{
+withDefaults(defineProps<{
   label?: string
   description?: string
   collapsible?: boolean
@@ -71,59 +71,3 @@ const props = withDefaults(defineProps<{
   columns: () => []
 })
 </script>
-
-<style scoped>
-.form-section {
-  margin-bottom: 1.5rem;
-}
-
-.form-section-collapsible {
-  margin-bottom: 1rem;
-}
-
-.section-header {
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.section-title {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin: 0;
-}
-
-.section-description {
-  font-size: 0.8125rem;
-  color: #64748b;
-  margin: 0.25rem 0 0 0;
-}
-
-.section-columns {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.section-column {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  min-width: 0;
-}
-
-.section-field {
-  /* Field wrapper */
-}
-
-@media (max-width: 768px) {
-  .section-columns {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .section-column {
-    flex: 1 1 100% !important;
-  }
-}
-</style>

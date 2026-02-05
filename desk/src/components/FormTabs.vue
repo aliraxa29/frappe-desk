@@ -1,11 +1,19 @@
 <template>
-  <div class="form-tabs">
-    <div class="tabs-header" role="tablist">
+  <div class="flex flex-col">
+    <!-- Tabs Header -->
+    <div 
+      class="sticky top-0 z-20 flex gap-1 border-b border-slate-200 dark:border-slate-700 px-2 bg-slate-50 dark:bg-slate-800 overflow-x-auto scrollbar-hide"
+      role="tablist"
+    >
       <button
         v-for="(tab, idx) in tabs"
         :key="tab.fieldname || idx"
-        class="tab-button"
-        :class="{ 'tab-button-active': activeTab === idx }"
+        class="px-5 py-3 border-0 bg-transparent text-sm font-medium cursor-pointer whitespace-nowrap relative transition-colors duration-200"
+        :class="[
+          activeTab === idx 
+            ? 'text-blue-600 dark:text-blue-400 after:absolute after:-bottom-px after:left-0 after:right-0 after:h-0.5 after:bg-blue-600 dark:after:bg-blue-400 after:rounded-t'
+            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+        ]"
         role="tab"
         :aria-selected="activeTab === idx"
         @click="activeTab = idx"
@@ -14,12 +22,13 @@
       </button>
     </div>
     
-    <div class="tabs-content">
+    <!-- Tabs Content -->
+    <div class="py-6 mx-2">
       <div
         v-for="(tab, idx) in tabs"
         v-show="activeTab === idx"
         :key="tab.fieldname || idx"
-        class="tab-panel"
+        class="animate-fadeIn"
         role="tabpanel"
       >
         <slot :name="`tab-${idx}`" :tab="tab" :fields="tab.fields">
@@ -52,63 +61,12 @@ const activeTab = ref(props.defaultTab)
 </script>
 
 <style scoped>
-.form-tabs {
-  display: flex;
-  flex-direction: column;
-}
-
-.tabs-header {
-  display: flex;
-  gap: 0.25rem;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 0 0.5rem;
-  background: #f8fafc;
-  overflow-x: auto;
+.scrollbar-hide {
+  -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
-.tabs-header::-webkit-scrollbar {
+.scrollbar-hide::-webkit-scrollbar {
   display: none;
-}
-
-.tab-button {
-  padding: 0.75rem 1.25rem;
-  border: none;
-  background: transparent;
-  color: #64748b;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  position: relative;
-  transition: color 0.2s ease;
-}
-
-.tab-button:hover {
-  color: #334155;
-}
-
-.tab-button-active {
-  color: #3b82f6;
-}
-
-.tab-button-active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: #3b82f6;
-  border-radius: 2px 2px 0 0;
-}
-
-.tabs-content {
-  padding: 1.5rem 0;
-}
-
-.tab-panel {
-  animation: fadeIn 0.2s ease;
 }
 
 @keyframes fadeIn {
@@ -120,5 +78,9 @@ const activeTab = ref(props.defaultTab)
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease;
 }
 </style>

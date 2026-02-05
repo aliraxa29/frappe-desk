@@ -1,6 +1,6 @@
 <template>
   <div v-if="loading" class="flex justify-center items-center h-96 text-gray-600 text-base">
-    Loading form...
+    {{ __(`Loading ${doctype}...`) }}
   </div>
 
   <div v-else-if="error" class="p-4 bg-red-100 text-red-600 rounded my-4">
@@ -11,11 +11,15 @@
     <!-- If we have tabs, render with FormTabs -->
     <FormTabs v-if="hasTabs" :tabs="parsedTabs">
       <template v-for="(tab, tabIdx) in parsedTabs" :key="tab.fieldname" #[`tab-${tabIdx}`]>
-        <div class="flex flex-col gap-6">
-          <template v-for="section in tab.sections" :key="section.fieldname || section.label">
+        <div class="flex flex-col">
+          <template v-for="(section, sectionIdx) in tab.sections" :key="section.fieldname || section.label">
             <!-- Section with accordion if collapsible -->
-            <Accordion v-if="section.collapsible" :label="section.label || 'Details'" :default-open="!section.collapsed"
-              class="mb-4">
+            <Accordion
+              v-if="section.collapsible"
+              :label="section.label || 'Details'"
+              :default-open="!section.collapsed"
+              :class="getAccordionClasses(tab.sections, sectionIdx)"
+            >
               <div class="flex flex-col md:flex-row gap-6">
                 <div v-for="(column, colIdx) in section.columns" :key="colIdx"
                   class="flex-1 flex flex-col gap-4 min-w-0">
@@ -46,10 +50,14 @@
 
     <!-- No tabs - render sections directly -->
     <template v-else>
-      <template v-for="section in parsedSections" :key="section.fieldname || section.label">
+      <template v-for="(section, sectionIdx) in parsedSections" :key="section.fieldname || section.label">
         <!-- Section with accordion if collapsible -->
-        <Accordion v-if="section.collapsible" :label="section.label || 'Details'" :default-open="!section.collapsed"
-          class="mb-4">
+        <Accordion
+          v-if="section.collapsible"
+          :label="section.label || 'Details'"
+          :default-open="!section.collapsed"
+          :class="getAccordionClasses(parsedSections, sectionIdx)"
+        >
           <div class="flex flex-col md:flex-row gap-6">
             <div v-for="(column, colIdx) in section.columns" :key="colIdx" class="flex-1 flex flex-col gap-4 min-w-0">
               <FieldRenderer v-for="field in column.fields" :key="field.fieldname" :field="field" :ctx="ctx"
@@ -243,6 +251,30 @@ function parseFieldsIntoSections(fields: Field[]): ParsedSection[] {
 
   // Filter out empty sections
   return sections.filter(s => s.columns.some(c => c.fields.length > 0))
+}
+
+function getAccordionClasses(sections: ParsedSection[], idx: number): string {
+  const current = sections[idx]
+  if (!current?.collapsible) return ''
+
+  const prevIsAccordion = sections[idx - 1]?.collapsible
+  const nextIsAccordion = sections[idx + 1]?.collapsible
+
+  const classes: string[] = []
+
+  if (prevIsAccordion) {
+    classes.push('rounded-t-none', 'border-t-0')
+  } else {
+    classes.push('rounded-t-lg')
+  }
+
+  if (nextIsAccordion) {
+    classes.push('rounded-b-none', 'mb-0')
+  } else {
+    classes.push('rounded-b-lg', 'mb-6')
+  }
+
+  return classes.join(' ')
 }
 
 onMounted(async () => {

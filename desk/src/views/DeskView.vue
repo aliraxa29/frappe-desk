@@ -5,12 +5,14 @@
   </div>
 
   <!-- Main container -->
-  <div v-else
-    class="min-h-screen dark:bg-gray-950 dark:bg-none bg-[linear-gradient(135deg,var(--bg-primary)_0%,var(--bg-secondary)_50%,var(--bg-tertiary)_100%)]">
-    <Navbar />
+  <div
+    v-else
+    class="h-screen flex flex-col overflow-hidden dark:bg-gray-950 dark:bg-none bg-[linear-gradient(135deg,var(--bg-primary)_0%,var(--bg-secondary)_50%,var(--bg-tertiary)_100%)]"
+  >
+    <Navbar class="shrink-0" />
 
-    <!-- Apps section -->
-    <div class="px-6 py-8 md:px-6 md:py-8 sm:px-4 sm:py-6">
+    <!-- Apps section (scrollable) -->
+    <div class="flex-1 overflow-y-auto px-6 py-8 md:px-6 md:py-8 sm:px-4 sm:py-6">
       <!-- Installed apps -->
       <div class="mb-10">
         <div class="mb-6">

@@ -1,17 +1,19 @@
 <template>
-  <div class="accordion" :class="{ 'accordion-collapsed': !isOpen }">
+  <div 
+    class="border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 overflow-hidden"
+  >
     <button
       type="button"
-      class="accordion-header"
-      :class="{ 'accordion-header-open': isOpen }"
+      class="flex items-center justify-between w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer text-left transition-colors duration-200"
+      :class="{ 'border-b border-slate-200 dark:border-slate-700': isOpen }"
       @click="toggle"
     >
-      <div class="accordion-title">
+      <div class="flex items-center gap-2 font-semibold text-sm text-slate-700 dark:text-slate-200">
         <slot name="icon">
           <svg
             v-if="showIcon"
-            class="accordion-chevron"
-            :class="{ 'accordion-chevron-open': isOpen }"
+            class="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0 transition-transform duration-200"
+            :class="{ 'rotate-90': isOpen }"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -19,24 +21,27 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </slot>
-        <span class="accordion-label">{{ label }}</span>
-        <span v-if="badge" class="accordion-badge">{{ badge }}</span>
+        <span class="flex-1">{{ label }}</span>
+        <span 
+          v-if="badge" 
+          class="inline-flex items-center justify-center min-w-5 px-1.5 py-0.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 rounded-full"
+        >
+          {{ badge }}
+        </span>
       </div>
       <slot name="actions" />
     </button>
     
-    <Transition name="accordion">
-      <div v-show="isOpen" class="accordion-content">
-        <div class="accordion-body">
-          <slot />
-        </div>
+    <div v-if="isOpen" class="overflow-hidden">
+      <div class="p-4">
+        <slot />
       </div>
-    </Transition>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch } from 'vue'
 
 const props = withDefaults(defineProps<{
   label: string
@@ -56,128 +61,28 @@ const emit = defineEmits<{
   toggle: [isOpen: boolean]
 }>()
 
-const internalOpen = ref(props.defaultOpen)
+// Use simple ref for internal state
+const isOpen = ref(props.modelValue ?? props.defaultOpen)
 
-// Support v-model
-const isOpen = computed({
-  get: () => props.modelValue !== undefined ? props.modelValue : internalOpen.value,
-  set: (val) => {
-    internalOpen.value = val
-    emit('update:modelValue', val)
+// Watch for v-model changes from parent
+watch(() => props.modelValue, (newVal) => {
+  if (newVal !== undefined) {
+    isOpen.value = newVal
+  }
+})
+
+// Watch for defaultOpen changes
+watch(() => props.defaultOpen, (newVal) => {
+  if (props.modelValue === undefined) {
+    isOpen.value = newVal
   }
 })
 
 function toggle() {
   if (!props.collapsible) return
+  
   isOpen.value = !isOpen.value
+  emit('update:modelValue', isOpen.value)
   emit('toggle', isOpen.value)
 }
-
-// Watch for external changes
-watch(() => props.defaultOpen, (val) => {
-  if (props.modelValue === undefined) {
-    internalOpen.value = val
-  }
-})
 </script>
-
-<style scoped>
-.accordion {
-  border: 1px solid #e2e8f0;
-  border-radius: 0.5rem;
-  background: #fff;
-  overflow: hidden;
-}
-
-.accordion-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0.875rem 1rem;
-  background: #f8fafc;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  text-align: left;
-}
-
-.accordion-header:hover {
-  background: #f1f5f9;
-}
-
-.accordion-header-open {
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.accordion-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: #334155;
-}
-
-.accordion-chevron {
-  width: 1rem;
-  height: 1rem;
-  color: #64748b;
-  transition: transform 0.2s ease;
-  flex-shrink: 0;
-}
-
-.accordion-chevron-open {
-  transform: rotate(90deg);
-}
-
-.accordion-label {
-  flex: 1;
-}
-
-.accordion-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.25rem;
-  padding: 0.125rem 0.375rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #3b82f6;
-  background: #dbeafe;
-  border-radius: 9999px;
-}
-
-.accordion-content {
-  overflow: hidden;
-}
-
-.accordion-body {
-  padding: 1rem;
-}
-
-/* Transition */
-.accordion-enter-active,
-.accordion-leave-active {
-  transition: all 0.2s ease;
-}
-
-.accordion-enter-from,
-.accordion-leave-to {
-  opacity: 0;
-  max-height: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
-.accordion-enter-to,
-.accordion-leave-from {
-  opacity: 1;
-  max-height: 2000px;
-}
-
-/* Collapsed state */
-.accordion-collapsed .accordion-header {
-  border-bottom: none;
-}
-</style>
