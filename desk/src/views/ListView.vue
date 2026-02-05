@@ -17,8 +17,8 @@
 
     <template #content>
       <!-- List Component -->
-      <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-gray-950 overflow-hidden mt-1">
-        <ListView 
+      <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-gray-950 overflow-hidden m-2">
+        <ListView
           ref="listViewRef"
           :doctype="doctype" 
           @select="handleSelect"

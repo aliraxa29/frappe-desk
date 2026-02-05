@@ -11,7 +11,7 @@
       <!-- Main Content -->
       <main class="flex-1 flex flex-col overflow-hidden">
         <!-- Page Header -->
-        <div class="shrink-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 z-20">
+        <div class="shrink-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 z-17">
           <div class="px-6 flex items-center justify-between dark:bg-gray-950">
             <slot name="header" />
           </div>

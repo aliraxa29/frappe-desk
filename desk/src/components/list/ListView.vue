@@ -13,58 +13,145 @@
     <!-- List Content -->
     <template v-else>
       <!-- Filters Bar -->
-      <div class="flex items-center gap-3 p-4 border-b border-slate-200 dark:border-slate-800">
-        <!-- Search -->
-        <div class="flex-1 max-w-sm">
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Search..."
-            class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-          />
+      <div class="flex flex-wrap items-center gap-3 p-4 border-b border-slate-200 dark:border-slate-800">
+        <!-- Quick Filters (Left) -->
+        <div class="flex flex-1 flex-wrap items-start gap-4">
+          <div v-for="filter in filterFields" :key="filter.fieldname" class="min-w-55">
+            <FieldRenderer
+              :field="getQuickFilterField(filter)"
+              :ctx="quickFilterCtx"
+              @field-change="applyFilters"
+            />
+          </div>
         </div>
 
-        <!-- Standard Filters -->
-        <div v-for="filter in standardFilters" :key="filter.fieldname" class="relative">
-          <select
-            v-if="filter.fieldtype === 'Select'"
-            v-model="activeFilters[filter.fieldname]"
-            class="px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            @change="applyFilters"
+        <!-- Actions (Right) -->
+        <div class="flex items-center gap-2 ml-auto">
+          <button
+            type="button"
+            @click="toggleQueryBuilder"
+            ref="queryButtonRef"
+            class="px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
           >
-            <option value="">{{ filter.label }}</option>
-            <option v-for="opt in getSelectOptions(filter)" :key="opt" :value="opt">{{ opt }}</option>
-          </select>
-          <input
-            v-else-if="filter.fieldtype === 'Link'"
-            v-model="activeFilters[filter.fieldname]"
-            type="text"
-            :placeholder="filter.label"
-            class="px-3 py-2 text-sm border border-slate-300 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            @change="applyFilters"
-          />
+            Filters
+          </button>
+          <button
+            v-if="hasActiveFilters"
+            @click="clearFilters"
+            class="px-3 py-2 text-sm text-slate-600 hover:text-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+          >
+            Clear
+          </button>
+          <slot name="actions" />
         </div>
-
-        <!-- Clear Filters -->
-        <button
-          v-if="hasActiveFilters"
-          @click="clearFilters"
-          class="px-3 py-2 text-sm text-slate-600 hover:text-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-        >
-          Clear
-        </button>
-
-        <!-- Refresh -->
-        <button
-          @click="refresh"
-          class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-          title="Refresh"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-        </button>
       </div>
+
+      <Teleport to="body">
+        <div v-if="showQueryBuilder" class="fixed inset-0 z-40">
+          <div class="absolute inset-0" @click="closeQueryBuilder" />
+          <div
+            class="absolute z-50 w-96 max-w-screen-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl"
+            :style="queryPopoverStyle"
+          >
+            <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">Filters</span>
+              <button
+                type="button"
+                @click="addQueryFilter"
+                class="px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-slate-800 rounded transition-colors"
+              >
+                + Add Filter
+              </button>
+            </div>
+
+            <div class="p-4 max-h-[60vh] overflow-y-auto">
+              <div v-if="queryFilters.length === 0" class="text-xs text-slate-500">
+                No filters applied
+              </div>
+
+              <div v-else class="flex flex-col gap-3">
+                <div
+                  v-for="row in queryFilters"
+                  :key="row.id"
+                  class="flex flex-wrap items-start gap-2"
+                >
+                  <select
+                    v-model="row.fieldname"
+                    class="px-2 py-1.5 text-sm border border-slate-300 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    @change="onQueryFieldChange(row)"
+                  >
+                    <option value="">Select field</option>
+                    <option v-for="f in queryFieldOptions" :key="f.fieldname" :value="f.fieldname">
+                      {{ f.label || f.fieldname }}
+                    </option>
+                  </select>
+
+                  <select
+                    v-model="row.operator"
+                    class="px-2 py-1.5 text-sm border border-slate-300 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option v-for="op in getOperatorsForRow(row)" :key="op" :value="op">
+                      {{ op }}
+                    </option>
+                  </select>
+
+                  <div class="flex-1 min-w-60">
+                    <template v-if="row.operator === 'between'">
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <FieldRenderer
+                          v-if="getQueryField(row, 'from')"
+                          :field="getQueryField(row, 'from')!"
+                          :ctx="getQueryCtx(row, 'from')"
+                          @field-change="applyFilters"
+                        />
+                        <FieldRenderer
+                          v-if="getQueryField(row, 'to')"
+                          :field="getQueryField(row, 'to')!"
+                          :ctx="getQueryCtx(row, 'to')"
+                          @field-change="applyFilters"
+                        />
+                      </div>
+                    </template>
+                    <template v-else>
+                      <FieldRenderer
+                        v-if="getQueryField(row)"
+                        :field="getQueryField(row)!"
+                        :ctx="getQueryCtx(row)"
+                        @field-change="applyFilters"
+                      />
+                    </template>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="px-2 py-1.5 text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-slate-800 rounded"
+                    @click="removeQueryFilter(row.id)"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+              <button
+                type="button"
+                @click="clearFilters"
+                class="px-3 py-2 text-sm text-slate-600 hover:text-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                Clear
+              </button>
+              <button
+                type="button"
+                @click="closeQueryBuilder"
+                class="px-3 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      </Teleport>
 
       <!-- Table -->
       <div class="overflow-x-auto">
@@ -216,10 +303,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { DocTypeMeta, Field, ListColumn, Document } from '../../types'
 import { frappeClient } from '../../api/resource'
+import FieldRenderer from '../../fields/FieldRenderer.vue'
 
 // Cell components for different field types
 import LinkCell from './cells/LinkCell.vue'
@@ -257,12 +345,25 @@ const sortField = ref('modified')
 const sortOrder = ref<'asc' | 'desc'>('desc')
 
 // Filtering
-const searchQuery = ref('')
 const activeFilters = ref<Record<string, any>>({})
+const quickFilterDoc = reactive<Record<string, any>>({})
+const queryFilters = ref<Array<{ id: string; fieldname: string; operator: string; value: any }>>([])
+const queryRowDocs = reactive<Record<string, Record<string, any>>>({})
 
 // Selection
 const selectedRows = ref<string[]>([])
 const selectAll = ref(false)
+const showQueryBuilder = ref(false)
+const queryButtonRef = ref<HTMLElement | null>(null)
+const queryPopoverStyle = ref<Record<string, string>>({})
+
+const quickFilterCtx = {
+  doc: quickFilterDoc,
+  set_value: (fieldname: string, value: any) => {
+    quickFilterDoc[fieldname] = value
+    activeFilters.value[fieldname] = value
+  }
+} as any
 
 // Computed: columns from metadata
 const columns = computed<ListColumn[]>(() => {
@@ -277,7 +378,14 @@ const columns = computed<ListColumn[]>(() => {
     const df = fields.find(f => f.fieldname === titleField)
     cols.push({
       type: 'Subject',
-      df: df || { fieldname: titleField, label: titleField, fieldtype: 'Data', reqd: false, read_only: false },
+      df: df || {
+        fieldname: titleField,
+        label: titleField,
+        fieldtype: 'Data',
+        reqd: false,
+        read_only: false,
+        hidden: 0
+      },
       label: df?.label || 'ID',
       fieldname: titleField
     })
@@ -343,22 +451,46 @@ const fetchFields = computed(() => {
   return Array.from(fields)
 })
 
-// Computed: standard filters (fields with in_standard_filter or in_filter)
-const standardFilters = computed<Field[]>(() => {
+// Computed: filter fields (in_standard_filter + in_list_view)
+const filterFields = computed<Field[]>(() => {
   if (!meta.value) return []
-  
-  return meta.value.fields
-    .filter(f => 
-      (f.in_standard_filter || f.in_filter) && 
+
+  const fields = meta.value.fields
+    .filter(f =>
+      (f.in_standard_filter || f.in_filter || f.in_list_view) &&
       !f.hidden &&
-      ['Select', 'Link', 'Data'].includes(f.fieldtype)
+      !['Section Break', 'Column Break', 'Tab Break', 'Table', 'HTML', 'Button'].includes(f.fieldtype)
     )
-    .slice(0, 4) // Limit to 4 filters in toolbar
+    .sort((a, b) => (a.idx || 0) - (b.idx || 0))
+
+  const unique = new Map<string, Field>()
+  fields.forEach(f => {
+    if (!unique.has(f.fieldname)) unique.set(f.fieldname, f)
+  })
+
+  return Array.from(unique.values()).slice(0, 6)
+})
+
+const queryFieldOptions = computed<Field[]>(() => {
+  if (!meta.value) return []
+  return meta.value.fields
+    .filter(f =>
+      !f.hidden &&
+      !['Section Break', 'Column Break', 'Tab Break', 'Table', 'HTML', 'Button'].includes(f.fieldtype)
+    )
+    .sort((a, b) => (a.idx || 0) - (b.idx || 0))
 })
 
 // Computed: has active filters
 const hasActiveFilters = computed(() => {
-  return searchQuery.value || Object.values(activeFilters.value).some(v => v)
+  const quick = Object.values(activeFilters.value).some(v => v !== undefined && v !== null && v !== '')
+  const advanced = queryFilters.value.some(row => {
+    if (row.operator === 'between') {
+      return row.value?.from || row.value?.to
+    }
+    return row.value !== undefined && row.value !== null && row.value !== ''
+  })
+  return quick || advanced
 })
 
 // Computed: pagination
@@ -395,6 +527,13 @@ async function loadMeta() {
     if (meta.value?.sort_order) {
       sortOrder.value = meta.value.sort_order as 'asc' | 'desc'
     }
+
+    // Initialize quick filter doc values
+    filterFields.value.forEach(f => {
+      if (quickFilterDoc[f.fieldname] === undefined) {
+        quickFilterDoc[f.fieldname] = activeFilters.value[f.fieldname] ?? ''
+      }
+    })
   } catch (err: any) {
     console.error('Failed to load doctype meta:', err)
     error.value = err.message || 'Failed to load doctype metadata'
@@ -406,18 +545,46 @@ async function refresh() {
   error.value = ''
   
   try {
-    // Build filters
-    const filters: Record<string, any> = {}
-    
-    // Add search query as name LIKE filter
-    if (searchQuery.value) {
-      filters['name'] = ['like', `%${searchQuery.value}%`]
-    }
-    
-    // Add active filters
+    // Build filters (Frappe listview style)
+    const filters: any[] = []
+
+    // Quick filters
     Object.entries(activeFilters.value).forEach(([key, value]) => {
-      if (value) {
-        filters[key] = value
+      if (value !== undefined && value !== null && value !== '') {
+        filters.push([key, '=', value])
+      }
+    })
+
+    // Query builder filters
+    queryFilters.value.forEach(row => {
+      if (!row.fieldname || !row.operator) return
+
+      if (row.operator === 'between') {
+        const from = row.value?.from
+        const to = row.value?.to
+        if (from || to) {
+          filters.push([row.fieldname, 'between', [from, to]])
+        }
+        return
+      }
+
+      if (row.operator === 'in') {
+        if (typeof row.value === 'string') {
+          const parts = row.value.split(',').map(v => v.trim()).filter(Boolean)
+          if (parts.length) {
+            filters.push([row.fieldname, 'in', parts])
+          }
+        } else if (Array.isArray(row.value)) {
+          filters.push([row.fieldname, 'in', row.value])
+        }
+        return
+      }
+
+      if (row.value !== undefined && row.value !== null && row.value !== '') {
+        const value = row.operator === 'like' && typeof row.value === 'string'
+          ? `%${row.value}%`
+          : row.value
+        filters.push([row.fieldname, row.operator, value])
       }
     })
 
@@ -447,7 +614,7 @@ defineExpose({
   loadMeta
 })
 
-async function fetchTotalCount(filters: Record<string, any>) {
+async function fetchTotalCount(filters: any[]) {
   try {
     const response = await frappeClient.callMethod('frappe.client.get_count', {
       doctype: props.doctype,
@@ -464,11 +631,117 @@ function applyFilters() {
   refresh()
 }
 
+function getQuickFilterField(field: Field): Field {
+  return {
+    ...field,
+    read_only: false,
+    reqd: false
+  }
+}
+
+function addQueryFilter() {
+  const id = `f_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
+  const defaultField = queryFieldOptions.value[0]
+  const defaultOp = defaultField ? (getOperatorsForType(defaultField.fieldtype)[0] || '=') : '='
+  queryFilters.value.push({
+    id,
+    fieldname: defaultField?.fieldname || '',
+    operator: defaultOp,
+    value: ''
+  })
+}
+
+function removeQueryFilter(id: string) {
+  queryFilters.value = queryFilters.value.filter(row => row.id !== id)
+  delete queryRowDocs[id]
+}
+
+function onQueryFieldChange(row: { id: string; fieldname: string; operator: string; value: any }) {
+  const field = queryFieldOptions.value.find(f => f.fieldname === row.fieldname)
+  const ops = field ? getOperatorsForType(field.fieldtype) : ['=']
+  row.operator = ops[0] || '='
+  row.value = ''
+  delete queryRowDocs[row.id]
+}
+
+function getOperatorsForType(fieldtype: string): string[] {
+  if (['Int', 'Float', 'Currency'].includes(fieldtype)) {
+    return ['=', '!=', '>', '>=', '<', '<=', 'between', 'in']
+  }
+  if (['Date', 'DateTime'].includes(fieldtype)) {
+    return ['=', '!=', '>', '>=', '<', '<=', 'between']
+  }
+  if (['Check'].includes(fieldtype)) {
+    return ['=']
+  }
+  return ['=', '!=', 'like', 'in']
+}
+
+function getOperatorsForRow(row: { fieldname: string }): string[] {
+  const field = queryFieldOptions.value.find(f => f.fieldname === row.fieldname)
+  return field ? getOperatorsForType(field.fieldtype) : ['=']
+}
+
+function getQueryField(row: { id: string; fieldname: string }, part?: 'from' | 'to'): Field | null {
+  const base = queryFieldOptions.value.find(f => f.fieldname === row.fieldname)
+  if (!base) return null
+  const suffix = part ? `_${part}` : ''
+  return {
+    ...base,
+    fieldname: `__qb_${row.id}${suffix}`,
+    label: part ? (part === 'from' ? 'From' : 'To') : (base.label || base.fieldname),
+    reqd: false,
+    read_only: false
+  }
+}
+
+function getQueryCtx(row: { id: string; operator: string; value: any }, part?: 'from' | 'to') {
+  if (!queryRowDocs[row.id]) queryRowDocs[row.id] = {}
+  const doc = queryRowDocs[row.id]!
+  return {
+    doc,
+    set_value: (fieldname: string, value: any) => {
+      doc[fieldname] = value
+      if (row.operator === 'between') {
+        const next = { ...(row.value || {}) }
+        next[part || 'value'] = value
+        row.value = next
+      } else {
+        row.value = value
+      }
+    }
+  } as any
+}
+
 function clearFilters() {
-  searchQuery.value = ''
   activeFilters.value = {}
+  Object.keys(quickFilterDoc).forEach(key => delete quickFilterDoc[key])
+  queryFilters.value = []
+  Object.keys(queryRowDocs).forEach(key => delete queryRowDocs[key])
   currentPage.value = 0
   refresh()
+}
+
+function updateQueryPopoverPosition() {
+  if (!showQueryBuilder.value || !queryButtonRef.value) return
+  const rect = queryButtonRef.value.getBoundingClientRect()
+  const top = rect.bottom + 8
+  const left = Math.max(8, rect.right - 384)
+  queryPopoverStyle.value = {
+    top: `${top}px`,
+    left: `${left}px`
+  }
+}
+
+function toggleQueryBuilder() {
+  showQueryBuilder.value = !showQueryBuilder.value
+  if (showQueryBuilder.value) {
+    updateQueryPopoverPosition()
+  }
+}
+
+function closeQueryBuilder() {
+  showQueryBuilder.value = false
 }
 
 function toggleSort(col: ListColumn) {
@@ -567,15 +840,17 @@ function getCellComponent(df: Field) {
   return componentMap[df.fieldtype] || DefaultCell
 }
 
-function getSelectOptions(field: Field): string[] {
-  if (!field.options) return []
-  return field.options.split('\n').filter(opt => opt.trim())
-}
-
 // Initialize
 onMounted(async () => {
   await loadMeta()
   await refresh()
+  window.addEventListener('resize', updateQueryPopoverPosition)
+  window.addEventListener('scroll', updateQueryPopoverPosition, true)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateQueryPopoverPosition)
+  window.removeEventListener('scroll', updateQueryPopoverPosition, true)
 })
 </script>
 

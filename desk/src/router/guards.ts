@@ -6,7 +6,7 @@ import { useAuthStore } from '../stores/auth'
  * Ensures users are logged in before accessing protected routes
  */
 export function setupRouterGuards(router: Router) {
-  router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next) => {
+  router.beforeEach(async (to: RouteLocationNormalized, _from: RouteLocationNormalized, next) => {
     const authStore = useAuthStore()
 
     // Public routes that don't require authentication
@@ -31,13 +31,12 @@ export function setupRouterGuards(router: Router) {
   })
 
   router.afterEach((to: RouteLocationNormalized) => {
-    // Update page title based on route
     const titles: Record<string, string> = {
       'Desk': 'Desk - ERP',
       'App': 'App',
-      'ListView': 'List',
-      'NewForm': 'New Form',
-      'EditForm': 'Form',
+      'ListView': `${to.params.doctype || ''}`.trim(),
+      'NewForm': `New ${to.params.doctype || ''}`.trim(),
+      'EditForm': `${to.params.doctype || ''} - ${to.params.name || ''}`.trim(),
       'Login': 'Login',
       'ResetPassword': 'Reset Password',
       'NotFound': 'Not Found'
@@ -51,7 +50,7 @@ export function setupRouterGuards(router: Router) {
  * Check if user has specific roles
  */
 export function requireRoles(allowedRoles: string | string[]) {
-  return (to: RouteLocationNormalized, from: RouteLocationNormalized, next: any) => {
+  return (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: any) => {
     const authStore = useAuthStore()
     const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles]
 
