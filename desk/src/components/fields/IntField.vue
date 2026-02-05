@@ -1,79 +1,101 @@
 <template>
-  <div class="field-wrapper">
-    <label v-if="field.label" :for="`field-${field.fieldname}`" class="field-label">
+  <div class="mb-4 flex flex-col">
+    <label 
+      v-if="field.label" 
+      :for="`field-${field.fieldname}`" 
+      class="font-medium mb-1 text-[0.95rem] text-slate-700 dark:text-slate-300"
+    >
       {{ field.label }}
-      <span v-if="field.reqd" class="required">*</span>
+      <span v-if="field.reqd" class="text-red-600 dark:text-red-500 ml-1">*</span>
     </label>
     <input
       :id="`field-${field.fieldname}`"
-      :value="ctx.doc[field.fieldname]"
+      :value="displayValue"
       :readonly="field.read_only"
       :required="field.reqd"
-      type="number"
-      class="field-input"
+      type="text"
+      inputmode="numeric"
+      class="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded text-[0.95rem] transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-600 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-600/10 dark:focus:ring-blue-500/20 read-only:bg-slate-50 dark:read-only:bg-slate-900/50 read-only:cursor-not-allowed disabled:opacity-50"
       @input="updateValue"
+      @keydown="validateKeypress"
     />
-    <small v-if="field.description" class="field-description">{{ field.description }}</small>
+    <small 
+      v-if="field.description" 
+      class="block text-slate-600 dark:text-slate-400 mt-1 text-[0.85rem]"
+    >
+      {{ field.description }}
+    </small>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Field, FormContext } from '@/types'
 
-defineProps<{ field: Field; ctx: FormContext }>()
+const props = defineProps<{ field: Field; ctx: FormContext }>()
 
 const emit = defineEmits<{
   fieldChange: [value: any]
 }>()
 
+const displayValue = computed(() => {
+  const val = props.ctx.doc[props.field.fieldname]
+  return val !== null && val !== undefined ? String(val) : ''
+})
+
+function validateKeypress(e: KeyboardEvent) {
+  // Allow: backspace, delete, tab, escape, enter, arrows
+  if ([8, 9, 27, 13, 46, 37, 38, 39, 40].includes(e.keyCode)) {
+    return
+  }
+  
+  // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+  if ((e.ctrlKey || e.metaKey) && [65, 67, 86, 88].includes(e.keyCode)) {
+    return
+  }
+  
+  // Allow: home, end
+  if (e.keyCode === 35 || e.keyCode === 36) {
+    return
+  }
+  
+  // Allow minus sign only at the beginning
+  const input = e.target as HTMLInputElement
+  if (e.key === '-' && input.selectionStart === 0 && !input.value.includes('-')) {
+    return
+  }
+  
+  // Ensure that it is a number and stop the keypress
+  if ((e.shiftKey || e.key < '0' || e.key > '9') && e.key !== '-') {
+    e.preventDefault()
+  }
+}
+
 function updateValue(e: Event) {
-  const value = (e.target as HTMLInputElement).value
-  ctx.set_value(field.fieldname, value ? parseInt(value) : 0)
-  emit('fieldChange', value)
+  const input = e.target as HTMLInputElement
+  let value = input.value.trim()
+  
+  // Remove any non-numeric characters except minus at the start
+  value = value.replace(/[^\d-]/g, '')
+  
+  // Ensure only one minus sign at the beginning
+  if (value.includes('-')) {
+    const parts = value.split('-')
+    value = '-' + parts.filter(p => p).join('')
+  }
+  
+  // Parse and set value
+  let parsedValue: number | null = null
+  if (value === '' || value === '-') {
+    parsedValue = null
+  } else {
+    parsedValue = parseInt(value, 10)
+    if (isNaN(parsedValue)) {
+      parsedValue = null
+    }
+  }
+  
+  props.ctx.set_value(props.field.fieldname, parsedValue)
+  emit('fieldChange', parsedValue)
 }
 </script>
-
-<style scoped>
-.field-wrapper {
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-}
-
-.field-label {
-  font-weight: 500;
-  margin-bottom: 0.25rem;
-  font-size: 0.95rem;
-}
-
-.required {
-  color: #dc3545;
-  margin-left: 0.25rem;
-}
-
-.field-input {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  transition: border-color 0.2s;
-}
-
-.field-input:focus {
-  outline: none;
-  border-color: #0066cc;
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-}
-
-.field-input:readonly {
-  background-color: #f5f5f5;
-  cursor: not-allowed;
-}
-
-.field-description {
-  display: block;
-  color: #666;
-  margin-top: 0.25rem;
-  font-size: 0.85rem;
-}
-</style>

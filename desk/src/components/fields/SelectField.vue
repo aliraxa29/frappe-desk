@@ -1,28 +1,37 @@
 <template>
-  <div class="field-wrapper">
-    <label v-if="field.label" :for="`field-${field.fieldname}`" class="field-label">
+  <div class="mb-4 flex flex-col">
+    <label 
+      v-if="field.label" 
+      :for="`field-${field.fieldname}`" 
+      class="font-medium mb-1 text-[0.95rem] text-slate-700 dark:text-slate-300"
+    >
       {{ field.label }}
-      <span v-if="field.reqd" class="required">*</span>
+      <span v-if="field.reqd" class="text-red-600 dark:text-red-500 ml-1">*</span>
     </label>
     <select
       :id="`field-${field.fieldname}`"
-      :value="ctx.doc[field.fieldname]"
-      :readonly="field.read_only"
+      :value="currentValue"
+      :disabled="field.read_only"
       :required="field.reqd"
-      class="field-select"
+      class="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded text-[0.95rem] transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-600 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-600/10 dark:focus:ring-blue-500/20 disabled:bg-slate-50 dark:disabled:bg-slate-900/50 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
       @change="updateValue"
     >
-      <option value="">-- Select --</option>
-      <option v-for="option in options" :key="option" :value="option">
-        {{ option }}
+      <option value="">{{ placeholderText }}</option>
+      <option v-for="option in options" :key="option.value" :value="option.value">
+        {{ option.label }}
       </option>
     </select>
-    <small v-if="field.description" class="field-description">{{ field.description }}</small>
+    <small 
+      v-if="field.description" 
+      class="block text-slate-600 dark:text-slate-400 mt-1 text-[0.85rem]"
+    >
+      {{ field.description }}
+    </small>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import type { Field, FormContext } from '@/types'
 
 const props = defineProps<{ field: Field; ctx: FormContext }>()
@@ -31,60 +40,62 @@ const emit = defineEmits<{
   fieldChange: [value: any]
 }>()
 
+const currentValue = ref('')
+const originalValue = ref<any>(null)
+
+const placeholderText = computed(() => {
+  if (props.field.reqd) {
+    return '-- Select --'
+  }
+  return '-- No Selection --'
+})
+
 const options = computed(() => {
   if (!props.field.options) return []
-  return props.field.options.split('\n').filter(o => o.trim())
+  
+  // Parse options: can be newline-separated, comma-separated, or JSON array
+  let optionsList: string[] = []
+  
+  const optionsStr = props.field.options.trim()
+  
+  // Try JSON array first
+  if (optionsStr.startsWith('[')) {
+    try {
+      optionsList = JSON.parse(optionsStr)
+    } catch {
+      // Fall back to string parsing
+      optionsList = optionsStr.split('\n').filter(o => o.trim())
+    }
+  } else {
+    // Split by newline or comma
+    optionsList = optionsStr
+      .split(/[\n,]/)
+      .map(o => o.trim())
+      .filter(o => o)
+  }
+  
+  return optionsList.map(option => ({
+    value: option,
+    label: option
+  }))
 })
 
 function updateValue(e: Event) {
-  const value = (e.target as HTMLSelectElement).value
-  props.ctx.set_value(props.field.fieldname, value)
-  emit('fieldChange', value)
+  const value = (e.target as HTMLSelectElement).value || null
+  
+  // Only update if value actually changed
+  if (value !== originalValue.value) {
+    props.ctx.set_value(props.field.fieldname, value)
+    emit('fieldChange', value)
+  }
 }
+
+watch(
+  () => props.ctx.doc?.[props.field.fieldname],
+  (next) => {
+    originalValue.value = next
+    currentValue.value = next || ''
+  },
+  { immediate: true }
+)
 </script>
-
-<style scoped>
-.field-wrapper {
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-}
-
-.field-label {
-  font-weight: 500;
-  margin-bottom: 0.25rem;
-  font-size: 0.95rem;
-}
-
-.required {
-  color: #dc3545;
-  margin-left: 0.25rem;
-}
-
-.field-select {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: border-color 0.2s;
-}
-
-.field-select:focus {
-  outline: none;
-  border-color: #0066cc;
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-}
-
-.field-select:disabled {
-  background-color: #f5f5f5;
-  cursor: not-allowed;
-}
-
-.field-description {
-  display: block;
-  color: #666;
-  margin-top: 0.25rem;
-  font-size: 0.85rem;
-}
-</style>

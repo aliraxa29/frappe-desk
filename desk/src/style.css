@@ -1,8 +1,27 @@
 @import "tailwindcss";
 
-/* Light mode colors (default) */
-:root,
-html.light {
+/* Tailwind v4: Configure dark mode to use class selector */
+@custom-variant dark (&:where(.dark, .dark *));
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Light mode (default) */
+:root {
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
   --bg-tertiary: #f1f5f9;
@@ -34,9 +53,16 @@ html.light {
   --button-primary-hover: #2563eb;
   --button-secondary: #e2e8f0;
   --button-secondary-text: #0f172a;
+  
+  color-scheme: light;
 }
 
-/* Dark mode colors */
+html.light {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Dark mode */
 html.dark {
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
@@ -69,4 +95,9 @@ html.dark {
   --button-primary-hover: #2563eb;
   --button-secondary: #334155;
   --button-secondary-text: #f1f5f9;
+  
+  color-scheme: dark;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
+

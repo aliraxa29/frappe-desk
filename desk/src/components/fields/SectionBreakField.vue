@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Field, FormContext } from '@/types'
+import type { Field, FormContext } from '../../types'
 
-defineProps<{ field: Field; ctx: FormContext }>()
+const props = defineProps<{ field: Field; ctx: FormContext }>()
 </script>
 
 <style scoped>

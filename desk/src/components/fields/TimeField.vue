@@ -1,6 +1,6 @@
 <template>
   <div class="mb-4 flex flex-col relative">
-    <label v-if="field.label" class="font-medium mb-1 text-sm text-slate-700">
+    <label v-if="field.label" class="font-medium mb-1 text-sm text-slate-700 dark:text-white">
       {{ field.label }}
       <span v-if="field.reqd" class="text-red-500 ml-1">*</span>
     </label>
@@ -25,12 +25,12 @@
       <div
         v-if="showPicker"
         ref="pickerRef"
-        class="absolute top-full left-0 mt-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg shadow-lg p-3 z-18"
+        class="absolute top-full left-0 mt-2 bg-white dark:bg-slate-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg shadow-lg p-3 z-18"
         style="width: 240px"
       >
         <!-- Time Display -->
         <div class="text-center mb-3 pb-2 border-b border-gray-200">
-          <div class="text-lg font-semibold text-slate-900 font-mono">
+          <div class="text-lg font-semibold text-slate-900 dark:text-white font-mono">
             {{ padTime(hour) }}:{{ padTime(minute) }}:{{ padTime(second) }}
           </div>
         </div>
@@ -38,8 +38,8 @@
         <!-- Hour Slider -->
         <div class="mb-3">
           <div class="flex justify-between items-center mb-1">
-            <label class="text-xs font-medium text-slate-600 uppercase tracking-wide text-[11px]">Hour</label>
-            <span class="text-xs font-semibold text-slate-700">{{ padTime(hour) }}</span>
+            <label class="text-xs font-medium text-slate-600 dark:text-white uppercase tracking-wide text-[11px]">Hour</label>
+            <span class="text-xs font-semibold text-slate-700 dark:text-white">{{ padTime(hour) }}</span>
           </div>
           <input
             v-model.number="hour"
@@ -54,8 +54,8 @@
         <!-- Minute Slider -->
         <div class="mb-3">
           <div class="flex justify-between items-center mb-1">
-            <label class="text-xs font-medium text-slate-600 uppercase tracking-wide text-[11px]">Minute</label>
-            <span class="text-xs font-semibold text-slate-700">{{ padTime(minute) }}</span>
+            <label class="text-xs font-medium text-slate-600 dark:text-white uppercase tracking-wide text-[11px]">Minute</label>
+            <span class="text-xs font-semibold text-slate-700 dark:text-white">{{ padTime(minute) }}</span>
           </div>
           <input
             v-model.number="minute"
@@ -70,8 +70,8 @@
         <!-- Second Slider -->
         <div class="mb-3">
           <div class="flex justify-between items-center mb-1">
-            <label class="text-xs font-medium text-slate-600 uppercase tracking-wide text-[11px]">Second</label>
-            <span class="text-xs font-semibold text-slate-700">{{ padTime(second) }}</span>
+            <label class="text-xs font-medium text-slate-600 dark:text-white uppercase tracking-wide text-[11px]">Second</label>
+            <span class="text-xs font-semibold text-slate-700 dark:text-white">{{ padTime(second) }}</span>
           </div>
           <input
             v-model.number="second"

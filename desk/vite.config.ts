@@ -9,8 +9,10 @@ import Components from 'unplugin-vue-components/vite'
 export default defineConfig({
   base: '/dashboard/',
   plugins: [
+    tailwindcss({
+      configPath: './tailwind.config.ts',
+    }),
     vue(),
-    tailwindcss(),
   ],
   resolve: {
     alias: {

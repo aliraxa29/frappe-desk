@@ -3,9 +3,10 @@
     <!-- Header -->
     <template #header>
       <div class="flex items-center justify-between gap-4 w-full py-4">
-        <h2 class="text-lg font-semibold text-slate-800">
-          {{ doctype }}
+        <h2 class="text-lg font-semibold text-slate-800 dark:text-white">
+          {{ doctype }} 
         </h2>
+        <span>{{ isNewDocument ? '(New)' : documentName }}</span>
       </div>
     </template>
 

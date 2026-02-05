@@ -25,7 +25,7 @@ export const useThemeStore = defineStore('theme', () => {
     return theme.value
   }
 
-  // Apply theme to document
+  // Apply theme to document - applies to html element for Tailwind
   const applyTheme = () => {
     const effective = getEffectiveTheme()
     const html = document.documentElement
@@ -33,13 +33,9 @@ export const useThemeStore = defineStore('theme', () => {
     if (effective === 'dark') {
       html.classList.add('dark')
       html.classList.remove('light')
-      document.body.classList.add('dark')
-      document.body.classList.remove('light')
     } else {
       html.classList.add('light')
       html.classList.remove('dark')
-      document.body.classList.add('light')
-      document.body.classList.remove('dark')
     }
   }
 

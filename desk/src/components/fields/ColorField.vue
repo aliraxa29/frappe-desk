@@ -1,6 +1,6 @@
 <template>
   <div class="mb-4 flex flex-col relative">
-    <label v-if="field.label" class="font-medium mb-1 text-sm text-slate-700">
+    <label v-if="field.label" class="font-medium mb-1 text-sm text-slate-700 dark:text-white">
       {{ field.label }}
       <span v-if="field.reqd" class="text-red-500 ml-1">*</span>
     </label>
@@ -21,7 +21,7 @@
 
     <Transition name="picker">
       <div v-if="showPicker" ref="pickerRef"
-        class="absolute top-full left-0 mt-2 w-52.5 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg shadow-lg p-3 z-18">
+        class="absolute top-full left-0 mt-2 w-52.5 bg-white dark:bg-slate-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg shadow-lg p-3 z-18">
         <!-- Swatches Section -->
         <div>
           <div class="text-xs text-gray-500 font-medium mb-2 uppercase tracking-wide">Swatches</div>
