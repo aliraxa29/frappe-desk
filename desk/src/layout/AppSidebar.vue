@@ -16,11 +16,53 @@
 
         <!-- Sidebar Content - Scrollable -->
         <div ref="sidebarContentRef" class="flex-1 overflow-y-auto px-2 py-3 dark:bg-gray-950">
+            <!-- Loading -->
+            <div v-if="loading" class="py-10 text-center text-sm text-slate-400">
+                Loading...
+            </div>
+
             <!-- Empty -->
-            <div v-if="allSidebarEmpty" class="py-10 text-center text-sm text-slate-400">
+            <div v-else-if="allSidebarEmpty" class="py-10 text-center text-sm text-slate-400">
                 No sidebar items
             </div>
 
+            <!-- Workspace Mode: Show workspaces as sidebar items -->
+            <div v-else-if="sidebarSource === 'workspaces'" class="space-y-1">
+                <div
+                    v-for="item in filteredWorkspaces"
+                    :key="`ws-${item.name}`"
+                    @click="handleWorkspaceClick(item)"
+                    :class="[
+                        'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition cursor-pointer',
+                        isWorkspaceActive(item) 
+                            ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold' 
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    ]"
+                >
+                    <span class="text-base">{{ getWorkspaceIcon(item.icon) }}</span>
+                    <span class="truncate">{{ item.label || item.name }}</span>
+                </div>
+            </div>
+
+            <!-- Module Mode: Show modules as sidebar items -->
+            <div v-else-if="sidebarSource === 'modules'" class="space-y-1">
+                <div
+                    v-for="item in filteredModules"
+                    :key="`mod-${item.name}`"
+                    @click="handleModuleClick(item)"
+                    :class="[
+                        'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition cursor-pointer',
+                        isModuleActive(item) 
+                            ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold' 
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    ]"
+                >
+                    <span class="text-base">{{ getWorkspaceIcon(item.icon) }}</span>
+                    <span class="truncate">{{ item.label || item.name }}</span>
+                </div>
+            </div>
+
+            <!-- App Sidebar Mode: Show grouped items (DocTypes, Pages, Reports, Dashboards) -->
             <div v-else class="space-y-6">
                 <!-- DocTypes -->
                 <div v-if="groupedSidebar.doctypes.length">
@@ -29,12 +71,9 @@
                     </h4>
 
                     <div v-for="item in groupedSidebar.doctypes" :key="`doctype-${item.name}`"
-                        @click="handleDoctypeClick(item)" :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition cursor-pointer', isItemActive(item) ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800']"><span class="text-base">
-                            {{ item.icon || '📄' }}
-                        </span>
-                        <span class="truncate">
-                            {{ item.label || item.name }}
-                        </span>
+                        @click="handleDoctypeClick(item)" :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition cursor-pointer', isItemActive(item) ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800']">
+                        <span class="text-base">{{ getWorkspaceIcon(item.icon) }}</span>
+                        <span class="truncate">{{ item.label || item.name }}</span>
                     </div>
                 </div>
 
@@ -45,12 +84,9 @@
                     </h4>
 
                     <router-link v-for="item in groupedSidebar.pages" :key="`page-${item.name}`" :to="getRoute(item)"
-                        :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', isPageActive(item) ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800']"><span class="text-base">
-                            {{ item.icon || '📄' }}
-                        </span>
-                        <span class="truncate">
-                            {{ item.label || item.name }}
-                        </span>
+                        :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', isPageActive(item) ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800']">
+                        <span class="text-base">{{ getWorkspaceIcon(item.icon) }}</span>
+                        <span class="truncate">{{ item.label || item.name }}</span>
                     </router-link>
                 </div>
 
@@ -61,12 +97,9 @@
                     </h4>
 
                     <router-link v-for="item in groupedSidebar.reports" :key="`report-${item.name}`"
-                        :to="getRoute(item)" :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', isPageActive(item) ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800']"><span class="text-base">
-                            {{ item.icon || '�' }}
-                        </span>
-                        <span class="truncate">
-                            {{ item.label || item.name }}
-                        </span>
+                        :to="getRoute(item)" :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', isPageActive(item) ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800']">
+                        <span class="text-base">{{ getWorkspaceIcon(item.icon) || '📊' }}</span>
+                        <span class="truncate">{{ item.label || item.name }}</span>
                     </router-link>
                 </div>
                 
@@ -77,12 +110,9 @@
                     </h4>
 
                     <router-link v-for="item in groupedSidebar.dashboards" :key="`dashboard-${item.name}`"
-                        :to="getRoute(item)" :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', isPageActive(item) ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800']"><span class="text-base">
-                            {{ item.icon || '📈' }}
-                        </span>
-                        <span class="truncate">
-                            {{ item.label || item.name }}
-                        </span>
+                        :to="getRoute(item)" :class="['group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition', isPageActive(item) ? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800']">
+                        <span class="text-base">{{ getWorkspaceIcon(item.icon) || '📈' }}</span>
+                        <span class="truncate">{{ item.label || item.name }}</span>
                     </router-link>
                 </div>
             </div>
@@ -97,25 +127,121 @@ import type { SidebarItem } from '../data/app_sidebar';
 import { computed, onMounted, ref, watch } from 'vue';
 import { desktopAPI } from '../api/desktop';
 import { model } from '../data/model';
+import { useSidebarStore } from '../stores/sidebar';
+
+declare const locals: any
 
 const searchQuery = ref('')
-const loading = ref(true)
-const doctypes = ref<string[]>([])
-const sidebarItems = ref<SidebarItem[]>([])
+const sidebarStore = useSidebarStore()
 const route = useRoute();
 const router = useRouter();
 const sidebarContentRef = ref<HTMLElement | null>(null);
 
+// Use store items instead of local state
+const sidebarItems = computed(() => sidebarStore.items)
+const sidebarSource = computed(() => sidebarStore.source)
+const loading = computed(() => sidebarStore.loading)
+
+// Icon mapping for workspace icons (Frappe icon names to emoji)
+const iconMap: Record<string, string> = {
+    'home': '🏠',
+    'file': '📄',
+    'folder': '📁',
+    'chart': '📊',
+    'users': '👥',
+    'settings': '⚙️',
+    'shopping-cart': '🛒',
+    'dollar-sign': '💵',
+    'briefcase': '💼',
+    'calendar': '📅',
+    'clipboard': '📋',
+    'database': '🗄️',
+    'tool': '🔧',
+    'truck': '🚚',
+    'package': '📦',
+    'credit-card': '💳',
+    'star': '⭐',
+    'heart': '❤️',
+    'book': '📚',
+    'education': '🎓',
+    'hammer': '🔨',
+    'default': '📁'
+}
+
+function getWorkspaceIcon(icon?: string): string {
+    if (!icon) return iconMap['default'] ?? '📁'
+    if (icon.length <= 2) return icon
+    return iconMap[icon.toLowerCase()] ?? iconMap['default'] ?? '📁'
+}
+
+const filteredWorkspaces = computed(() => {
+    if (!searchQuery.value) return sidebarItems.value
+    const q = searchQuery.value.toLowerCase()
+    return sidebarItems.value.filter(item => 
+        (item.label || item.name).toLowerCase().includes(q)
+    )
+})
+
+const filteredModules = computed(() => {
+    if (!searchQuery.value) return sidebarItems.value
+    const q = searchQuery.value.toLowerCase()
+    return sidebarItems.value.filter(item => 
+        (item.label || item.name).toLowerCase().includes(q)
+    )
+})
+
+function handleWorkspaceClick(item: SidebarItem) {
+    const appName = route.params.app as string
+    const workspaceName = item.link_to || item.name
+    router.push(`/${appName}/workspace/${encodeURIComponent(workspaceName)}`)
+}
+
+function handleModuleClick(item: SidebarItem) {
+    const appName = route.params.app as string
+    const moduleName = item.link_to || item.name
+    router.push(`/${appName}/module/${encodeURIComponent(moduleName)}`)
+}
+
+function isWorkspaceActive(item: SidebarItem): boolean {
+    const workspaceName = item.link_to || item.name
+    return route.params.workspace === workspaceName
+}
+
+function isModuleActive(item: SidebarItem): boolean {
+    const moduleName = item.link_to || item.name
+    return route.params.module === moduleName
+}
+
 async function handleDoctypeClick(item: SidebarItem) {
     const doctypeName = item.link_to || item.name
+    const docView = item.doc_view?.toLowerCase()
     
-    // Check if we already have the doctype metadata in locals
+    if (docView) {
+        switch (docView) {
+            case 'new':
+                router.push({
+                    name: "NewForm",
+                    params: { app: route.params.app, doctype: doctypeName }
+                })
+                return
+            case 'kanban':
+            case 'calendar':
+            case 'tree':
+            case 'report builder':
+            case 'dashboard':
+                router.push({
+                    name: "ListView",
+                    params: { app: route.params.app, doctype: doctypeName }
+                })
+                return
+        }
+    }
+    
     let isSingle = false
     
     if (locals?.DocType?.[doctypeName]) {
         isSingle = locals.DocType[doctypeName].issingle === 1
     } else {
-        // Load the doctype metadata if not available
         try {
             await new Promise((resolve) => {
                 model.with_doctype(doctypeName, (result: any) => {
@@ -133,14 +259,13 @@ async function handleDoctypeClick(item: SidebarItem) {
         }
     }
     
-    // Navigate based on whether it's a single doctype or not
     if (isSingle) {
         router.push({
             name: "EditForm",
             params: { 
                 app: route.params.app, 
                 doctype: doctypeName,
-                name: doctypeName // Single doctypes use doctype name as document name
+                name: doctypeName
             }
         })
     } else {
@@ -153,29 +278,17 @@ async function handleDoctypeClick(item: SidebarItem) {
 
 function getRoute(item: SidebarItem) {
     const type = (item.link_type || item.type || '').toLowerCase()
+    const appName = route.params.app as string
+    const itemName = item.link_to || item.name
     
-    // Pages
     if (type === 'page') {
-        return {
-            name: "PageView",
-            params: { app: route.params.app, page: item.link_to || item.name },
-        }
+        return `/${appName}/page/${encodeURIComponent(itemName)}`
     }
-
-    // Reports
     if (type === 'report') {
-        return {
-            name: "ReportView",
-            params: { app: route.params.app, report: item.link_to || item.name },
-        }
+        return `/${appName}/report/${encodeURIComponent(itemName)}`
     }
-    
-    // Dashboards
     if (type === 'dashboard') {
-        return {
-            name: "DashboardView",
-            params: { app: route.params.app, dashboard: item.link_to || item.name },
-        }
+        return `/${appName}/dashboard/${encodeURIComponent(itemName)}`
     }
     
     return "#"
@@ -189,23 +302,19 @@ function isItemActive(item: SidebarItem): boolean {
 function isPageActive(item: SidebarItem): boolean {
     const itemName = item.link_to || item.name
     const type = (item.link_type || item.type || '').toLowerCase()
+    const currentPath = route.path
+    const appName = route.params.app as string
     
     if (type === 'page') {
-        return route.params.page === itemName
+        return currentPath === `/${appName}/page/${encodeURIComponent(itemName)}`
     } else if (type === 'report') {
-        return route.params.report === itemName
+        return currentPath === `/${appName}/report/${encodeURIComponent(itemName)}`
     } else if (type === 'dashboard') {
-        return route.params.dashboard === itemName
+        return currentPath === `/${appName}/dashboard/${encodeURIComponent(itemName)}`
     }
     
     return false
 }
-
-const filteredDoctypes = computed(() => {
-    if (!searchQuery.value) return doctypes.value
-    const query = searchQuery.value.toLowerCase()
-    return doctypes.value.filter(dt => dt.toLowerCase().includes(query))
-})
 
 const groupedSidebar = computed(() => {
     const q = (searchQuery.value || '').toLowerCase()
@@ -222,7 +331,6 @@ const groupedSidebar = computed(() => {
     }
 
     for (const item of filtered) {
-        // Skip child doctypes (istable = true)
         if (item.istable) continue
 
         const t = (item.link_type || item.type || '').toLowerCase()
@@ -236,43 +344,24 @@ const groupedSidebar = computed(() => {
 })
 
 const allSidebarEmpty = computed(() => {
+    if (sidebarSource.value === 'workspaces') {
+        return filteredWorkspaces.value.length === 0
+    }
+    if (sidebarSource.value === 'modules') {
+        return filteredModules.value.length === 0
+    }
     const g = groupedSidebar.value
     return g.doctypes.length === 0 && g.pages.length === 0 && g.reports.length === 0 && g.dashboards.length === 0
 })
 
-
-onMounted(async () => {
-    await fetchSidebar()
-})
-
-async function fetchSidebar() {
-    try {
-        loading.value = true
-        const module = (route.params.app as string) || 'desktop'
-
-        const dtResult = await desktopAPI.getModuleDoctypes(module)
-        doctypes.value = dtResult
-
-        const sb = await desktopAPI.getModuleSidebar(module)
-        sidebarItems.value = sb
-        
-        // Reset scroll position to top
+// Removed fetchSidebar - AppView now manages sidebar state via store
+// Just scroll to top when route changes
+watch(
+    () => route.params.app,
+    () => {
         if (sidebarContentRef.value) {
             sidebarContentRef.value.scrollTop = 0
         }
-    } catch (error) {
-        console.error('Failed to load module data:', error)
-        doctypes.value = []
-        sidebarItems.value = []
-    } finally {
-        loading.value = false
-    }
-}
-
-watch(
-    () => route.fullPath,
-    async () => {
-        await fetchSidebar()
     }
 )
 </script>

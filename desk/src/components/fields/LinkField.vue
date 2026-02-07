@@ -238,6 +238,9 @@ function handleInput(e: Event) {
 }
 
 function handleFocus() {
+  if (props.field.read_only) {
+    return
+  }
   showDropdown.value = true
   if (!resultItems.value.length && !loading.value) {
     fetchOptions('')

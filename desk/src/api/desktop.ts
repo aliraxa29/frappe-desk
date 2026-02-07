@@ -1,6 +1,30 @@
 import { desk } from '../utils/desk'
-import { APP_SIDEBARS, type SidebarItem } from '../data/app_sidebar'
+import { APP_SIDEBARS, type SidebarItem, type WorkspaceContent } from '../data/app_sidebar'
 import type { AppInfo } from '../types'
+
+/**
+   * Response from getModuleSidebar
+   */
+interface SidebarResponse {
+  source: 'app_sidebar' | 'modules' | 'workspaces'
+  items: SidebarItem[]
+}
+
+/**
+ * Module content structure
+ */
+export interface ModuleContent {
+  name: string
+  label?: string
+  icon?: string
+  shortcuts: any[]
+  cards: any[]
+  charts: any[]
+  number_cards: any[]
+  quick_lists: any[]
+  doctypes: { name: string; label: string; description?: string; link_type: string; type: string }[]
+  reports: { name: string; label: string; report_type?: string; link_type: string; type: string }[]
+}
 
 export interface Module {
   name: string
@@ -200,8 +224,9 @@ class DesktopAPI {
 
   /**
    * Get sidebar items for a module. Attempts server call, falls back to frontend data.
+   * Returns both the items and the source (app_sidebar, modules, or workspaces)
    */
-  async getModuleSidebar(app: string): Promise<SidebarItem[]> {
+  async getModuleSidebar(app: string): Promise<SidebarResponse> {
     try {
       const response = await desk.call({
         method: 'desktop.api.apps.get_module_sidebar',
@@ -209,14 +234,102 @@ class DesktopAPI {
       })
 
       if (response.message) {
-        return response.message
+        // Handle new response format with source
+        if (response.message.source && response.message.items) {
+          return response.message as SidebarResponse
+        }
+        // Handle legacy format (array of items)
+        return {
+          source: 'app_sidebar',
+          items: response.message
+        }
       }
 
       // fallback to bundled data
-      return APP_SIDEBARS[app] || []
+      return {
+        source: 'app_sidebar',
+        items: APP_SIDEBARS[app] || []
+      }
     } catch (error) {
       console.error(`Failed to fetch sidebar for module ${app}:`, error)
-      return APP_SIDEBARS[app] || []
+      return {
+        source: 'app_sidebar',
+        items: APP_SIDEBARS[app] || []
+      }
+    }
+  }
+
+  /**
+   * Get module content (shortcuts, doctypes, reports, etc.)
+   */
+  async getModuleContent(moduleName: string): Promise<ModuleContent> {
+    try {
+      const response = await desk.call({
+        method: 'desktop.api.apps.get_module_content',
+        args: { module_name: moduleName }
+      })
+
+      if (response.message) {
+        return response.message
+      }
+
+      return {
+        name: moduleName,
+        shortcuts: [],
+        cards: [],
+        charts: [],
+        number_cards: [],
+        quick_lists: [],
+        doctypes: [],
+        reports: []
+      }
+    } catch (error) {
+      console.error(`Failed to fetch module content for ${moduleName}:`, error)
+      return {
+        name: moduleName,
+        shortcuts: [],
+        cards: [],
+        charts: [],
+        number_cards: [],
+        quick_lists: [],
+        doctypes: [],
+        reports: []
+      }
+    }
+  }
+
+  /**
+   * Get workspace content (shortcuts, cards, etc.)
+   */
+  async getWorkspaceContent(workspaceName: string): Promise<WorkspaceContent> {
+    try {
+      const response = await desk.call({
+        method: 'desktop.api.apps.get_workspace_content',
+        args: { workspace_name: workspaceName }
+      })
+
+      if (response.message) {
+        return response.message
+      }
+
+      return {
+        name: workspaceName,
+        shortcuts: [],
+        cards: [],
+        charts: [],
+        number_cards: [],
+        quick_lists: []
+      }
+    } catch (error) {
+      console.error(`Failed to fetch workspace content for ${workspaceName}:`, error)
+      return {
+        name: workspaceName,
+        shortcuts: [],
+        cards: [],
+        charts: [],
+        number_cards: [],
+        quick_lists: []
+      }
     }
   }
 

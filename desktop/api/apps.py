@@ -396,24 +396,335 @@ def get_module_sidebar(app):
     """Get sidebar items for a module.
 
     Tries to read items from a DocType named 'App Sidebar' (if installed).
-    If that DocType does not exist, falls back to returning the module's doctypes
-    as simple sidebar entries.
+    If that DocType does not exist, falls back to modules for that app.
+    
+    Returns:
+        dict: {
+            "source": "app_sidebar" | "modules",
+            "items": list of sidebar items
+        }
     """
     try:
-        items = frappe.get_doc("App Sidebar", app).get("items")
+        if not frappe.db.exists("DocType", "App Sidebar"):
+            return
+        
+        doc = frappe.get_doc("App Sidebar", app)
+        items = doc.get("items")
 
-        result = []
-        for it in items:
-            result.append(
-                {
-                    "name": it.get("name"),
-                    "label": it.get("label") or it.get("name"),
-                    "link_type": it.get("link_type"),
-                    "link_to": it.get("link_to"),
-                }
-            )
-
-        return result
+        if items and len(items) > 0:
+            result = []
+            for it in items:
+                result.append(
+                    {
+                        "name": it.get("name"),
+                        "label": it.get("label") or it.get("name"),
+                        "link_type": it.get("link_type"),
+                        "link_to": it.get("link_to"),
+                        "icon": it.get("icon"),
+                        "type": it.get("link_type"),
+                    }
+                )
+            return {
+                "source": "app_sidebar",
+                "items": result
+            }
+    except frappe.DoesNotExistError:
+        # App Sidebar doesn't exist, fall back to modules
+        pass
     except Exception as e:
-        frappe.logger().error(f"Error fetching module sidebar for {app}: {str(e)}")
-        return []
+        frappe.logger().debug(f"App Sidebar not found for {app}: {str(e)}")
+
+    # Fallback: Get modules for this app as sidebar items
+    return get_modules_for_app(app)
+
+
+def get_modules_for_app(app_name):
+    """Get modules for a given app as sidebar items.
+    
+    Returns modules belonging to this app.
+    """
+    result = []
+    
+    try:
+        # Get all Module Def records for this app
+        modules = frappe.get_all(
+            "Module Def",
+            filters={"app_name": app_name},
+            fields=["name", "module_name", "app_name"],
+            order_by="name asc",
+        )
+        
+        # Get workspace info for each module to get icons
+        for module in modules:
+            # Try to find a workspace for this module to get the icon
+            workspace = frappe.db.get_value(
+                "Workspace",
+                {"module": module.name, "public": 1},
+                ["name", "icon"],
+                as_dict=True
+            )
+            
+            icon = workspace.icon if workspace else None
+            
+            result.append({
+                "name": module.name,
+                "label": module.module_name or module.name,
+                "icon": icon,
+                "link_type": "Module",
+                "link_to": module.name,
+                "type": "Module",
+            })
+        
+        return {
+            "source": "modules",
+            "items": result
+        }
+        
+    except Exception as e:
+        frappe.logger().error(f"Error fetching modules for {app_name}: {str(e)}")
+        return {
+            "source": "modules",
+            "items": []
+        }
+
+
+@frappe.whitelist()
+def get_module_content(module_name):
+    """Get module content (shortcuts, links, reports, etc.) from workspace.
+    
+    Args:
+        module_name: Name of the module
+        
+    Returns:
+        dict with shortcuts, cards, charts, number_cards, quick_lists, doctypes
+    """
+    try:
+        # Find workspace for this module
+        workspace_name = frappe.db.get_value(
+            "Workspace",
+            {"module": module_name, "public": 1},
+            "name"
+        )
+        
+        if workspace_name:
+            content = _get_workspace_content_internal(workspace_name)
+        else:
+            content = {
+                "name": module_name,
+                "label": module_name,
+                "shortcuts": [],
+                "cards": [],
+                "charts": [],
+                "number_cards": [],
+                "quick_lists": [],
+            }
+        
+        # Also get doctypes for this module
+        doctypes = frappe.get_all(
+            "DocType",
+            filters={"module": module_name, "istable": 0},
+            fields=["name", "description"],
+            order_by="name asc"
+        )
+        
+        content["doctypes"] = [
+            {
+                "name": dt.name,
+                "label": dt.label or dt.name,
+                "description": dt.description,
+                "link_type": "DocType",
+                "type": "DocType",
+            }
+            for dt in doctypes
+        ]
+        
+        # Get reports for this module
+        reports = frappe.get_all(
+            "Report",
+            filters={"module": module_name, "disabled": 0},
+            fields=["name", "report_name", "report_type"],
+            order_by="name asc"
+        )
+        
+        content["reports"] = [
+            {
+                "name": r.name,
+                "label": r.report_name or r.name,
+                "report_type": r.report_type,
+                "link_type": "Report",
+                "type": "Report",
+            }
+            for r in reports
+        ]
+        
+        return content
+        
+    except Exception as e:
+        frappe.logger().error(f"Error fetching module content for {module_name}: {str(e)}")
+        return {
+            "name": module_name,
+            "label": module_name,
+            "shortcuts": [],
+            "cards": [],
+            "charts": [],
+            "number_cards": [],
+            "quick_lists": [],
+            "doctypes": [],
+            "reports": [],
+        }
+
+
+def _get_workspace_content_internal(workspace_name):
+    """Internal function to get workspace content."""
+    try:
+        shortcuts = frappe.get_all("Workspace Shortcut", filters={"parent": workspace_name}, fields=["*"], order_by="idx asc")
+        
+        # Get shortcuts
+        shortcuts_list = []
+        for shortcut in shortcuts:
+            shortcuts_list.append({
+                "name": shortcut.link_to or shortcut.label,
+                "label": shortcut.label or shortcut.link_to,
+                "link_type": shortcut.type,
+                "link_to": shortcut.link_to,
+                "icon": shortcut.icon,
+                "type": shortcut.type,
+                "doc_view": shortcut.doc_view,
+                "color": shortcut.color,
+                "format": shortcut.format,
+                "stats_filter": shortcut.stats_filter,
+            })
+        
+        # Get cards/links grouped by card breaks
+        cards = []
+        current_card = {"label": "Links", "links": []}
+        
+        for link in frappe.get_all("Workspace Link", filters={"parent": workspace_name}, fields=["*"], order_by="idx asc"):
+            if link.type == "Card Break":
+                if current_card["links"]:
+                    cards.append(current_card)
+                current_card = {
+                    "label": link.label or "Links",
+                    "icon": link.icon,
+                    "links": []
+                }
+            else:
+                current_card["links"].append({
+                    "name": link.link_to or link.label,
+                    "label": link.label or link.link_to,
+                    "link_type": link.link_type,
+                    "link_to": link.link_to,
+                    "icon": link.icon,
+                    "type": link.link_type,
+                    "description": link.description,
+                })
+        
+        if current_card["links"]:
+            cards.append(current_card)
+        
+        # Get charts
+        charts = []
+        for chart in frappe.get_all("Workspace Chart", filters={"parent": workspace_name}, fields=["*"], order_by="idx asc"):
+            charts.append({
+                "name": chart.chart_name,
+                "label": chart.label or chart.chart_name,
+                "chart_name": chart.chart_name,
+            })
+        
+        # Get number cards
+        number_cards = []
+        for nc in frappe.get_all("Workspace Number Card", filters={"parent": workspace_name}, fields=["*"], order_by="idx asc"):
+            number_cards.append({
+                "name": nc.number_card_name,
+                "label": nc.label or nc.number_card_name,
+            })
+        
+        # Get quick lists
+        quick_lists = []
+        for ql in frappe.get_all("Workspace Quick List", filters={"parent": workspace_name}, fields=["*"], order_by="idx asc"):
+            quick_lists.append({
+                "name": ql.document_type,
+                "label": ql.label or ql.document_type,
+                "document_type": ql.document_type,
+                "quick_list_filter": ql.quick_list_filter,
+            })
+        
+        return {
+            "name": workspace_name,
+            "label": workspace_name,
+            "icon": None,
+            "shortcuts": shortcuts_list,
+            "cards": cards,
+            "charts": charts,
+            "number_cards": number_cards,
+            "quick_lists": quick_lists,
+        }
+        
+    except Exception as e:
+        frappe.logger().error(f"Error fetching workspace content for {workspace_name}: {str(e)}")
+        return {
+            "name": workspace_name,
+            "shortcuts": [],
+            "cards": [],
+            "charts": [],
+            "number_cards": [],
+            "quick_lists": [],
+        }
+
+
+@frappe.whitelist()
+def get_workspace_content(workspace_name):
+    """Get workspace content (shortcuts, cards, charts, etc.).
+    
+    Args:
+        workspace_name: Name of the workspace
+        
+    Returns:
+        dict with shortcuts, cards, charts, number_cards, quick_lists
+    """
+    return _get_workspace_content_internal(workspace_name)
+
+
+def _get_module_from_app(app_name):
+    """Get the module name from app name.
+    
+    Tries to find Module Def that belongs to this app.
+    """
+    try:
+        # First, try to find Module Def with matching app_name
+        modules = frappe.get_all(
+            "Module Def",
+            filters={"app_name": app_name},
+            fields=["name"],
+            limit=1
+        )
+        
+        if modules:
+            return modules[0].name
+        
+        # Fallback: Convert app_name to title case (e.g., 'erpnext' -> 'ERPNext')
+        # Common patterns
+        app_to_module = {
+            "erpnext": "ERPNext",
+            "frappe": "Frappe",
+            "hrms": "HRMS",
+            "hr": "HR",
+            "crm": "CRM",
+            "assets": "Assets",
+            "buying": "Buying",
+            "selling": "Selling",
+            "stock": "Stock",
+            "accounts": "Accounts",
+            "manufacturing": "Manufacturing",
+            "projects": "Projects",
+            "setup": "Setup",
+        }
+        
+        if app_name.lower() in app_to_module:
+            return app_to_module[app_name.lower()]
+        
+        # Default: Title case the app name
+        return app_name.replace("_", " ").title()
+        
+    except Exception:
+        return app_name.replace("_", " ").title()

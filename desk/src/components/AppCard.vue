@@ -25,7 +25,7 @@
 
             <div v-if="showActions" class="mt-auto pt-4 flex gap-2">
                 <button v-if="installed" @click.stop="emit('uninstall', app.name)"
-                    class="flex-1 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-500 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-200 cursor-pointer">
+                    class="flex-1 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold transition hover:bg-red-500 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-200 hover:text-white text-red-600 cursor-pointer">
                     {{ __('Uninstall') }}
                 </button>
                 <button v-else @click.stop="emit('install', app.name)"

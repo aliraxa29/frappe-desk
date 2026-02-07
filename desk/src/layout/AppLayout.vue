@@ -3,11 +3,12 @@
     <!-- Top Navbar - Fixed height, no scroll -->
     <Navbar class="shrink-0 z-50" />
 
-    <!-- Sidebar (Fixed) -->
-    <AppSidebar />
+    <!-- Sidebar (Fixed) - conditionally shown -->
+    <AppSidebar v-if="!hideSidebar" />
 
     <!-- Main Layout with margin for sidebar -->
-    <div class="flex flex-1 flex-col ml-64 overflow-hidden">
+    <div class="flex flex-1 flex-col overflow-hidden transition-all duration-300"
+         :class="hideSidebar ? 'ml-0' : 'ml-64'">
       <!-- Main Content -->
       <main class="flex-1 flex flex-col overflow-hidden">
         <!-- Page Header -->
@@ -29,4 +30,12 @@
 <script setup lang="ts">
 import AppSidebar from './AppSidebar.vue';
 import Navbar from './Navbar.vue';
+
+interface Props {
+  hideSidebar?: boolean
+}
+
+withDefaults(defineProps<Props>(), {
+  hideSidebar: false
+})
 </script>

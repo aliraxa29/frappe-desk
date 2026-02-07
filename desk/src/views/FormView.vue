@@ -12,7 +12,7 @@
 
     <!-- Content -->
     <template #content>
-      <div class="relative pb-5">
+      <div class="relative">
         <FormRenderer 
           ref="formContext" 
           :doctype="doctype" 
