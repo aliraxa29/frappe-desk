@@ -1,14 +1,34 @@
 export interface User {
   get_full_name(): string;
+  get_user_full_name(): string;
+  get_user_image(): string;
   get_email(): string;
 }
 
 export const user: User = {
   get_full_name(): string {
-    return `${window.dash.boot.user.first_name} ${window.dash.boot.user.last_name}`.trim();
+    return user.get_user_full_name();
+  },
+
+  get_user_full_name(): string {
+    const bootUser = (window as any).desk?.boot?.user;
+    if (!bootUser) return "";
+
+    const fullName = String(bootUser.full_name || "").trim();
+    if (fullName) return fullName;
+
+    const firstName = String(bootUser.first_name || "").trim();
+    const lastName = String(bootUser.last_name || "").trim();
+    return `${firstName} ${lastName}`.trim();
+  },
+
+  get_user_image(): string {
+    const bootUser = (window as any).desk?.boot?.user;
+    return String(bootUser?.user_image || "").trim();
   },
 
   get_email(): string {
-    return window.dash.boot.user.email;
+    const bootUser = (window as any).desk?.boot?.user;
+    return String(bootUser?.email || "").trim();
   },
 };

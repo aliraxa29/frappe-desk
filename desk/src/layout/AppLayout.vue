@@ -23,7 +23,9 @@
 				</div>
 
 				<!-- Page Content - Only scrollable area -->
-				<div class="flex-1 overflow-y-auto bg-transparent text-slate-900 dark:bg-gray-950">
+				<div
+					class="flex-1 overflow-y-auto bg-transparent text-slate-900 dark:bg-gray-950 p-3"
+				>
 					<slot name="content" />
 				</div>
 			</main>
