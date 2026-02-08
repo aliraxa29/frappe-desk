@@ -1,224 +1,230 @@
 <template>
-  <div class="mb-4 flex flex-col">
-    <label 
-      v-if="field.label" 
-      :for="`field-${field.fieldname}`" 
-      class="font-medium mb-1 text-[0.95rem] text-slate-700 dark:text-slate-300"
-    >
-      {{ field.label }}
-      <span v-if="field.reqd" class="text-red-600 dark:text-red-500 ml-1">*</span>
-    </label>
-    <div class="relative">
-      <span
-        v-if="currencySymbol"
-        class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 text-[0.95rem] pointer-events-none"
-      >
-        {{ currencySymbol }}
-      </span>
-      <input
-        :id="`field-${field.fieldname}`"
-        :value="localValue"
-        :readonly="field.read_only"
-        :required="field.reqd"
-        type="text"
-        inputmode="decimal"
-        :class="[
-          'w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded text-[0.95rem] transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-600 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-600/10 dark:focus:ring-blue-500/20 read-only:bg-slate-50 dark:read-only:bg-slate-900/50 read-only:cursor-not-allowed disabled:opacity-50',
-          align === 'left' ? 'text-left' : 'text-right',
-          currencySymbol ? 'pl-8' : ''
-        ]"
-        @input="updateValue"
-        @focus="handleFocus"
-        @blur="handleBlur"
-        @keydown="validateKeypress"
-      />
-    </div>
-    <small 
-      v-if="field.description" 
-      class="block text-slate-600 dark:text-slate-400 mt-1 text-[0.85rem]"
-    >
-      {{ field.description }}
-    </small>
-  </div>
+	<div class="mb-4 flex flex-col">
+		<label
+			v-if="field.label"
+			:for="`field-${field.fieldname}`"
+			class="font-medium mb-1 text-[0.95rem] text-slate-700 dark:text-slate-300"
+		>
+			{{ field.label }}
+			<span v-if="field.reqd" class="text-red-600 dark:text-red-500 ml-1">*</span>
+		</label>
+		<div class="relative">
+			<span
+				v-if="currencySymbol"
+				class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 text-[0.95rem] pointer-events-none"
+			>
+				{{ currencySymbol }}
+			</span>
+			<input
+				:id="`field-${field.fieldname}`"
+				:value="localValue"
+				:readonly="field.read_only"
+				:required="field.reqd"
+				type="text"
+				inputmode="decimal"
+				:class="[
+					'w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded text-[0.95rem] transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-600 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-600/10 dark:focus:ring-blue-500/20 read-only:bg-slate-50 dark:read-only:bg-slate-900/50 read-only:cursor-not-allowed disabled:opacity-50',
+					align === 'left' ? 'text-left' : 'text-right',
+					currencySymbol ? 'pl-8' : '',
+				]"
+				@input="updateValue"
+				@focus="handleFocus"
+				@blur="handleBlur"
+				@keydown="validateKeypress"
+			/>
+		</div>
+		<small
+			v-if="field.description"
+			class="block text-slate-600 dark:text-slate-400 mt-1 text-[0.85rem]"
+		>
+			{{ field.description }}
+		</small>
+	</div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import type { Field, FormContext } from '../../types'
+import { computed, ref, watch } from "vue";
+import type { Field, FormContext } from "../../types";
 
-const props = withDefaults(defineProps<{
-  field: Field
-  ctx: FormContext
-  align?: 'left' | 'right'
-}>(), {
-  align: 'right'
-})
+const props = withDefaults(
+	defineProps<{
+		field: Field;
+		ctx: FormContext;
+		align?: "left" | "right";
+	}>(),
+	{
+		align: "right",
+	},
+);
 
 const emit = defineEmits<{
-  fieldChange: [value: any]
-}>()
+	fieldChange: [value: any];
+}>();
 
-const localValue = ref('0')
-const isFocused = ref(false)
-const originalValue = ref<any>(null)
+const localValue = ref("0");
+const isFocused = ref(false);
+const originalValue = ref<any>(null);
 
 const currencyCode = computed(() => {
-  const desk = (window as any)?.desk
-  if (desk?.meta?.get_field_currency) {
-    try {
-      return desk.meta.get_field_currency(props.field, props.ctx.doc)
-    } catch {
-      // ignore
-    }
-  }
+	const desk = (window as any)?.desk;
+	if (desk?.meta?.get_field_currency) {
+		try {
+			return desk.meta.get_field_currency(props.field, props.ctx.doc);
+		} catch {
+			// ignore
+		}
+	}
 
-  const options = props.field.options
-  if (options && typeof options === 'string') {
-    const docValue = props.ctx.doc?.[options]
-    if (typeof docValue === 'string' && docValue.trim()) return docValue
-    if (options.length <= 5) return options
-  }
+	const options = props.field.options;
+	if (options && typeof options === "string") {
+		const docValue = props.ctx.doc?.[options];
+		if (typeof docValue === "string" && docValue.trim()) return docValue;
+		if (options.length <= 5) return options;
+	}
 
-  return desk?.boot?.sysdefaults?.currency || ''
-})
+	return desk?.boot?.sysdefaults?.currency || "";
+});
 
 const currencySymbol = computed(() => {
-  if (!currencyCode.value) return ''
-  try {
-    const parts = new Intl.NumberFormat(undefined, {
-      style: 'currency',
-      currency: currencyCode.value,
-      currencyDisplay: 'symbol'
-    }).formatToParts(0)
-    return parts.find((p) => p.type === 'currency')?.value || currencyCode.value
-  } catch {
-    return currencyCode.value
-  }
-})
+	if (!currencyCode.value) return "";
+	try {
+		const parts = new Intl.NumberFormat(undefined, {
+			style: "currency",
+			currency: currencyCode.value,
+			currencyDisplay: "symbol",
+		}).formatToParts(0);
+		return parts.find((p) => p.type === "currency")?.value || currencyCode.value;
+	} catch {
+		return currencyCode.value;
+	}
+});
 
 function validateKeypress(e: KeyboardEvent) {
-  // Allow: backspace, delete, tab, escape, enter, arrows
-  if ([8, 9, 27, 13, 46, 37, 38, 39, 40].includes(e.keyCode)) {
-    return
-  }
-  
-  // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-  if ((e.ctrlKey || e.metaKey) && [65, 67, 86, 88].includes(e.keyCode)) {
-    return
-  }
-  
-  // Allow: home, end
-  if (e.keyCode === 35 || e.keyCode === 36) {
-    return
-  }
-  
-  const input = e.target as HTMLInputElement
-  const currentValue = input.value
-  
-  // Allow minus sign only at the beginning
-  if (e.key === '-' && input.selectionStart === 0 && !currentValue.includes('-')) {
-    return
-  }
-  
-  // Allow decimal point only once
-  if (e.key === '.' && !currentValue.includes('.')) {
-    return
-  }
-  
-  // Ensure that it is a number
-  if ((e.shiftKey || e.key < '0' || e.key > '9') && e.key !== '-' && e.key !== '.') {
-    e.preventDefault()
-  }
+	// Allow: backspace, delete, tab, escape, enter, arrows
+	if ([8, 9, 27, 13, 46, 37, 38, 39, 40].includes(e.keyCode)) {
+		return;
+	}
+
+	// Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+	if ((e.ctrlKey || e.metaKey) && [65, 67, 86, 88].includes(e.keyCode)) {
+		return;
+	}
+
+	// Allow: home, end
+	if (e.keyCode === 35 || e.keyCode === 36) {
+		return;
+	}
+
+	const input = e.target as HTMLInputElement;
+	const currentValue = input.value;
+
+	// Allow minus sign only at the beginning
+	if (e.key === "-" && input.selectionStart === 0 && !currentValue.includes("-")) {
+		return;
+	}
+
+	// Allow decimal point only once
+	if (e.key === "." && !currentValue.includes(".")) {
+		return;
+	}
+
+	// Ensure that it is a number
+	if ((e.shiftKey || e.key < "0" || e.key > "9") && e.key !== "-" && e.key !== ".") {
+		e.preventDefault();
+	}
 }
 
 function updateValue(e: Event) {
-  localValue.value = (e.target as HTMLInputElement).value
+	localValue.value = (e.target as HTMLInputElement).value;
 }
 
 function handleFocus() {
-  isFocused.value = true
+	isFocused.value = true;
 }
 
 function handleBlur() {
-  isFocused.value = false
-  let raw = localValue.value.trim()
-  
-  // Remove currency symbols and codes
-  if (currencySymbol.value) raw = raw.replaceAll(currencySymbol.value, '')
-  if (currencyCode.value) raw = raw.replaceAll(currencyCode.value, '')
-  
-  // Clean up input - remove commas and any non-numeric characters except minus and decimal
-  raw = raw.replace(/,/g, '').replace(/[^\d.-]/g, '')
-  
-  // Ensure only one minus sign at the beginning
-  if (raw.includes('-')) {
-    const parts = raw.split('-')
-    raw = '-' + parts.filter(p => p).join('')
-  }
-  
-  // Ensure only one decimal point
-  const decimalCount = (raw.match(/\./g) || []).length
-  if (decimalCount > 1) {
-    const parts = raw.split('.')
-    raw = parts[0] + '.' + parts.slice(1).join('')
-  }
-  
-  let newValue: number | null = null
+	isFocused.value = false;
+	let raw = localValue.value.trim();
 
-  if (!raw || raw === '-' || raw === '.') {
-    newValue = null
-  } else {
-    const parsed = parseFloat(raw)
-    if (isNaN(parsed)) {
-      newValue = null
-    } else {
-      const precision = props.field.precision
-      newValue = typeof precision === 'number' && precision >= 0
-        ? Number(parsed.toFixed(precision))
-        : parsed
-    }
-  }
-  
-  // Only update if value actually changed
-  if (newValue !== originalValue.value) {
-    props.ctx.set_value(props.field.fieldname, newValue)
-    emit('fieldChange', newValue)
-  }
-  
-  // Update display value
-  if (newValue === null) {
-    localValue.value = '0'
-  } else {
-    const precision = props.field.precision
-    localValue.value = typeof precision === 'number' && precision >= 0
-      ? newValue.toFixed(precision)
-      : String(newValue)
-  }
+	// Remove currency symbols and codes
+	if (currencySymbol.value) raw = raw.replaceAll(currencySymbol.value, "");
+	if (currencyCode.value) raw = raw.replaceAll(currencyCode.value, "");
+
+	// Clean up input - remove commas and any non-numeric characters except minus and decimal
+	raw = raw.replace(/,/g, "").replace(/[^\d.-]/g, "");
+
+	// Ensure only one minus sign at the beginning
+	if (raw.includes("-")) {
+		const parts = raw.split("-");
+		raw = "-" + parts.filter((p) => p).join("");
+	}
+
+	// Ensure only one decimal point
+	const decimalCount = (raw.match(/\./g) || []).length;
+	if (decimalCount > 1) {
+		const parts = raw.split(".");
+		raw = parts[0] + "." + parts.slice(1).join("");
+	}
+
+	let newValue: number | null = null;
+
+	if (!raw || raw === "-" || raw === ".") {
+		newValue = null;
+	} else {
+		const parsed = parseFloat(raw);
+		if (isNaN(parsed)) {
+			newValue = null;
+		} else {
+			const precision = props.field.precision;
+			newValue =
+				typeof precision === "number" && precision >= 0
+					? Number(parsed.toFixed(precision))
+					: parsed;
+		}
+	}
+
+	// Only update if value actually changed
+	if (newValue !== originalValue.value) {
+		props.ctx.set_value(props.field.fieldname, newValue);
+		emit("fieldChange", newValue);
+	}
+
+	// Update display value
+	if (newValue === null) {
+		localValue.value = "0";
+	} else {
+		const precision = props.field.precision;
+		localValue.value =
+			typeof precision === "number" && precision >= 0
+				? newValue.toFixed(precision)
+				: String(newValue);
+	}
 }
 
 watch(
-  () => props.ctx.doc?.[props.field.fieldname],
-  (next) => {
-    if (isFocused.value) return
-    
-    originalValue.value = next
-    
-    if (next === null || next === undefined || next === '') {
-      localValue.value = '0'
-      return
-    }
+	() => props.ctx.doc?.[props.field.fieldname],
+	(next) => {
+		if (isFocused.value) return;
 
-    const precision = props.field.precision
-    const numeric = Number(next)
-    if (Number.isNaN(numeric)) {
-      localValue.value = ''
-      return
-    }
+		originalValue.value = next;
 
-    localValue.value = typeof precision === 'number' && precision >= 0
-      ? numeric.toFixed(precision)
-      : String(numeric)
-  },
-  { immediate: true }
-)
+		if (next === null || next === undefined || next === "") {
+			localValue.value = "0";
+			return;
+		}
+
+		const precision = props.field.precision;
+		const numeric = Number(next);
+		if (Number.isNaN(numeric)) {
+			localValue.value = "";
+			return;
+		}
+
+		localValue.value =
+			typeof precision === "number" && precision >= 0
+				? numeric.toFixed(precision)
+				: String(numeric);
+	},
+	{ immediate: true },
+);
 </script>

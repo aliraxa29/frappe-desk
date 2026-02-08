@@ -3,9 +3,9 @@ import { routes } from "./routes";
 import { setupRouterGuards } from "./guards";
 
 export const router = createRouter({
-  history: createWebHistory('/dashboard/'),
-  routes
-})
+  history: createWebHistory("/dashboard/"),
+  routes,
+});
 
 // Setup authentication guards
-setupRouterGuards(router)
+setupRouterGuards(router);

@@ -1,73 +1,78 @@
-import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { defineStore } from "pinia";
+import { ref, watch } from "vue";
 
-export type Theme = 'light' | 'dark' | 'system'
+export type Theme = "light" | "dark" | "system";
 
-export const useThemeStore = defineStore('theme', () => {
-  const theme = ref<Theme>('system')
+export const useThemeStore = defineStore("theme", () => {
+  const theme = ref<Theme>("system");
 
   // Initialize theme from localStorage
   const initializeTheme = () => {
-    const saved = localStorage.getItem('theme') as Theme | null
-    if (saved && ['light', 'dark', 'system'].includes(saved)) {
-      theme.value = saved
+    const saved = localStorage.getItem("theme") as Theme | null;
+    if (saved && ["light", "dark", "system"].includes(saved)) {
+      theme.value = saved;
     } else {
-      theme.value = 'system'
+      theme.value = "system";
     }
-    applyTheme()
-  }
+    applyTheme();
+  };
 
   // Get effective theme (light or dark)
-  const getEffectiveTheme = (): 'light' | 'dark' => {
-    if (theme.value === 'system') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  const getEffectiveTheme = (): "light" | "dark" => {
+    if (theme.value === "system") {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
     }
-    return theme.value
-  }
+    return theme.value;
+  };
 
   // Apply theme to document - applies to html element for Tailwind
   const applyTheme = () => {
-    const effective = getEffectiveTheme()
-    const html = document.documentElement
+    const effective = getEffectiveTheme();
+    const html = document.documentElement;
 
-    if (effective === 'dark') {
-      html.classList.add('dark')
-      html.classList.remove('light')
+    if (effective === "dark") {
+      html.classList.add("dark");
+      html.classList.remove("light");
     } else {
-      html.classList.add('light')
-      html.classList.remove('dark')
+      html.classList.add("light");
+      html.classList.remove("dark");
     }
-  }
+  };
 
   // Set theme
   const setTheme = (newTheme: Theme) => {
-    theme.value = newTheme
-    localStorage.setItem('theme', newTheme)
-    applyTheme()
-  }
+    theme.value = newTheme;
+    localStorage.setItem("theme", newTheme);
+    applyTheme();
+  };
 
   // Toggle between light and dark
   const toggleTheme = () => {
-    const effective = getEffectiveTheme()
-    setTheme(effective === 'dark' ? 'light' : 'dark')
-  }
+    const effective = getEffectiveTheme();
+    setTheme(effective === "dark" ? "light" : "dark");
+  };
 
   // Watch for system theme changes
   const watchSystemTheme = () => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handler = () => {
-      if (theme.value === 'system') {
-        applyTheme()
+      if (theme.value === "system") {
+        applyTheme();
       }
-    }
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }
+    };
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
+  };
 
   // Watch theme changes
-  watch(() => theme.value, () => {
-    applyTheme()
-  })
+  watch(
+    () => theme.value,
+    () => {
+      applyTheme();
+    },
+  );
 
   return {
     theme,
@@ -76,6 +81,6 @@ export const useThemeStore = defineStore('theme', () => {
     setTheme,
     toggleTheme,
     watchSystemTheme,
-    applyTheme
-  }
-})
+    applyTheme,
+  };
+});

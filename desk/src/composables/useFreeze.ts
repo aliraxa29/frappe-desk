@@ -1,25 +1,25 @@
-import { useFreezeStore } from '../stores/freeze'
+import { useFreezeStore } from "../stores/freeze";
 
 /**
  * Composable for freezing/unfreezing the UI
  * Similar to Frappe's freeze functionality
  */
 export function useFreeze() {
-  const freezeStore = useFreezeStore()
+  const freezeStore = useFreezeStore();
 
   /**
    * Freeze the UI with an optional message
    * @param message - Message to display (default: "Loading...")
    */
   function freeze(message?: string) {
-    freezeStore.freeze(message || 'Loading...')
+    freezeStore.freeze(message || "Loading...");
   }
 
   /**
    * Unfreeze the UI
    */
   function unfreeze() {
-    freezeStore.unfreeze()
+    freezeStore.unfreeze();
   }
 
   /**
@@ -29,19 +29,19 @@ export function useFreeze() {
    */
   async function withFreeze<T>(
     fn: () => Promise<T>,
-    message?: string
+    message?: string,
   ): Promise<T> {
-    freeze(message)
+    freeze(message);
     try {
-      return await fn()
+      return await fn();
     } finally {
-      unfreeze()
+      unfreeze();
     }
   }
 
   return {
     freeze,
     unfreeze,
-    withFreeze
-  }
+    withFreeze,
+  };
 }

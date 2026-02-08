@@ -3,7 +3,7 @@
 
 frappe.ui.form.on("App Sidebar", {
 	refresh(frm) {
-        frappe.xcall("desktop.api.apps.get_installed_apps").then((r) => {
+		frappe.xcall("desktop.api.apps.get_installed_apps").then((r) => {
 			let apps = r?.map((r) => r.name) || [];
 			frm.set_df_property("app", "options", [...apps]);
 		});

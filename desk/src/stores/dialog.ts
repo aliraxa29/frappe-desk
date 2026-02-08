@@ -1,49 +1,55 @@
-import { defineStore } from 'pinia'
-import { ref, markRaw, type Component } from 'vue'
+import { defineStore } from "pinia";
+import { ref, markRaw, type Component } from "vue";
 
-export type DialogType = 'confirm' | 'alert' | 'prompt' | 'error' | 'custom' | 'progress'
+export type DialogType =
+  | "confirm"
+  | "alert"
+  | "prompt"
+  | "error"
+  | "custom"
+  | "progress";
 
 export interface DialogButton {
-  label: string
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost'
-  onClick?: () => void | Promise<void>
-  closeOnClick?: boolean
+  label: string;
+  variant?: "primary" | "secondary" | "danger" | "ghost";
+  onClick?: () => void | Promise<void>;
+  closeOnClick?: boolean;
 }
 
 export interface DialogOptions {
-  type: DialogType
-  title: string
-  message?: string
-  icon?: 'info' | 'warning' | 'error' | 'success' | 'question'
-  primaryButton?: DialogButton
-  secondaryButton?: DialogButton
-  showClose?: boolean
-  size?: 'sm' | 'md' | 'lg' | 'xl'
+  type: DialogType;
+  title: string;
+  message?: string;
+  icon?: "info" | "warning" | "error" | "success" | "question";
+  primaryButton?: DialogButton;
+  secondaryButton?: DialogButton;
+  showClose?: boolean;
+  size?: "sm" | "md" | "lg" | "xl";
   // For progress dialogs
-  percent?: number
+  percent?: number;
   // For prompt dialogs
-  inputLabel?: string
-  inputPlaceholder?: string
-  inputDefault?: string
-  inputType?: 'text' | 'textarea' | 'number' | 'email' | 'password'
-  inputRequired?: boolean
+  inputLabel?: string;
+  inputPlaceholder?: string;
+  inputDefault?: string;
+  inputType?: "text" | "textarea" | "number" | "email" | "password";
+  inputRequired?: boolean;
   // For custom dialogs
-  component?: Component
-  componentProps?: Record<string, any>
+  component?: Component;
+  componentProps?: Record<string, any>;
 }
 
 export interface Dialog extends DialogOptions {
-  id: string
-  resolve: (value: any) => void
-  reject: (reason?: any) => void
-  inputValue?: string
+  id: string;
+  resolve: (value: any) => void;
+  reject: (reason?: any) => void;
+  inputValue?: string;
 }
 
-export const useDialogStore = defineStore('dialog', () => {
-  const dialogs = ref<Dialog[]>([])
+export const useDialogStore = defineStore("dialog", () => {
+  const dialogs = ref<Dialog[]>([]);
 
   function generateId(): string {
-    return `dialog-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    return `dialog-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 
   function open(options: DialogOptions): Promise<any> {
@@ -54,192 +60,202 @@ export const useDialogStore = defineStore('dialog', () => {
         component: options.component ? markRaw(options.component) : undefined,
         resolve,
         reject,
-        inputValue: options.inputDefault || ''
-      }
-      dialogs.value.push(dialog)
-    })
+        inputValue: options.inputDefault || "",
+      };
+      dialogs.value.push(dialog);
+    });
   }
 
   function close(id: string, result?: any) {
-    const index = dialogs.value.findIndex((d: any) => d.id === id)
+    const index = dialogs.value.findIndex((d: any) => d.id === id);
     if (index > -1) {
-      const dialog = dialogs.value[index]
+      const dialog = dialogs.value[index];
       if (dialog) {
-        dialog.resolve(result)
+        dialog.resolve(result);
       }
-      dialogs.value.splice(index, 1)
+      dialogs.value.splice(index, 1);
     }
   }
 
   function cancel(id: string) {
-    const index = dialogs.value.findIndex((d: any) => d.id === id)
+    const index = dialogs.value.findIndex((d: any) => d.id === id);
     if (index > -1) {
-      const dialog = dialogs.value[index]
+      const dialog = dialogs.value[index];
       if (dialog) {
-        dialog.resolve(null)
+        dialog.resolve(null);
       }
-      dialogs.value.splice(index, 1)
+      dialogs.value.splice(index, 1);
     }
   }
 
   function updateInputValue(id: string, value: string) {
-    const dialog = dialogs.value.find((d: any) => d.id === id)
+    const dialog = dialogs.value.find((d: any) => d.id === id);
     if (dialog) {
-      dialog.inputValue = value
+      dialog.inputValue = value;
     }
   }
 
   // Convenience methods
   function confirm(title: string, message?: string): Promise<boolean> {
     return open({
-      type: 'confirm',
+      type: "confirm",
       title,
       message,
-      icon: 'question',
+      icon: "question",
       primaryButton: {
-        label: 'Confirm',
-        variant: 'primary',
-        closeOnClick: true
+        label: "Confirm",
+        variant: "primary",
+        closeOnClick: true,
       },
       secondaryButton: {
-        label: 'Cancel',
-        variant: 'secondary',
-        closeOnClick: true
-      }
-    }).then(result => result === true)
+        label: "Cancel",
+        variant: "secondary",
+        closeOnClick: true,
+      },
+    }).then((result) => result === true);
   }
 
   function alert(title: string, message?: string): Promise<void> {
     return open({
-      type: 'alert',
+      type: "alert",
       title,
       message,
-      icon: 'info',
+      icon: "info",
       primaryButton: {
-        label: 'OK',
-        variant: 'primary',
-        closeOnClick: true
-      }
-    })
+        label: "OK",
+        variant: "primary",
+        closeOnClick: true,
+      },
+    });
   }
 
   function error(title: string, message?: string): Promise<void> {
     return open({
-      type: 'error',
+      type: "error",
       title,
       message,
-      icon: 'error',
+      icon: "error",
       primaryButton: {
-        label: 'OK',
-        variant: 'primary',
-        closeOnClick: true
-      }
-    })
+        label: "OK",
+        variant: "primary",
+        closeOnClick: true,
+      },
+    });
   }
 
   function warning(title: string, message?: string): Promise<boolean> {
     return open({
-      type: 'confirm',
+      type: "confirm",
       title,
       message,
-      icon: 'warning',
+      icon: "warning",
       primaryButton: {
-        label: 'Continue',
-        variant: 'danger',
-        closeOnClick: true
+        label: "Continue",
+        variant: "danger",
+        closeOnClick: true,
       },
       secondaryButton: {
-        label: 'Cancel',
-        variant: 'secondary',
-        closeOnClick: true
-      }
-    }).then(result => result === true)
+        label: "Cancel",
+        variant: "secondary",
+        closeOnClick: true,
+      },
+    }).then((result) => result === true);
   }
 
   function prompt(
     title: string,
     options?: {
-      message?: string
-      label?: string
-      placeholder?: string
-      defaultValue?: string
-      type?: 'text' | 'textarea' | 'number' | 'email' | 'password'
-      required?: boolean
-    }
+      message?: string;
+      label?: string;
+      placeholder?: string;
+      defaultValue?: string;
+      type?: "text" | "textarea" | "number" | "email" | "password";
+      required?: boolean;
+    },
   ): Promise<string | null> {
     return open({
-      type: 'prompt',
+      type: "prompt",
       title,
       message: options?.message,
-      icon: 'question',
+      icon: "question",
       inputLabel: options?.label,
       inputPlaceholder: options?.placeholder,
       inputDefault: options?.defaultValue,
-      inputType: options?.type || 'text',
+      inputType: options?.type || "text",
       inputRequired: options?.required ?? true,
       primaryButton: {
-        label: 'Submit',
-        variant: 'primary',
-        closeOnClick: true
+        label: "Submit",
+        variant: "primary",
+        closeOnClick: true,
       },
       secondaryButton: {
-        label: 'Cancel',
-        variant: 'secondary',
-        closeOnClick: true
-      }
-    })
+        label: "Cancel",
+        variant: "secondary",
+        closeOnClick: true,
+      },
+    });
   }
 
   function confirmDelete(itemName?: string): Promise<boolean> {
     return open({
-      type: 'confirm',
-      title: 'Delete Confirmation',
+      type: "confirm",
+      title: "Delete Confirmation",
       message: itemName
         ? `Are you sure you want to delete "${itemName}"? This action cannot be undone.`
-        : 'Are you sure you want to delete this item? This action cannot be undone.',
-      icon: 'warning',
+        : "Are you sure you want to delete this item? This action cannot be undone.",
+      icon: "warning",
       primaryButton: {
-        label: 'Delete',
-        variant: 'danger',
-        closeOnClick: true
+        label: "Delete",
+        variant: "danger",
+        closeOnClick: true,
       },
       secondaryButton: {
-        label: 'Cancel',
-        variant: 'secondary',
-        closeOnClick: true
-      }
-    }).then(result => result === true)
+        label: "Cancel",
+        variant: "secondary",
+        closeOnClick: true,
+      },
+    }).then((result) => result === true);
   }
 
-  function custom(component: Component, props?: Record<string, any>, options?: Partial<DialogOptions>): Promise<any> {
+  function custom(
+    component: Component,
+    props?: Record<string, any>,
+    options?: Partial<DialogOptions>,
+  ): Promise<any> {
     return open({
-      type: 'custom',
-      title: options?.title || '',
+      type: "custom",
+      title: options?.title || "",
       component,
       componentProps: props,
-      size: options?.size || 'md',
+      size: options?.size || "md",
       showClose: options?.showClose ?? true,
-      ...options
-    })
+      ...options,
+    });
   }
 
   // Progress dialog: create or update an in-flight progress dialog
-  function progress(options: { title: string; message?: string; percent?: number }): Promise<void> {
-    const existing = dialogs.value.find((d: any) => d.type === 'progress' && d.title === options.title)
+  function progress(options: {
+    title: string;
+    message?: string;
+    percent?: number;
+  }): Promise<void> {
+    const existing = dialogs.value.find(
+      (d: any) => d.type === "progress" && d.title === options.title,
+    );
     if (existing) {
-      existing.message = options.message ?? existing.message
-      existing.percent = options.percent ?? existing.percent ?? 0
-      return Promise.resolve()
+      existing.message = options.message ?? existing.message;
+      existing.percent = options.percent ?? existing.percent ?? 0;
+      return Promise.resolve();
     }
     return open({
-      type: 'progress',
+      type: "progress",
       title: options.title,
       message: options.message,
-      icon: 'info',
-      size: 'sm',
+      icon: "info",
+      size: "sm",
       showClose: false,
-      percent: options.percent ?? 0
-    }).then(() => { })
+      percent: options.percent ?? 0,
+    }).then(() => {});
   }
 
   return {
@@ -256,27 +272,35 @@ export const useDialogStore = defineStore('dialog', () => {
     prompt,
     confirmDelete,
     custom,
-    progress
-  }
-})
+    progress,
+  };
+});
 
 // Global dialog helper for use outside of Vue components
 function getDialogStore() {
-  return useDialogStore()
+  return useDialogStore();
 }
 
 export const dialog = {
-  confirm: (title: string, message?: string) => getDialogStore().confirm(title, message),
-  alert: (title: string, message?: string) => getDialogStore().alert(title, message),
-  error: (title: string, message?: string) => getDialogStore().error(title, message),
-  warning: (title: string, message?: string) => getDialogStore().warning(title, message),
-  prompt: (title: string, options?: Parameters<ReturnType<typeof useDialogStore>['prompt']>[1]) =>
-    getDialogStore().prompt(title, options),
-  confirmDelete: (itemName?: string) => getDialogStore().confirmDelete(itemName),
+  confirm: (title: string, message?: string) =>
+    getDialogStore().confirm(title, message),
+  alert: (title: string, message?: string) =>
+    getDialogStore().alert(title, message),
+  error: (title: string, message?: string) =>
+    getDialogStore().error(title, message),
+  warning: (title: string, message?: string) =>
+    getDialogStore().warning(title, message),
+  prompt: (
+    title: string,
+    options?: Parameters<ReturnType<typeof useDialogStore>["prompt"]>[1],
+  ) => getDialogStore().prompt(title, options),
+  confirmDelete: (itemName?: string) =>
+    getDialogStore().confirmDelete(itemName),
   custom: (
     component: Component,
     props?: Record<string, any>,
-    options?: Partial<DialogOptions>
+    options?: Partial<DialogOptions>,
   ) => getDialogStore().custom(component, props, options),
-  progress: (opts: { title: string; message?: string; percent?: number }) => getDialogStore().progress(opts)
-}
+  progress: (opts: { title: string; message?: string; percent?: number }) =>
+    getDialogStore().progress(opts),
+};

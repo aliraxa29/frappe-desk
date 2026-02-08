@@ -1,1 +1,1 @@
-IGNORE_APPS = ['frappe', 'desktop']
+IGNORE_APPS = ["frappe", "desktop"]

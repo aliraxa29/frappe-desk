@@ -50,12 +50,19 @@ yarn dev
 
 ### Pre-commit (required)
 
-This repo uses `pre-commit` to enforce formatting/lint rules.
+This repo uses the **Python** `pre-commit` framework (configured in `.pre-commit-config.yaml`) to enforce formatting/lint rules.
 
 ```bash
 cd apps/desktop
 pip install pre-commit
 pre-commit install
+```
+
+Run the checks manually at any time:
+
+```bash
+cd apps/desktop
+pre-commit run --all-files
 ```
 
 ### Lint/format
