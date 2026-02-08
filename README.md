@@ -171,6 +171,8 @@ If you discover a security vulnerability, please follow our [Security Policy](SE
 
 This project is licensed under the [MIT License](LICENSE).
 
+**Note:** This project is not yet production ready. It is under maintenance and we are adding features to it.
+
 ---
 
 <div align="center">
