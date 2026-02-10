@@ -21,7 +21,7 @@
 					:disabled="isRefreshing"
 					class="px-4 py-2 flex items-center gap-2 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
 				>
-					<Icon icon="lucide:refresh-cw" :class="{ 'animate-spin': isRefreshing }" />
+					<RefreshCwIcon :class="{ 'animate-spin': isRefreshing, 'w-4 h-4': true }" />
 					<span class="text-sm font-medium">Refresh</span>
 				</button>
 
@@ -30,7 +30,7 @@
 					@click="openSettings"
 					class="px-4 py-2 flex items-center gap-2 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
 				>
-					<Icon icon="lucide:settings" />
+					<SettingsIcon class="w-4 h-4" />
 					<span class="text-sm font-medium">Settings</span>
 				</button>
 
@@ -39,7 +39,7 @@
 					@click="exportData"
 					class="px-4 py-2 flex items-center gap-2 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
 				>
-					<Icon icon="lucide:download" />
+					<DownloadIcon class="w-4 h-4" />
 					<span class="text-sm font-medium">Export</span>
 				</button>
 			</div>
@@ -155,9 +155,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from "vue";
-import { Icon } from "@iconify/vue";
 import DashboardChartGrid from "./DashboardChartGrid.vue";
 import DashboardMetricCard from "./DashboardMetricCard.vue";
+import RefreshCwIcon from "../../assets/icons/RefreshCw.vue";
+import SettingsIcon from "../../assets/icons/Settings.vue";
+import DownloadIcon from "../../assets/icons/Download.vue";
 
 export interface DashboardFilter {
 	name: string;

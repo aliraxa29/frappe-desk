@@ -84,7 +84,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { Icon } from "@iconify/vue";
 import { useBreadcrumbStore } from "../stores/breadcrumbs";
 import AppLayout from "../layout/AppLayout.vue";
 import DashboardContainer from "../components/dashboard/DashboardContainer.vue";

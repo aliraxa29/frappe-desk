@@ -24,7 +24,7 @@
 					:disabled="loading"
 					class="p-2 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50"
 				>
-					<Icon icon="lucide:refresh-cw" :class="{ 'animate-spin': loading }" />
+					<RefreshCwIcon :class="{ 'animate-spin': loading, 'w-5 h-5': true }" />
 				</button>
 
 				<button
@@ -32,7 +32,7 @@
 					@click="downloadChart"
 					class="p-2 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-colors"
 				>
-					<Icon icon="lucide:download" />
+					<DownloadIcon class="w-5 h-5" />
 				</button>
 
 				<button
@@ -40,7 +40,8 @@
 					@click="toggleFullscreen"
 					class="p-2 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-colors"
 				>
-					<Icon :icon="isFullscreen ? 'lucide:minimize-2' : 'lucide:maximize-2'" />
+					<Minimize2Icon v-if="isFullscreen" class="w-5 h-5" />
+					<Maximize2Icon v-else class="w-5 h-5" />
 				</button>
 			</div>
 		</div>
@@ -51,7 +52,7 @@
 			<div v-if="loading" class="flex items-center justify-center h-96">
 				<div class="flex flex-col items-center gap-3">
 					<div class="animate-spin">
-						<Icon icon="lucide:loader-circle" class="w-8 h-8 text-blue-600" />
+						<LoaderCircleIcon class="w-8 h-8 text-blue-600" />
 					</div>
 					<p class="text-sm text-slate-500 dark:text-slate-400">Loading chart data...</p>
 				</div>
@@ -60,23 +61,18 @@
 			<!-- Error State -->
 			<div v-else-if="error" class="flex items-center justify-center h-96">
 				<div class="text-center">
-					<Icon icon="lucide:alert-circle" class="w-12 h-12 text-red-500 mx-auto mb-3" />
-					<h4 class="text-sm font-medium text-slate-900 dark:text-white mb-1">
+					<AlertCircleIcon class="w-12 h-12 text-red-500 mx-auto mb-3" />
+					<h4 class="text-sm font-medium text-slate-600 dark:text-slate-400">
 						Error Loading Chart
 					</h4>
 					<p class="text-sm text-slate-500 dark:text-slate-400 mb-4">{{ error }}</p>
-					<button
-						@click="refresh"
-						class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-					>
-						Retry
-					</button>
+					<button @click="refresh">Retry</button>
 				</div>
 			</div>
 
 			<!-- Chart -->
 			<div v-else-if="apexOptions && apexOptions.series">
-				<apexchart
+				<ApexChart
 					:type="chartType"
 					:options="apexOptions"
 					:series="apexOptions.series"
@@ -87,8 +83,7 @@
 			<!-- No Data State -->
 			<div v-else class="flex items-center justify-center h-96">
 				<div class="text-center">
-					<Icon
-						icon="lucide:database"
+					<DatabaseIcon
 						class="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3"
 					/>
 					<h4 class="text-sm font-medium text-slate-600 dark:text-slate-400">
@@ -124,14 +119,11 @@
 						Growth
 					</p>
 					<div class="flex items-center gap-2 mt-1">
-						<Icon
-							:icon="
-								metrics.trend === 'up'
-									? 'lucide:trending-up'
-									: 'lucide:trending-down'
-							"
-							:class="metrics.trend === 'up' ? 'text-green-600' : 'text-red-600'"
+						<TrendingUpIcon
+							v-if="metrics.trend === 'up'"
+							class="w-5 h-5 text-green-600"
 						/>
+						<TrendingDownIcon v-else class="w-5 h-5 text-red-600" />
 						<p
 							:class="metrics.trend === 'up' ? 'text-green-600' : 'text-red-600'"
 							class="text-lg font-bold"
@@ -156,11 +148,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted } from "vue";
-import { Icon } from "@iconify/vue";
+import { ref, computed, watch, onUnmounted, defineAsyncComponent } from "vue";
 import { mergeChartOptions, formatNumber, formatChartDate } from "../../utils/chartUtils";
 import type { DashboardChart, DashboardMetrics, ApexChartOptions } from "../../types/dashboard";
 import { useDashboardChart } from "../../composables/useDashboardChart";
+import RefreshCwIcon from "../../assets/icons/RefreshCw.vue";
+import DownloadIcon from "../../assets/icons/Download.vue";
+import Minimize2Icon from "../../assets/icons/Minimize2.vue";
+import Maximize2Icon from "../../assets/icons/Maximize2.vue";
+import LoaderCircleIcon from "../../assets/icons/LoaderCircle.vue";
+import AlertCircleIcon from "../../assets/icons/AlertCircle.vue";
+import DatabaseIcon from "../../assets/icons/Database.vue";
+import TrendingUpIcon from "../../assets/icons/TrendingUp.vue";
+import TrendingDownIcon from "../../assets/icons/TrendingDown.vue";
+
+const ApexChart = defineAsyncComponent(() => import("vue3-apexcharts"));
 
 interface Props {
 	chartName?: string;

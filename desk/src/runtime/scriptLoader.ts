@@ -1,31 +1,4 @@
-import ts from "typescript";
-
 const loadedScripts = new Set<string>();
-
-function transpileScriptContent(content: string, scriptId: string): string {
-  try {
-    const result = ts.transpileModule(content, {
-      compilerOptions: {
-        target: ts.ScriptTarget.ES2017,
-        module: ts.ModuleKind.None,
-        removeComments: false,
-        sourceMap: false,
-      },
-    });
-
-    if (result.diagnostics?.length) {
-      console.warn(
-        `TypeScript diagnostics for ${scriptId}:`,
-        result.diagnostics,
-      );
-    }
-
-    return result.outputText || content;
-  } catch (e) {
-    console.error(`Failed to transpile script ${scriptId}:`, e);
-    return content;
-  }
-}
 
 /**
  * Script Loader - Injects doctype scripts into the page
@@ -57,8 +30,7 @@ export function injectScript(
   }
 
   try {
-    const jsContent = transpileScriptContent(content, scriptId);
-    const wrappedContent = `(function(){\n${jsContent}\n})();\n//# sourceURL=${scriptId}.js`;
+    const wrappedContent = `(function(){\n${content}\n})();\n//# sourceURL=${scriptId}.js`;
     const script = document.createElement("script");
     script.type = attributes?.type || "text/javascript";
     script.textContent = wrappedContent;

@@ -15,7 +15,7 @@
 			<!-- Line Chart -->
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
-					<Icon icon="lucide:trending-up" class="w-6 h-6 text-blue-600" />
+					<TrendingUpIcon class="w-6 h-6 text-blue-600" />
 					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
 						Line Chart
 					</h3>
@@ -26,7 +26,7 @@
 				<div
 					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
 				>
-					<apexchart
+					<ApexChart
 						type="line"
 						:options="lineChartOptions"
 						:series="lineChartData"
@@ -38,7 +38,7 @@
 			<!-- Area Chart -->
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
-					<Icon icon="lucide:area-chart" class="w-6 h-6 text-green-600" />
+					<AreaChartIcon class="w-6 h-6 text-green-600" />
 					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
 						Area Chart
 					</h3>
@@ -49,7 +49,7 @@
 				<div
 					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
 				>
-					<apexchart
+					<ApexChart
 						type="area"
 						:options="areaChartOptions"
 						:series="areaChartData"
@@ -61,7 +61,7 @@
 			<!-- Bar Chart -->
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
-					<Icon icon="lucide:bar-chart" class="w-6 h-6 text-purple-600" />
+					<BarChartIcon class="w-6 h-6 text-purple-600" />
 					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">Bar Chart</h3>
 				</div>
 				<p class="text-sm text-slate-600 dark:text-slate-400">
@@ -70,7 +70,7 @@
 				<div
 					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
 				>
-					<apexchart
+					<ApexChart
 						type="bar"
 						:options="barChartOptions"
 						:series="barChartData"
@@ -82,7 +82,7 @@
 			<!-- Pie Chart -->
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
-					<Icon icon="lucide:pie-chart" class="w-6 h-6 text-orange-600" />
+					<PieChartIcon class="w-6 h-6 text-orange-600" />
 					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">Pie Chart</h3>
 				</div>
 				<p class="text-sm text-slate-600 dark:text-slate-400">
@@ -91,7 +91,7 @@
 				<div
 					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
 				>
-					<apexchart
+					<ApexChart
 						type="pie"
 						:options="pieChartOptions"
 						:series="pieChartData"
@@ -103,7 +103,7 @@
 			<!-- Donut Chart -->
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
-					<Icon icon="lucide:donut" class="w-6 h-6 text-red-600" />
+					<DonutIcon class="w-6 h-6 text-red-600" />
 					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
 						Donut Chart
 					</h3>
@@ -114,7 +114,7 @@
 				<div
 					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
 				>
-					<apexchart
+					<ApexChart
 						type="donut"
 						:options="donutChartOptions"
 						:series="donutChartData"
@@ -126,7 +126,7 @@
 			<!-- Radar Chart -->
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
-					<Icon icon="lucide:radar" class="w-6 h-6 text-indigo-600" />
+					<RadarIcon class="w-6 h-6 text-indigo-600" />
 					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
 						Radar Chart
 					</h3>
@@ -137,7 +137,7 @@
 				<div
 					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
 				>
-					<apexchart
+					<ApexChart
 						type="radar"
 						:options="radarChartOptions"
 						:series="radarChartData"
@@ -149,7 +149,7 @@
 			<!-- Scatter Chart -->
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
-					<Icon icon="lucide:scatter-chart" class="w-6 h-6 text-cyan-600" />
+					<ScatterChartIcon class="w-6 h-6 text-cyan-600" />
 					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
 						Scatter Chart
 					</h3>
@@ -160,7 +160,7 @@
 				<div
 					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
 				>
-					<apexchart
+					<ApexChart
 						type="scatter"
 						:options="scatterChartOptions"
 						:series="scatterChartData"
@@ -172,7 +172,7 @@
 			<!-- Bubble Chart -->
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
-					<Icon icon="lucide:bubble-chart" class="w-6 h-6 text-pink-600" />
+					<BubbleChartIcon class="w-6 h-6 text-pink-600" />
 					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
 						Bubble Chart
 					</h3>
@@ -183,7 +183,7 @@
 				<div
 					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
 				>
-					<apexchart
+					<ApexChart
 						type="bubble"
 						:options="bubbleChartOptions"
 						:series="bubbleChartData"
@@ -195,7 +195,7 @@
 			<!-- Heatmap Chart -->
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
-					<Icon icon="lucide:heat-map" class="w-6 h-6 text-amber-600" />
+					<HeatMapIcon class="w-6 h-6 text-amber-600" />
 					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
 						Heatmap Chart
 					</h3>
@@ -206,7 +206,7 @@
 				<div
 					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
 				>
-					<apexchart
+					<ApexChart
 						type="heatmap"
 						:options="heatmapChartOptions"
 						:series="heatmapChartData"
@@ -218,7 +218,7 @@
 			<!-- Radial Bar Chart -->
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
-					<Icon icon="lucide:radial-chart" class="w-6 h-6 text-lime-600" />
+					<RadialChartIcon class="w-6 h-6 text-lime-600" />
 					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
 						Radial Bar Chart
 					</h3>
@@ -229,7 +229,7 @@
 				<div
 					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
 				>
-					<apexchart
+					<ApexChart
 						type="radialBar"
 						:options="radialBarChartOptions"
 						:series="radialBarChartData"
@@ -242,10 +242,20 @@
 </template>
 
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
-import VueApexCharts from "vue3-apexcharts";
+import { defineAsyncComponent } from "vue";
 import { chartColorPalettes } from "../../utils/chartUtils";
+import TrendingUpIcon from "../../assets/icons/TrendingUp.vue";
+import AreaChartIcon from "../../assets/icons/AreaChart.vue";
+import BarChartIcon from "../../assets/icons/BarChart.vue";
+import PieChartIcon from "../../assets/icons/PieChart.vue";
+import DonutIcon from "../../assets/icons/Donut.vue";
+import RadarIcon from "../../assets/icons/Radar.vue";
+import ScatterChartIcon from "../../assets/icons/ScatterChart.vue";
+import BubbleChartIcon from "../../assets/icons/BubbleChart.vue";
+import HeatMapIcon from "../../assets/icons/HeatMap.vue";
+import RadialChartIcon from "../../assets/icons/RadialChart.vue";
 
+const ApexChart = defineAsyncComponent(() => import("vue3-apexcharts"));
 // Line Chart
 const lineChartData = [
 	{

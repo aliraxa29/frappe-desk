@@ -507,7 +507,9 @@ async function onLoad() {
 		} else {
 			meta.value = locals.DocType[props.doctype];
 		}
-		loadDoctypeScriptsFromMetadata(meta.value, "form");
+		if (meta.value) {
+			loadDoctypeScriptsFromMetadata(meta.value, "form");
+		}
 
 		// Check if this is a single doctype - redirect if necessary
 		if (meta.value?.issingle && props.docname !== props.doctype) {

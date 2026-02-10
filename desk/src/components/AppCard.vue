@@ -88,7 +88,6 @@
 </template>
 
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
 import { computed } from "vue";
 import { __ } from "../utils/translate";
 import type { AppInfo } from "../types";

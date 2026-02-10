@@ -17,7 +17,7 @@
 							: 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600',
 					]"
 				>
-					<Icon :icon="type.icon" class="w-6 h-6" />
+					<component :is="type.iconComponent" class="w-6 h-6" />
 					<span class="text-xs font-medium text-center">{{ type.label }}</span>
 				</button>
 			</div>
@@ -29,7 +29,7 @@
 			<div
 				class="border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 p-6 min-h-96"
 			>
-				<apexchart
+				<ApexChart
 					:type="selectedType as any"
 					:options="previewOptions"
 					:series="previewData"
@@ -149,24 +149,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from "vue";
-import { Icon } from "@iconify/vue";
-import VueApexCharts from "vue3-apexcharts";
+import { ref, computed, reactive, defineAsyncComponent } from "vue";
 import { getChartTemplate } from "../../utils/chartUtils";
+import TrendingUpIcon from "../../assets/icons/TrendingUp.vue";
+import AreaChartIcon from "../../assets/icons/AreaChart.vue";
+import BarChartIcon from "../../assets/icons/BarChart.vue";
+import PieChartIcon from "../../assets/icons/PieChart.vue";
+import DonutIcon from "../../assets/icons/Donut.vue";
+import RadarIcon from "../../assets/icons/Radar.vue";
+import ScatterChartIcon from "../../assets/icons/ScatterChart.vue";
+import BubbleChartIcon from "../../assets/icons/BubbleChart.vue";
+import HeatMapIcon from "../../assets/icons/HeatMap.vue";
+import CandlestickIcon from "../../assets/icons/Candlestick.vue";
+import RadialChartIcon from "../../assets/icons/RadialChart.vue";
+import TimelineIcon from "../../assets/icons/Timeline.vue";
+
+const ApexChart = defineAsyncComponent(() => import("vue3-apexcharts"));
 
 const chartTypes = [
-	{ value: "line", label: "Line", icon: "lucide:trending-up" },
-	{ value: "area", label: "Area", icon: "lucide:area-chart" },
-	{ value: "bar", label: "Bar", icon: "lucide:bar-chart" },
-	{ value: "pie", label: "Pie", icon: "lucide:pie-chart" },
-	{ value: "donut", label: "Donut", icon: "lucide:donut" },
-	{ value: "radar", label: "Radar", icon: "lucide:radar" },
-	{ value: "scatter", label: "Scatter", icon: "lucide:scatter-chart" },
-	{ value: "bubble", label: "Bubble", icon: "lucide:bubble-chart" },
-	{ value: "heatmap", label: "Heatmap", icon: "lucide:heat-map" },
-	{ value: "candlestick", label: "Candlestick", icon: "lucide:candlestick" },
-	{ value: "radialBar", label: "Radial", icon: "lucide:radial-chart" },
-	{ value: "timeline", label: "Timeline", icon: "lucide:timeline" },
+	{ value: "line", label: "Line", iconComponent: TrendingUpIcon },
+	{ value: "area", label: "Area", iconComponent: AreaChartIcon },
+	{ value: "bar", label: "Bar", iconComponent: BarChartIcon },
+	{ value: "pie", label: "Pie", iconComponent: PieChartIcon },
+	{ value: "donut", label: "Donut", iconComponent: DonutIcon },
+	{ value: "radar", label: "Radar", iconComponent: RadarIcon },
+	{ value: "scatter", label: "Scatter", iconComponent: ScatterChartIcon },
+	{ value: "bubble", label: "Bubble", iconComponent: BubbleChartIcon },
+	{ value: "heatmap", label: "Heatmap", iconComponent: HeatMapIcon },
+	{ value: "candlestick", label: "Candlestick", iconComponent: CandlestickIcon },
+	{ value: "radialBar", label: "Radial", iconComponent: RadialChartIcon },
+	{ value: "timeline", label: "Timeline", iconComponent: TimelineIcon },
 ];
 
 const selectedType = ref<string>("bar");

@@ -117,11 +117,14 @@
 								<div
 									class="w-20 h-20 rounded-2xl bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/30 group-hover:scale-110 group-hover:shadow-xl group-hover:shadow-violet-500/40 transition-all duration-300 overflow-hidden p-2"
 								>
-									<img
-										:src="getModuleIconPath(module.name)"
-										:alt="module.label || module.name"
-										class="w-10 h-10 text-white filter brightness-0 invert"
+									<component
+										:is="getModuleIconComponent(module.name)"
+										v-if="getModuleIconComponent(module.name)"
+										class="w-10 h-10 text-white"
 									/>
+									<span v-else class="text-white font-semibold text-lg">
+										{{ getModuleInitials(module.label || module.name) }}
+									</span>
 								</div>
 								<!-- Hover ring effect -->
 								<div
@@ -776,7 +779,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch, type Component } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { desktopAPI } from "../api/desktop";
 import type { WorkspaceContent } from "../data/app_sidebar";
@@ -784,8 +787,23 @@ import { useBreadcrumbStore } from "../stores/breadcrumbs";
 import { useSidebarStore } from "../stores/sidebar";
 import { model } from "../data/model";
 import type { SidebarItem } from "../data/app_sidebar";
-import { getModuleIcon } from "../utils/moduleIcons";
 import AppLayout from "../layout/AppLayout.vue";
+import AccountsIcon from "../assets/icons/Accounts.vue";
+import AgricultureIcon from "../assets/icons/Agriculture.vue";
+import BuyingIcon from "../assets/icons/Buying.vue";
+import CrmIcon from "../assets/icons/CRM.vue";
+import DefaultIcon from "../assets/icons/Default.vue";
+import DeskIcon from "../assets/icons/Desk.vue";
+import HrIcon from "../assets/icons/HR.vue";
+import LoanIcon from "../assets/icons/Loan.vue";
+import ManufacturingIcon from "../assets/icons/Manufacturing.vue";
+import ProjectsIcon from "../assets/icons/Projects.vue";
+import QualityIcon from "../assets/icons/Quality.vue";
+import SellingIcon from "../assets/icons/Selling.vue";
+import SetupIcon from "../assets/icons/Setup.vue";
+import StockIcon from "../assets/icons/Stock.vue";
+import ToolsIcon from "../assets/icons/Tools.vue";
+import WebsiteIcon from "../assets/icons/Website.vue";
 
 declare const locals: any;
 
@@ -931,9 +949,61 @@ function formatLabel(str: string): string {
 	return str.replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-// Get module icon path
-function getModuleIconPath(moduleName: string): string {
-	return getModuleIcon(moduleName);
+const MODULE_ICON_COMPONENTS: Record<string, Component> = {
+	// Core modules
+	selling: SellingIcon,
+	buying: BuyingIcon,
+	stock: StockIcon,
+	accounts: AccountsIcon,
+	crm: CrmIcon,
+	hr: HrIcon,
+	projects: ProjectsIcon,
+	manufacturing: ManufacturingIcon,
+	website: WebsiteIcon,
+	setup: SetupIcon,
+	quality: QualityIcon,
+	agriculture: AgricultureIcon,
+	loan: LoanIcon,
+	tools: ToolsIcon,
+	desk: DeskIcon,
+
+	// Aliases
+	erpnext: DefaultIcon,
+	desktop: DeskIcon,
+};
+
+function getModuleIconComponent(moduleName: string): Component | null {
+	const normalizedName = moduleName.toLowerCase().replace(/[-_\s]/g, "");
+
+	const exactMatch = Object.entries(MODULE_ICON_COMPONENTS).find(
+		([key]) => key.toLowerCase() === normalizedName,
+	);
+	if (exactMatch) {
+		return exactMatch[1];
+	}
+
+	const partialMatch = Object.entries(MODULE_ICON_COMPONENTS).find(
+		([key]) =>
+			normalizedName.includes(key.toLowerCase()) ||
+			key.toLowerCase().includes(normalizedName),
+	);
+	if (partialMatch) {
+		return partialMatch[1];
+	}
+
+	return null;
+}
+
+function getModuleInitials(label: string): string {
+	const cleaned = label.trim();
+	if (!cleaned) return "";
+
+	const parts = cleaned.split(/\s+/).filter(Boolean);
+	if (parts.length === 1) {
+		return parts[0].slice(0, 2).toUpperCase();
+	}
+
+	return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
 }
 
 // Navigate to doctype (handle single vs regular)

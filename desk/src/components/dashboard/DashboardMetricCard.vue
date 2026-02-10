@@ -27,10 +27,8 @@
 
 			<!-- Change Indicator -->
 			<div v-if="change !== undefined" class="flex items-center gap-2">
-				<Icon
-					:icon="change >= 0 ? 'lucide:trending-up' : 'lucide:trending-down'"
-					:class="change >= 0 ? 'text-green-600' : 'text-red-600'"
-				/>
+				<TrendingUpIcon v-if="change >= 0" class="w-4 h-4 text-green-600" />
+				<TrendingDownIcon v-else class="w-4 h-4 text-red-600" />
 				<span
 					:class="change >= 0 ? 'text-green-600' : 'text-red-600'"
 					class="font-medium text-sm"
@@ -44,7 +42,7 @@
 
 			<!-- Sparkline Chart (optional mini chart) -->
 			<div v-if="sparklineData" class="mt-4 h-12">
-				<apexchart
+				<ApexChart
 					type="sparkline"
 					:series="[{ data: sparklineData }]"
 					:options="sparklineOptions"
@@ -76,11 +74,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, defineAsyncComponent } from "vue";
 import { useRouter } from "vue-router";
-import VueApexCharts from "vue3-apexcharts";
-import { Icon } from "@iconify/vue";
 import { formatNumber, formatCurrency } from "../../utils/chartUtils";
+import TrendingUpIcon from "../../assets/icons/TrendingUp.vue";
+import TrendingDownIcon from "../../assets/icons/TrendingDown.vue";
+
+const ApexChart = defineAsyncComponent(() => import("vue3-apexcharts"));
 
 interface Props {
 	label: string;
