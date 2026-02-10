@@ -7,7 +7,7 @@
 		{{ error }}
 	</div>
 
-	<div v-else-if="ctx" class="flex flex-col gap-0">
+	<div v-else-if="ctx" data-form-content class="flex flex-col gap-0 pt-4">
 		<!-- If we have tabs, render with FormTabs -->
 		<FormTabs v-if="hasTabs" :tabs="parsedTabs">
 			<template v-for="(tab, tabIdx) in parsedTabs" :key="tab.fieldname" #[`tab-${tabIdx}`]>
@@ -136,7 +136,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, onUnmounted } from "vue";
+import { ref, computed, onMounted, watch, onUnmounted, nextTick } from "vue";
 import type { DocTypeMeta, Document, FormContext, Field } from "../types";
 import { createFormContext, formRegistry } from "../runtime/formContext";
 import { loadDoctypeScriptsFromMetadata } from "../runtime/scriptLoader";
@@ -636,6 +636,26 @@ function handleDiscard() {
 	ctx.value.dirty = false;
 }
 
+async function reload() {
+	await onLoad();
+}
+
+function focusFirstField() {
+	nextTick(() => {
+		// Select the first visible, non-disabled input/select/textarea
+		const selector = `input:not([type='hidden']):not([disabled]), select:not([disabled]), textarea:not([disabled]), [contenteditable='true']:not([disabled])`;
+		const formContent = document.querySelector("[data-form-content]");
+		const el = formContent?.querySelector(selector) || document.querySelector(selector);
+		if (el && el instanceof HTMLElement) {
+			el.focus({ preventScroll: true });
+			// Scroll field into view with a small delay
+			setTimeout(() => {
+				el.scrollIntoView({ behavior: "smooth", block: "center" });
+			}, 100);
+		}
+	});
+}
+
 // Cleanup on component unmount
 onUnmounted(() => {
 	cleanupRealtimeSubscriptions();
@@ -644,6 +664,8 @@ onUnmounted(() => {
 defineExpose({
 	handleSave,
 	handleDiscard,
+	reload,
+	focusFirstField,
 	formStatus,
 	isDirty,
 	ctx,
