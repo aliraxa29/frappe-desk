@@ -116,8 +116,8 @@ const emit = defineEmits<{
 	(e: "select", app: typeof props.app.name): void;
 	(e: "install", app: typeof props.app.name): void;
 	(e: "uninstall", app: typeof props.app.name): void;
-	(e: "marketplace-install", app: typeof props.app.name | typeof props.app.app_name): void;
-	(e: "marketplace-paid", app: typeof props.app.name | typeof props.app.app_name): void;
+	(e: "marketplace-install", app_name: string): void;
+	(e: "marketplace-paid", app_name: string): void;
 }>();
 
 const containerClass = computed(() => [
@@ -156,7 +156,7 @@ const pricingLabel = computed(() => {
 
 const handleSelect = () => {
 	if (props.selectable) {
-		emit("select", props.app.name || props.app.app_name);
+		emit("select", props.app.name || props.app.app_name || "");
 	}
 };
 </script>

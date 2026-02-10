@@ -30,7 +30,7 @@
 				<!-- Empty state -->
 				<div
 					v-if="installedApps.length === 0"
-					class="text-center text-sm text-[var(--text-secondary)]"
+					class="text-center text-sm text-(--text-secondary)"
 				>
 					{{ __("No apps installed") }}
 				</div>
@@ -277,11 +277,11 @@ async function confirmUninstall(app_name: string) {
 	}
 }
 
-async function installFreeMarketplaceApp(_app: string) {
-	const app = marketplaceApps.value.find((item) => item.app_name === _app);
+async function installFreeMarketplaceApp(app_name: string) {
+	const app = marketplaceApps.value.find((item) => item.app_name === app_name);
 	if (!app) return;
 
-	const label = app.title || _app;
+	const label = app.title || app_name;
 
 	// Verify it's a free app
 	if (app.pricing !== "Free") {
@@ -304,9 +304,9 @@ async function installFreeMarketplaceApp(_app: string) {
 	}
 
 	try {
-		installingApps.value.add(_app);
+		installingApps.value.add(app_name);
 
-		const response = await marketplaceAPI.installMarketplaceApp(app.repo_url, _app);
+		const response = await marketplaceAPI.installMarketplaceApp(app.repo_url, app_name);
 
 		if (response && response.message) {
 			await dialogStore.alert(__("Installation Successful"), response.message);
@@ -320,7 +320,7 @@ async function installFreeMarketplaceApp(_app: string) {
 		// Hard refresh to reload all metadata and boot data from server
 		window.location.href = window.location.href;
 	} catch (error: any) {
-		installingApps.value.delete(_app);
+		installingApps.value.delete(app_name);
 
 		// Extract error from response data if available (Frappe API error response)
 		const frappeError = error?.response?.data || error;
