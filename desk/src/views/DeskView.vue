@@ -53,7 +53,7 @@
 			</div>
 
 			<!-- Available apps (bench) -->
-			<div>
+			<div class="mb-10">
 				<div class="mb-6">
 					<h2 class="text-xl font-bold text-[--text-primary] mb-2 dark:text-white">
 						{{ __("Available Apps (Not Installed)") }}
@@ -65,7 +65,7 @@
 
 				<div
 					v-if="availableApps.length === 0"
-					class="text-center text-sm text-[var(--text-secondary)]"
+					class="text-center text-sm text-(--text-secondary)"
 				>
 					{{ __("No available apps found") }}
 				</div>
@@ -85,6 +85,46 @@
 					/>
 				</div>
 			</div>
+
+			<!-- Marketplace apps (READONLY) -->
+			<div>
+				<div class="mb-6">
+					<div>
+						<h2 class="text-xl font-bold text-[--text-primary] mb-2 dark:text-white">
+							{{ __("Explore Marketplace") }}
+						</h2>
+						<p class="text-[--text-secondary] dark:text-white">
+							{{ __("Browse and install available apps from the marketplace") }}
+						</p>
+					</div>
+				</div>
+
+				<div
+					v-if="marketplaceApps.length === 0"
+					class="text-center text-sm text-(--text-secondary)"
+				>
+					{{ __("No marketplace apps found") }}
+				</div>
+
+				<div
+					v-else
+					class="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+				>
+					<AppCard
+						v-for="app in marketplaceApps"
+						:key="app.app_name"
+						:app="convertMarketplaceApp(app)"
+						:show-actions="true"
+						:installed="false"
+						:selectable="false"
+						:is-marketplace="true"
+						:pricing="app.pricing"
+						:is-installing="installingApps.has(app.app_name)"
+						@marketplace-install="installFreeMarketplaceApp"
+						@marketplace-paid="showPaidAppDialog"
+					/>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -93,7 +133,9 @@
 import { ref, onMounted, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import type { AppInfo } from "../types";
+import type { MarketplaceApp } from "../api/marketplace";
 import { desktopAPI } from "../api/desktop";
+import { marketplaceAPI } from "../api/marketplace";
 import { useBreadcrumbStore } from "../stores/breadcrumbs";
 import { useDialogStore } from "../stores/dialog";
 import { __ } from "../utils/translate";
@@ -108,12 +150,15 @@ const dialogStore = useDialogStore();
 const loading = ref(true);
 const installedApps = ref<AppInfo[]>([]);
 const availableApps = ref<AppInfo[]>([]);
+const marketplaceApps = ref<MarketplaceApp[]>([]);
+const installingApps = ref<Set<string>>(new Set());
 
 const defaultApps: AppInfo[] = [];
 
 onMounted(async () => {
 	breadcrumbStore.clear();
 	await getApps();
+	await getMarketplaceApps();
 });
 
 async function getApps() {
@@ -133,6 +178,24 @@ async function getApps() {
 		availableApps.value = [];
 		loading.value = false;
 	}
+}
+
+async function getMarketplaceApps() {
+	try {
+		marketplaceApps.value = await marketplaceAPI.getMarketplaceApps();
+	} catch (error) {
+		console.error("Failed to load marketplace apps:", error);
+	}
+}
+
+function convertMarketplaceApp(app: MarketplaceApp): AppInfo {
+	return {
+		name: app.app_name,
+		title: app.title,
+		description: app.description,
+		icon: app.icon,
+		image: app.image,
+	};
 }
 
 async function selectApp(app_name: string) {
@@ -214,10 +277,87 @@ async function confirmUninstall(app_name: string) {
 	}
 }
 
+async function installFreeMarketplaceApp(_app: string) {
+	const app = marketplaceApps.value.find((item) => item.app_name === _app);
+	if (!app) return;
+
+	const label = app.title || _app;
+
+	// Verify it's a free app
+	if (app.pricing !== "Free") {
+		await dialogStore.error(
+			__("Cannot Install"),
+			__("Only free apps can be installed directly. Please purchase this app first."),
+		);
+		return;
+	}
+	const confirmed = await dialogStore.confirm(
+		__("Install Marketplace App"),
+		__("This will clone the repository from {0} and install '{1}' on your site. Continue?", {
+			0: app.repo_url,
+			1: label,
+		}),
+	);
+
+	if (!confirmed) {
+		return;
+	}
+
+	try {
+		installingApps.value.add(_app);
+
+		const response = await marketplaceAPI.installMarketplaceApp(app.repo_url, _app);
+
+		if (response && response.message) {
+			await dialogStore.alert(__("Installation Successful"), response.message);
+		} else {
+			await dialogStore.alert(
+				__("Installation Successful"),
+				__("App {0} has been installed successfully from marketplace.", { 0: label }),
+			);
+		}
+
+		// Hard refresh to reload all metadata and boot data from server
+		window.location.href = window.location.href;
+	} catch (error: any) {
+		installingApps.value.delete(_app);
+
+		// Extract error from response data if available (Frappe API error response)
+		const frappeError = error?.response?.data || error;
+		const rawErrorMessage = getErrorMessage(frappeError);
+		const errorMessage = formatErrorMessage(rawErrorMessage);
+		await dialogStore.error(__("Installation Failed"), errorMessage);
+	}
+}
+
+async function showPaidAppDialog(app_name: string) {
+	const app = marketplaceApps.value.find((item) => item.app_name === app_name);
+	if (!app) return;
+
+	const label = app.title || app_name;
+	const author = app.author_name ? ` by ${app.author_name}` : "";
+
+	await dialogStore.alert(
+		__("Paid App"),
+		__(
+			"{0}{1} is a paid application. You can purchase this app from the marketplace or contact the app developer at <a href='mailto:{2}'>{2}</a> for more information.",
+			{
+				0: label,
+				1: author,
+				2: app.author_email || "N/A",
+			},
+		),
+		{
+			isHtml: true,
+		},
+	);
+}
+
 watch(
 	() => route.fullPath,
 	async () => {
 		await getApps();
+		await getMarketplaceApps();
 	},
 );
 </script>

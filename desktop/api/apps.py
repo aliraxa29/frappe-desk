@@ -1,5 +1,9 @@
 """API endpoints for installed apps and doctypes."""
 
+import os
+import re
+import subprocess
+
 import frappe
 from frappe import _
 from frappe.core.doctype.scheduled_job_type.scheduled_job_type import sync_jobs
@@ -704,3 +708,145 @@ def _get_module_from_app(app_name):
 
 	except Exception:
 		return app_name.replace("_", " ").title()
+
+
+@frappe.whitelist(allow_guest=False)
+def install_marketplace_app(repo_url: str, app_name: str | None = None):
+	"""Install an app from marketplace using GitHub repository URL.
+
+	This function:
+	1. Extracts the app name from repo URL if not provided
+	2. Runs 'bench get-app <repo_url>' to clone the repository
+	3. Runs 'bench install-app <app_name>' to install on site
+	4. Syncs resources (doctypes, jobs, fixtures, etc.)
+
+	Args:
+	    repo_url: GitHub repository URL (e.g., https://github.com/user/app.git)
+	    app_name: Optional app name. If not provided, extracted from repo URL
+
+	Returns:
+	    Dict with status and message
+
+	Raises:
+	    frappe.PermissionError: If user doesn't have permission
+	    frappe.ValidationError: If URL or installation fails
+	"""
+
+	# Check permissions
+	if not frappe.has_permission("Desktop", "write"):
+		frappe.throw(_("You do not have permission to install apps"))
+
+	# Validate repo URL
+	if not repo_url or not isinstance(repo_url, str):
+		frappe.throw(_("Valid repository URL is required"))
+
+	repo_url = repo_url.strip()
+
+	# Validate URL format (basic HTTP/HTTPS GitHub validation)
+	if not (repo_url.startswith("http://") or repo_url.startswith("https://")):
+		frappe.throw(_("Repository URL must start with http:// or https://"))
+
+	if "github.com" not in repo_url.lower() and "gitlab.com" not in repo_url.lower():
+		frappe.throw(_("Only GitHub and GitLab repositories are currently supported"))
+
+	# Extract app name from URL if not provided
+	if not app_name:
+		# Extract from URL: https://github.com/user/app.git -> app
+		# or https://github.com/user/app -> app
+		match = re.search(r"/([a-z0-9_-]+?)(?:\.git)?/?$", repo_url.lower())
+		if match:
+			app_name = match.group(1)
+		else:
+			frappe.throw(_("Could not extract app name from repository URL. Please provide app_name"))
+
+	# Validate app name format
+	if not re.match(r"^[a-z0-9_]+$", app_name):
+		frappe.throw(_("Invalid app name format. Use lowercase letters, numbers, and underscores"))
+
+	# Check if already installed
+	if app_name in IGNORE_APPS:
+		frappe.throw(_("This app cannot be installed"))
+
+	if app_name in frappe.get_installed_apps():
+		return {
+			"status": "already_installed",
+			"message": _(f"{app_name} is already installed"),
+		}
+
+	# Get bench directory
+	try:
+		bench_dir = frappe.utils.get_bench_path()
+	except Exception:
+		frappe.throw(_("Could not determine bench directory"))
+
+	try:
+		frappe.logger().info(f"Starting marketplace app installation: {app_name} from {repo_url}")
+
+		# Step 1: Run 'bench get-app'
+		get_app_cmd = ["bench", "get-app", repo_url]
+		frappe.logger().info(f"Running: {' '.join(get_app_cmd)}")
+
+		result = subprocess.run(
+			get_app_cmd,
+			cwd=bench_dir,
+			capture_output=True,
+			text=True,
+			timeout=300,  # 5 minute timeout
+		)
+
+		if result.returncode != 0:
+			error_msg = result.stderr or result.stdout or "Unknown error"
+			frappe.logger().error(f"bench get-app failed: {error_msg}")
+			frappe.throw(_("Failed to download app: {0}").format(error_msg))
+
+		frappe.logger().info(f"Successfully cloned app: {app_name}")
+
+		# Step 2: Run 'bench install-app'
+		install_app_cmd = ["bench", "install-app", app_name, "--site", frappe.local.site]
+		frappe.logger().info(f"Running: {' '.join(install_app_cmd)}")
+
+		result = subprocess.run(
+			install_app_cmd,
+			cwd=bench_dir,
+			capture_output=True,
+			text=True,
+			timeout=300,  # 5 minute timeout
+		)
+
+		if result.returncode != 0:
+			error_msg = result.stderr or result.stdout or "Unknown error"
+			frappe.logger().error(f"bench install-app failed: {error_msg}")
+			frappe.throw(_("Failed to install app: {0}").format(error_msg))
+
+		frappe.logger().info(f"Successfully installed app: {app_name}")
+
+		# Step 3: Sync jobs and clear cache
+		try:
+			frappe.setup_module_map(include_all_apps=True)
+			sync_jobs()
+			frappe.clear_cache()
+		except Exception as e:
+			frappe.logger().warning(f"Failed to sync jobs/cache for {app_name}: {e}")
+			# Don't fail installation if sync fails
+
+		# Verify installation
+		if app_name not in frappe.get_installed_apps():
+			frappe.logger().error(f"App {app_name} was installed but not found in get_installed_apps()")
+			frappe.throw(_("Installation verification failed. Please check server logs."))
+
+		return {
+			"status": "installed",
+			"message": _(f"{app_name} has been installed successfully from marketplace"),
+		}
+
+	except subprocess.TimeoutExpired:
+		frappe.logger().error(f"Installation timeout for {app_name}")
+		frappe.throw(_("Installation timed out. Please try again later."))
+
+	except frappe.exceptions.ValidationError:
+		# Re-raise Frappe validation errors
+		raise
+
+	except Exception as e:
+		frappe.logger().error(f"Marketplace app installation failed for {app_name}: {frappe.get_traceback()}")
+		frappe.throw(_("Installation error: {0}").format(str(e)))

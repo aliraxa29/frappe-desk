@@ -36,6 +36,8 @@ export interface DialogOptions {
   // For custom dialogs
   component?: Component;
   componentProps?: Record<string, any>;
+  // HTML rendering support
+  isHtml?: boolean;
 }
 
 export interface Dialog extends DialogOptions {
@@ -96,12 +98,17 @@ export const useDialogStore = defineStore("dialog", () => {
   }
 
   // Convenience methods
-  function confirm(title: string, message?: string): Promise<boolean> {
+  function confirm(
+    title: string,
+    message?: string,
+    options?: { isHtml?: boolean },
+  ): Promise<boolean> {
     return open({
       type: "confirm",
       title,
       message,
       icon: "question",
+      isHtml: options?.isHtml,
       primaryButton: {
         label: "Confirm",
         variant: "primary",
@@ -115,12 +122,17 @@ export const useDialogStore = defineStore("dialog", () => {
     }).then((result) => result === true);
   }
 
-  function alert(title: string, message?: string): Promise<void> {
+  function alert(
+    title: string,
+    message?: string,
+    options?: { isHtml?: boolean },
+  ): Promise<void> {
     return open({
       type: "alert",
       title,
       message,
       icon: "info",
+      isHtml: options?.isHtml,
       primaryButton: {
         label: "OK",
         variant: "primary",
@@ -129,12 +141,17 @@ export const useDialogStore = defineStore("dialog", () => {
     });
   }
 
-  function error(title: string, message?: string): Promise<void> {
+  function error(
+    title: string,
+    message?: string,
+    options?: { isHtml?: boolean },
+  ): Promise<void> {
     return open({
       type: "error",
       title,
       message,
       icon: "error",
+      isHtml: options?.isHtml,
       primaryButton: {
         label: "OK",
         variant: "primary",
@@ -143,12 +160,17 @@ export const useDialogStore = defineStore("dialog", () => {
     });
   }
 
-  function warning(title: string, message?: string): Promise<boolean> {
+  function warning(
+    title: string,
+    message?: string,
+    options?: { isHtml?: boolean },
+  ): Promise<boolean> {
     return open({
       type: "confirm",
       title,
       message,
       icon: "warning",
+      isHtml: options?.isHtml,
       primaryButton: {
         label: "Continue",
         variant: "danger",
@@ -282,14 +304,14 @@ function getDialogStore() {
 }
 
 export const dialog = {
-  confirm: (title: string, message?: string) =>
-    getDialogStore().confirm(title, message),
-  alert: (title: string, message?: string) =>
-    getDialogStore().alert(title, message),
-  error: (title: string, message?: string) =>
-    getDialogStore().error(title, message),
-  warning: (title: string, message?: string) =>
-    getDialogStore().warning(title, message),
+  confirm: (title: string, message?: string, options?: { isHtml?: boolean }) =>
+    getDialogStore().confirm(title, message, options),
+  alert: (title: string, message?: string, options?: { isHtml?: boolean }) =>
+    getDialogStore().alert(title, message, options),
+  error: (title: string, message?: string, options?: { isHtml?: boolean }) =>
+    getDialogStore().error(title, message, options),
+  warning: (title: string, message?: string, options?: { isHtml?: boolean }) =>
+    getDialogStore().warning(title, message, options),
   prompt: (
     title: string,
     options?: Parameters<ReturnType<typeof useDialogStore>["prompt"]>[1],

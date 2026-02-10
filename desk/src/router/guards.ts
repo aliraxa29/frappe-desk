@@ -13,7 +13,6 @@ export function setupRouterGuards(router: Router) {
       next,
     ) => {
       const authStore = useAuthStore();
-
       // Public routes that don't require authentication
       const publicRoutes = ["Login", "ResetPassword", "NotFound"];
       const isPublicRoute = publicRoutes.includes(to.name as string);

@@ -115,8 +115,17 @@
 
 							<!-- Standard content -->
 							<template v-else>
-								<p v-if="dialog.message" class="dialog-message">
-									{{ dialog.message }}
+								<p
+									v-if="dialog.message"
+									class="dialog-message"
+									:class="{ 'dialog-message-html': dialog.isHtml }"
+								>
+									<template v-if="dialog.isHtml">
+										<div v-html="dialog.message" />
+									</template>
+									<template v-else>
+										{{ dialog.message }}
+									</template>
 								</p>
 
 								<!-- Prompt input -->
@@ -358,6 +367,38 @@ async function handleSecondaryAction(dialog: Dialog) {
 	color: var(--text-secondary, #475569);
 	margin: 0;
 	line-height: 1.6;
+}
+
+.dialog-message-html {
+	padding: 0;
+}
+
+.dialog-message-html div {
+	font-size: 0.9375rem;
+	color: var(--text-secondary, #475569);
+	line-height: 1.6;
+}
+
+.dialog-message-html a {
+	color: #0ea5e9;
+	text-decoration: underline;
+}
+
+.dialog-message-html a:hover {
+	color: #0284c7;
+}
+
+.dialog-message-html strong {
+	font-weight: 600;
+	color: var(--text-primary, #1e293b);
+}
+
+.dialog-message-html code {
+	background: var(--bg-secondary, #f1f5f9);
+	padding: 0.25rem 0.5rem;
+	border-radius: 0.25rem;
+	font-family: "Monaco", "Menlo", monospace;
+	font-size: 0.875rem;
 }
 
 .dialog-input-wrapper {

@@ -34,21 +34,54 @@
 				{{ app.description || __("No description available") }}
 			</p>
 
+			<!-- Pricing badge for marketplace apps -->
+			<div v-if="isMarketplace && pricing" class="mt-auto pt-2">
+				<span :class="pricingBadgeClass">
+					{{ pricingLabel }}
+				</span>
+			</div>
+
 			<div v-if="showActions" class="mt-auto pt-4 flex gap-2">
-				<button
-					v-if="installed"
-					@click.stop="emit('uninstall', app.name)"
-					class="flex-1 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold transition hover:bg-red-500 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-200 hover:text-white text-red-600 cursor-pointer"
-				>
-					{{ __("Uninstall") }}
-				</button>
-				<button
-					v-else
-					@click.stop="emit('install', app.name)"
-					class="flex-1 rounded-lg border border-violet-600 bg-violet-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-violet-700 cursor-pointer"
-				>
-					{{ __("Install") }}
-				</button>
+				<!-- For regular apps -->
+				<template v-if="!isMarketplace">
+					<button
+						v-if="installed"
+						@click.stop="emit('uninstall', app.name)"
+						class="flex-1 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold transition hover:bg-red-500 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-200 hover:text-white text-red-600 cursor-pointer"
+					>
+						{{ __("Uninstall") }}
+					</button>
+					<button
+						v-else
+						@click.stop="emit('install', app.name)"
+						class="flex-1 rounded-lg border border-violet-600 bg-violet-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-violet-700 cursor-pointer"
+					>
+						{{ __("Install") }}
+					</button>
+				</template>
+
+				<!-- For marketplace apps -->
+				<template v-if="isMarketplace">
+					<button
+						v-if="pricing === 'Free'"
+						@click.stop="emit('marketplace-install', app.name)"
+						:disabled="isInstalling"
+						:class="[
+							'flex-1 rounded-lg border border-green-600 bg-green-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-green-700 cursor-pointer',
+							isInstalling && 'opacity-50 cursor-not-allowed',
+						]"
+					>
+						<span v-if="!isInstalling">{{ __("Install Free") }}</span>
+						<span v-else>{{ __("Installing...") }}</span>
+					</button>
+					<button
+						v-else
+						@click.stop="emit('marketplace-paid', app.name)"
+						class="flex-1 rounded-lg border border-amber-600 bg-amber-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-amber-700 cursor-pointer"
+					>
+						{{ __("Paid App") }}
+					</button>
+				</template>
 			</div>
 		</div>
 	</div>
@@ -61,21 +94,30 @@ import { __ } from "../utils/translate";
 import type { AppInfo } from "../types";
 
 type Props = {
-	app: AppInfo;
+	app: AppInfo & { app_name?: string };
 	showActions?: boolean;
 	installed?: boolean;
 	selectable?: boolean;
+	isMarketplace?: boolean;
+	pricing?: "Free" | "Paid" | "Trial";
+	isInstalling?: boolean;
 };
+
 const props = withDefaults(defineProps<Props>(), {
 	showActions: false,
 	installed: true,
 	selectable: true,
+	isMarketplace: false,
+	pricing: undefined,
+	isInstalling: false,
 });
 
 const emit = defineEmits<{
 	(e: "select", app: typeof props.app.name): void;
 	(e: "install", app: typeof props.app.name): void;
 	(e: "uninstall", app: typeof props.app.name): void;
+	(e: "marketplace-install", app: typeof props.app.name | typeof props.app.app_name): void;
+	(e: "marketplace-paid", app: typeof props.app.name | typeof props.app.app_name): void;
 }>();
 
 const containerClass = computed(() => [
@@ -85,9 +127,36 @@ const containerClass = computed(() => [
 		: "cursor-default",
 ]);
 
+const pricingBadgeClass = computed(() => {
+	const base = "inline-block px-2 py-1 rounded text-xs font-semibold";
+	switch (props.pricing) {
+		case "Free":
+			return `${base} bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200`;
+		case "Paid":
+			return `${base} bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200`;
+		case "Trial":
+			return `${base} bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200`;
+		default:
+			return base;
+	}
+});
+
+const pricingLabel = computed(() => {
+	switch (props.pricing) {
+		case "Free":
+			return __("Free");
+		case "Paid":
+			return __("Paid");
+		case "Trial":
+			return __("Trial");
+		default:
+			return "";
+	}
+});
+
 const handleSelect = () => {
 	if (props.selectable) {
-		emit("select", props.app.name);
+		emit("select", props.app.name || props.app.app_name);
 	}
 };
 </script>
