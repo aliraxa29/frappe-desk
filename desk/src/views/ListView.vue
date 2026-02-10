@@ -6,10 +6,24 @@
 					<h2 class="text-lg font-semibold text-slate-800 dark:text-white">
 						{{ doctypeLabel }}
 					</h2>
+					<span
+						v-if="selectedRows.length > 0"
+						class="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-full"
+					>
+						{{ selectedRows.length }} {{ __("selected") }}
+					</span>
 				</div>
 				<div class="flex items-center gap-2">
+					<!-- Export -->
+					<Button @click="handleExport" variant="secondary" size="sm">
+						{{ __("Export") }}
+					</Button>
+					<!-- Refresh -->
+					<Button @click="handleRefresh" variant="secondary" size="sm">
+						{{ __("Refresh") }}
+					</Button>
 					<Button @click="handleNewDocument" variant="primary" size="sm">
-						+ New {{ doctypeLabel }}
+						+ {{ __("New") }} {{ doctypeLabel }}
 					</Button>
 				</div>
 			</div>
@@ -20,7 +34,7 @@
 			<div
 				class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-gray-950 overflow-hidden m-2"
 			>
-				<ListView ref="listViewRef" :doctype="doctype" @select="handleSelect" />
+				<ListViewEnhanced ref="listViewRef" :doctype="doctype" @select="handleSelect" />
 			</div>
 		</template>
 	</AppLayout>
@@ -33,20 +47,18 @@ import type { DocTypeMeta } from "../types";
 import { frappeClient } from "../api/resource";
 import { useBreadcrumbStore } from "../stores/breadcrumbs";
 import AppLayout from "../layout/AppLayout.vue";
-import ListView from "../components/list/ListView.vue";
+import ListViewEnhanced from "../components/list/ListViewEnhanced.vue";
 import Button from "../components/Button.vue";
 import { realtime } from "../utils/socketio/client";
-import { useToastStore } from "../stores/toast";
 
 const route = useRoute();
 const router = useRouter();
 const breadcrumbStore = useBreadcrumbStore();
-const toast = useToastStore();
 
 const doctype = computed(() => (route.params.doctype as string) || "");
 const app = computed(() => (route.params.app as string) || "");
 
-const listViewRef = ref<InstanceType<typeof ListView> | null>(null);
+const listViewRef = ref<InstanceType<typeof ListViewEnhanced> | null>(null);
 const meta = ref<DocTypeMeta | null>(null);
 const selectedRows = ref<string[]>([]);
 
@@ -80,7 +92,6 @@ function setupRealtimeSubscriptions() {
 			// Refresh the list view
 			if (listViewRef.value?.refresh) {
 				listViewRef.value.refresh();
-				toast.show(`List updated in realtime`, "info");
 			}
 		}
 	};
@@ -91,7 +102,6 @@ function setupRealtimeSubscriptions() {
 
 			if (listViewRef.value?.refresh) {
 				listViewRef.value.refresh();
-				toast.show(`List updated in realtime`, "info");
 			}
 		}
 	};
@@ -160,6 +170,20 @@ function handleNewDocument() {
 			name: "new",
 		},
 	});
+}
+
+function handleRefresh() {
+	if (listViewRef.value?.refresh) {
+		listViewRef.value.refresh();
+	}
+}
+
+function handleExport() {
+	// Open Frappe report builder / export in a new tab
+	window.open(
+		`/api/method/frappe.client.get_list?doctype=${doctype.value}&fields=["*"]&limit_page_length=0&as_dict=1`,
+		"_blank",
+	);
 }
 
 function handleSelect(rows: string[]) {

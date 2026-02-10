@@ -129,7 +129,7 @@ const customButtons = computed(() => {
 	return formContext.value?.customButtons || [];
 });
 
-const isDirty = computed(() => formContext.value?.isDirty?.value ?? false);
+const isDirty = computed(() => formContext.value?.isDirty ?? false);
 
 const currentDoc = computed(() => formContext.value?.ctx?.doc || null);
 const currentMeta = computed(() => formContext.value?.ctx?.meta || null);

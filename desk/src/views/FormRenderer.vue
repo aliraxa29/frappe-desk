@@ -202,11 +202,27 @@ const hasTabs = computed(() => {
 	return meta.value.fields.some((f) => f.fieldtype === "Tab Break");
 });
 
+// System fields that should never appear on forms
+const HIDDEN_FORM_FIELDS = new Set([
+	"name",
+	"creation",
+	"modified",
+	"modified_by",
+	"owner",
+	"docstatus",
+	"idx",
+	"parent",
+	"parenttype",
+	"parentfield",
+]);
+
 // Parse fields into tabs structure
 const parsedTabs = computed<ParsedTab[]>(() => {
 	if (!meta.value?.fields) return [];
 
-	const fields = meta.value.fields.filter((f) => !f.hidden);
+	const fields = meta.value.fields.filter(
+		(f) => !f.hidden && !HIDDEN_FORM_FIELDS.has(f.fieldname),
+	);
 	const tabs: ParsedTab[] = [];
 	let currentTab: ParsedTab | null = null;
 
@@ -238,7 +254,9 @@ const parsedTabs = computed<ParsedTab[]>(() => {
 const parsedSections = computed<ParsedSection[]>(() => {
 	if (!meta.value?.fields || hasTabs.value) return [];
 
-	const fields = meta.value.fields.filter((f) => !f.hidden);
+	const fields = meta.value.fields.filter(
+		(f) => !f.hidden && !HIDDEN_FORM_FIELDS.has(f.fieldname),
+	);
 	return parseFieldsIntoSections(fields);
 });
 

@@ -16,7 +16,11 @@ declare global {
      * @param context Context for translation. e.g., "change", "cash"
      * @returns Translated string
      */
-    __: (txt: string, replace: string, context?: string | null) => string;
+    __: (
+      txt: string,
+      replace?: string | null,
+      context?: string | null,
+    ) => string;
 
     // constants
     NEWLINE?: string;

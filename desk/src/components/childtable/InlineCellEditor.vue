@@ -1,5 +1,5 @@
 <template>
-	<div class="inline-editor">
+	<div class="inline-editor" ref="containerRef">
 		<!-- Check -->
 		<template v-if="field.fieldtype === 'Check'">
 			<input
@@ -26,20 +26,42 @@
 			</select>
 		</template>
 
-		<!-- Link -->
+		<!-- Link with autocomplete -->
 		<template v-else-if="field.fieldtype === 'Link'">
-			<input
-				type="text"
-				:value="value"
-				@input="emit('update', ($event.target as HTMLInputElement).value)"
-				@blur="emit('blur')"
-				@keydown.enter="emit('blur')"
-				@keydown.escape="emit('cancel')"
-				:placeholder="`Select ${field.options || field.label}`"
-				class="text-input"
-				ref="inputRef"
-			/>
-			<!-- TODO: Add Link autocomplete dropdown -->
+			<div class="link-wrapper">
+				<input
+					type="text"
+					:value="linkSearchText"
+					@input="onLinkInput(($event.target as HTMLInputElement).value)"
+					@blur="onLinkBlur"
+					@keydown.enter.prevent="selectHighlightedLink"
+					@keydown.escape="emit('cancel')"
+					@keydown.down.prevent="moveHighlight(1)"
+					@keydown.up.prevent="moveHighlight(-1)"
+					:placeholder="`Search ${field.options || field.label}...`"
+					class="text-input"
+					ref="inputRef"
+					autocomplete="off"
+				/>
+				<!-- Link dropdown -->
+				<div v-if="showLinkDropdown && linkResults.length > 0" class="link-dropdown">
+					<div
+						v-for="(item, idx) in linkResults"
+						:key="item.value"
+						class="link-option"
+						:class="{ 'link-option-active': idx === highlightedIndex }"
+						@mousedown.prevent="selectLinkResult(item)"
+					>
+						<span class="link-value">{{ item.value }}</span>
+						<span v-if="item.description" class="link-desc">{{
+							item.description
+						}}</span>
+					</div>
+				</div>
+				<div v-else-if="showLinkDropdown && linkSearching" class="link-dropdown">
+					<div class="link-loading">Searching...</div>
+				</div>
+			</div>
 		</template>
 
 		<!-- Int -->
@@ -123,7 +145,7 @@
 			/>
 		</template>
 
-		<!-- Default Text Input -->
+		<!-- Default Text Input (Data, Small Text, etc.) -->
 		<template v-else>
 			<input
 				type="text"
@@ -140,8 +162,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import type { Field, DocTypeMeta } from "../../types";
+import { desk } from "../../utils/desk";
 
 const props = defineProps<{
 	field: Field;
@@ -156,6 +179,23 @@ const emit = defineEmits<{
 }>();
 
 const inputRef = ref<HTMLInputElement | HTMLSelectElement | null>(null);
+const containerRef = ref<HTMLDivElement | null>(null);
+
+// ── Link autocomplete state ──
+const linkSearchText = ref(props.value ?? "");
+const linkResults = ref<Array<{ value: string; description?: string }>>([]);
+const showLinkDropdown = ref(false);
+const linkSearching = ref(false);
+const highlightedIndex = ref(-1);
+let linkSearchTimer: ReturnType<typeof setTimeout> | null = null;
+
+// Keep linkSearchText in sync with prop value
+watch(
+	() => props.value,
+	(v) => {
+		linkSearchText.value = v ?? "";
+	},
+);
 
 // Parse select options from field.options
 const selectOptions = computed<string[]>(() => {
@@ -174,6 +214,74 @@ function formatDateTimeLocal(value: any): string {
 	}
 }
 
+// ── Link autocomplete methods ──
+async function searchLink(txt: string) {
+	if (!props.field.options) return;
+	linkSearching.value = true;
+	try {
+		const resp = await desk.call({
+			method: "frappe.client.get_list",
+			args: {
+				doctype: props.field.options,
+				filters: txt ? { name: ["like", `%${txt}%`] } : {},
+				fields: ["name"],
+				limit_page_length: 20,
+				order_by: "modified desc",
+			},
+		});
+		const list: any[] = resp?.message ?? [];
+		linkResults.value = list.map((r: any) => ({
+			value: r.name,
+			description: r.description || r.title || "",
+		}));
+	} catch {
+		linkResults.value = [];
+	} finally {
+		linkSearching.value = false;
+	}
+}
+
+function onLinkInput(txt: string) {
+	linkSearchText.value = txt;
+	emit("update", txt);
+	highlightedIndex.value = -1;
+	showLinkDropdown.value = true;
+
+	if (linkSearchTimer) clearTimeout(linkSearchTimer);
+	linkSearchTimer = setTimeout(() => searchLink(txt), 250);
+}
+
+function onLinkBlur() {
+	// Delay so mousedown on dropdown can fire first
+	setTimeout(() => {
+		showLinkDropdown.value = false;
+		emit("blur");
+	}, 200);
+}
+
+function selectLinkResult(item: { value: string; description?: string }) {
+	linkSearchText.value = item.value;
+	emit("update", item.value);
+	showLinkDropdown.value = false;
+	emit("blur");
+}
+
+function selectHighlightedLink() {
+	if (highlightedIndex.value >= 0 && highlightedIndex.value < linkResults.value.length) {
+		selectLinkResult(linkResults.value[highlightedIndex.value]);
+	} else {
+		emit("blur");
+	}
+}
+
+function moveHighlight(dir: number) {
+	if (!showLinkDropdown.value || linkResults.value.length === 0) return;
+	highlightedIndex.value = Math.max(
+		-1,
+		Math.min(linkResults.value.length - 1, highlightedIndex.value + dir),
+	);
+}
+
 // Auto-focus on mount
 onMounted(() => {
 	setTimeout(() => {
@@ -184,6 +292,15 @@ onMounted(() => {
 			}
 		}
 	}, 0);
+
+	// For Link fields, load initial results on focus
+	if (props.field.fieldtype === "Link") {
+		searchLink(props.value ?? "");
+	}
+});
+
+onBeforeUnmount(() => {
+	if (linkSearchTimer) clearTimeout(linkSearchTimer);
 });
 </script>
 
@@ -234,5 +351,61 @@ onMounted(() => {
 
 .number-input {
 	text-align: right;
+}
+
+/* ── Link autocomplete styles ── */
+.link-wrapper {
+	position: relative;
+	width: 100%;
+}
+
+.link-dropdown {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	max-height: 200px;
+	overflow-y: auto;
+	background: #fff;
+	border: 1px solid #e2e8f0;
+	border-top: none;
+	border-radius: 0 0 0.25rem 0.25rem;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.link-option {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.375rem 0.5rem;
+	font-size: 0.8125rem;
+	cursor: pointer;
+	transition: background-color 0.1s;
+}
+
+.link-option:hover,
+.link-option-active {
+	background-color: #eff6ff;
+}
+
+.link-value {
+	color: #1e293b;
+	font-weight: 500;
+}
+
+.link-desc {
+	color: #94a3b8;
+	font-size: 0.75rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.link-loading {
+	padding: 0.5rem;
+	text-align: center;
+	font-size: 0.75rem;
+	color: #94a3b8;
 }
 </style>

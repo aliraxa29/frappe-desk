@@ -140,13 +140,17 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import type { Field, FormContext } from "../../types";
 
-// Load Google Fonts
+// Load Google Fonts (deduplicated)
 if (typeof document !== "undefined") {
-	const link = document.createElement("link");
-	link.href =
+	const fontHref =
 		"https://fonts.googleapis.com/css2?family=Georgia&family=Inter:wght@400;500;600;700&family=Poppins:wght@400;600;700&family=Roboto+Mono:wght@400;700&family=Playfair+Display:wght@400;600;700&family=Lora:wght@400;600;700&family=Ubuntu:wght@400;700&family=Source+Code+Pro:wght@400;700&display=swap";
-	link.rel = "stylesheet";
-	document.head.appendChild(link);
+	const existing = document.querySelector(`link[href="${fontHref}"]`);
+	if (!existing) {
+		const link = document.createElement("link");
+		link.href = fontHref;
+		link.rel = "stylesheet";
+		document.head.appendChild(link);
+	}
 }
 
 interface Props {
@@ -381,11 +385,13 @@ function getQuillHtml(): string {
 // LIFECYCLE
 // ============================================================================
 
+// Track debounce timer at component scope so onBeforeUnmount can clear it
+let textChangeTimeout: ReturnType<typeof setTimeout> | null = null;
+
 onMounted(() => {
 	if (!editorRef.value) return;
 
-	// Debounce text-change events (300ms like Frappe)
-	let textChangeTimeout: NodeJS.Timeout | null = null;
+	const Delta = Quill.import("delta");
 
 	quill.value = new Quill(editorRef.value, {
 		theme: "snow",
@@ -394,8 +400,19 @@ onMounted(() => {
 			keyboard: getKeyboardBindings(),
 			clipboard: {
 				matchers: [
-					[Node.ELEMENT_NODE, () => true],
-					["BR", () => ({ insert: { Break: true } })],
+					[
+						Node.ELEMENT_NODE,
+						(node: HTMLElement, delta: any) => {
+							// Pass through the delta unchanged (preserve content on paste)
+							return delta;
+						},
+					],
+					[
+						"BR",
+						() => {
+							return new Delta().insert({ Break: true });
+						},
+					],
 				],
 			},
 		},
@@ -437,10 +454,6 @@ onMounted(() => {
 			emit("fieldChange", html);
 		}, 300);
 	});
-
-	return () => {
-		if (textChangeTimeout) clearTimeout(textChangeTimeout);
-	};
 });
 
 watch(
@@ -463,6 +476,7 @@ watch(
 );
 
 onBeforeUnmount(() => {
+	if (textChangeTimeout) clearTimeout(textChangeTimeout);
 	if (quill.value) {
 		quill.value.off("text-change");
 		quill.value = null;
@@ -476,6 +490,33 @@ onBeforeUnmount(() => {
 	padding: 0.5rem;
 	background-color: #f9fafb;
 	border-bottom: 1px solid #ddd;
+}
+
+:deep(.dark .ql-toolbar),
+.dark :deep(.ql-toolbar) {
+	background-color: #1e293b;
+	border-bottom-color: #334155;
+}
+
+:deep(.dark .ql-toolbar button .ql-stroke),
+.dark :deep(.ql-toolbar button .ql-stroke) {
+	stroke: #94a3b8;
+}
+
+:deep(.dark .ql-toolbar button:hover .ql-stroke),
+.dark :deep(.ql-toolbar button:hover .ql-stroke) {
+	stroke: #e2e8f0;
+}
+
+:deep(.dark .ql-toolbar .ql-picker-label),
+.dark :deep(.ql-toolbar .ql-picker-label) {
+	color: #94a3b8;
+}
+
+:deep(.dark .ql-toolbar .ql-picker-options),
+.dark :deep(.ql-toolbar .ql-picker-options) {
+	background-color: #1e293b;
+	border-color: #334155;
 }
 
 :deep(.ql-container) {
