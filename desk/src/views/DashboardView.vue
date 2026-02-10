@@ -85,6 +85,7 @@
 import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useBreadcrumbStore } from "../stores/breadcrumbs";
+import { useAppInfoStore } from "../stores/appInfo";
 import AppLayout from "../layout/AppLayout.vue";
 import DashboardContainer from "../components/dashboard/DashboardContainer.vue";
 import { getDashboardConfig, availableDashboards } from "../data/dashboardConfigs";
@@ -92,6 +93,7 @@ import { getDashboardConfig, availableDashboards } from "../data/dashboardConfig
 const route = useRoute();
 const router = useRouter();
 const breadcrumbStore = useBreadcrumbStore();
+const appInfoStore = useAppInfoStore();
 
 const appName = computed(() => (route.params.app as string) || "");
 const dashboardName = computed(() => decodeURIComponent((route.params.dashboard as string) || ""));
@@ -108,9 +110,8 @@ const currentConfig = computed(() => {
 watch(
 	[appName, dashboardName],
 	() => {
-		const crumbs: any[] = [
-			{ label: formatLabel(appName.value), route: `/${appName.value}`, type: "app" },
-		];
+		const appLabel = appInfoStore.currentAppTitle || formatLabel(appName.value);
+		const crumbs: any[] = [{ label: appLabel, route: `/${appName.value}`, type: "app" }];
 
 		if (dashboardName.value) {
 			crumbs.push({

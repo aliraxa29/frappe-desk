@@ -137,6 +137,7 @@ import type { MarketplaceApp } from "../api/marketplace";
 import { desktopAPI } from "../api/desktop";
 import { marketplaceAPI } from "../api/marketplace";
 import { useBreadcrumbStore } from "../stores/breadcrumbs";
+import { useAppInfoStore } from "../stores/appInfo";
 import { useDialogStore } from "../stores/dialog";
 import { __ } from "../utils/translate";
 import { getErrorMessage, formatErrorMessage } from "../utils/errorHandler";
@@ -146,6 +147,7 @@ import AppCard from "../components/AppCard.vue";
 const router = useRouter();
 const route = useRoute();
 const breadcrumbStore = useBreadcrumbStore();
+const appInfoStore = useAppInfoStore();
 const dialogStore = useDialogStore();
 const loading = ref(true);
 const installedApps = ref<AppInfo[]>([]);
@@ -199,6 +201,14 @@ function convertMarketplaceApp(app: MarketplaceApp): AppInfo {
 }
 
 async function selectApp(app_name: string) {
+	// Find the app info from installed apps
+	const appInfo = installedApps.value.find((app) => app.name === app_name);
+
+	// Store the app info in the app info store
+	if (appInfo) {
+		appInfoStore.setCurrentApp(appInfo);
+	}
+
 	router.push({
 		name: "App",
 		params: { app: app_name },

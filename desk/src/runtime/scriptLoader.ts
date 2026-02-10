@@ -83,10 +83,10 @@ export function loadDoctypeScriptsFromMetadata(
   let scriptId: string;
 
   if (context === "form") {
-    scriptContent = metadata.__form_ts;
+    scriptContent = metadata.__form_js;
     scriptId = `doctype-form-scripts-${doctype}`;
   } else if (context === "list") {
-    scriptContent = metadata.__list_ts;
+    scriptContent = metadata.__list_js;
     scriptId = `doctype-list-scripts-${doctype}`;
   } else {
     console.warn(`Unknown context: ${context}`);

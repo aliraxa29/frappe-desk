@@ -18,13 +18,13 @@ class DesktopMeta(FormMeta):
 		def _get_path(fname):
 			return os.path.join(path, scrub(fname))
 
-		self._add_code(_get_path(self.name + ".form.ts"), "__form_ts")
-		self._add_code(_get_path(self.name + ".list.ts"), "__list_ts")
+		self._add_code(_get_path(self.name + ".form.js"), "__form_js")
+		self._add_code(_get_path(self.name + ".list.js"), "__list_js")
 
 	def as_dict(self, no_nulls=False):
 		d = super().as_dict(no_nulls=no_nulls)
-		d["__form_ts"] = self.get("__form_ts")
-		d["__list_ts"] = self.get("__list_ts")
+		d["__form_js"] = self.get("__form_js")
+		d["__list_js"] = self.get("__list_ts")
 		return d
 
 

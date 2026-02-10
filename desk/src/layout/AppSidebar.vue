@@ -1,11 +1,14 @@
 <template>
 	<aside
-		class="fixed left-0 top-14 bottom-0 w-64 flex flex-col bg-white dark:bg-gray-950 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 z-30"
+		class="fixed left-0 top-15 bottom-0 w-64 flex flex-col bg-white dark:bg-gray-950 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 z-30"
 	>
 		<!-- Sidebar Header -->
-		<div class="px-6 py-4 border-b border-slate-200 dark:border-gray-800 shrink-0">
-			<h2 class="text-lg font-semibold text-slate-800 dark:text-white truncate">
-				{{ route.params.app }}
+		<div class="px-6 py-3 border-b border-slate-200 dark:border-gray-800 shrink-0">
+			<h2
+				class="text-lg font-semibold text-slate-800 dark:text-white truncate"
+				:title="appInfoStore.currentAppTitle || route.params.app"
+			>
+				{{ appInfoStore.currentAppTitle || route.params.app }}
 			</h2>
 		</div>
 
@@ -170,15 +173,16 @@
 <script lang="ts" setup>
 import { useRoute, useRouter } from "vue-router";
 import type { SidebarItem } from "../data/app_sidebar";
-import { computed, onMounted, ref, watch } from "vue";
-import { desktopAPI } from "../api/desktop";
+import { computed, ref, watch } from "vue";
 import { model } from "../data/model";
 import { useSidebarStore } from "../stores/sidebar";
+import { useAppInfoStore } from "../stores/appInfo";
 
 declare const locals: any;
 
 const searchQuery = ref("");
 const sidebarStore = useSidebarStore();
+const appInfoStore = useAppInfoStore();
 const route = useRoute();
 const router = useRouter();
 const sidebarContentRef = ref<HTMLElement | null>(null);

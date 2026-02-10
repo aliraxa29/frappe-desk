@@ -646,6 +646,8 @@ defineExpose({
 	handleDiscard,
 	formStatus,
 	isDirty,
+	ctx,
+	customButtons: computed(() => ctx.value?.customButtons || []),
 });
 </script>
 

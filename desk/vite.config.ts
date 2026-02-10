@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
-import Components from "unplugin-vue-components/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -28,7 +27,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, "/api"),
         configure: (proxy) => {
-          proxy.on("proxyReq", (proxyReq, req) => {
+          proxy.on("proxyReq", (_proxyReq, req) => {
             console.log("[Proxy] API Request:", req.method, req.url);
           });
         },

@@ -1,7 +1,7 @@
 <template>
 	<AppLayout :hideSidebar="!selectedModule">
 		<template #header>
-			<div class="flex items-center justify-between gap-4 w-full py-4">
+			<div class="flex items-center justify-between gap-4 w-full py-2">
 				<div class="flex items-center gap-3">
 					<!-- Back button when viewing workspace -->
 					<button
@@ -25,8 +25,9 @@
 					</button>
 					<h2 class="text-lg font-semibold text-slate-800 dark:text-white">
 						{{
-							selectedModule
-								? formatLabel(selectedModule.label || selectedModule.name)
+							appInfoStore.currentAppTitle?.toLowerCase() ===
+							moduleName?.toLowerCase()
+								? appInfoStore.currentAppTitle
 								: formatLabel(moduleName)
 						}}
 					</h2>
@@ -79,11 +80,8 @@
 					<!-- App Title -->
 					<div class="text-center mb-12">
 						<h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-2">
-							{{ formatLabel(moduleName) }}
+							{{ appInfoStore.currentAppTitle || formatLabel(moduleName) }}
 						</h1>
-						<p class="text-slate-500 dark:text-slate-400">
-							Select a module to view its workspace
-						</p>
 					</div>
 
 					<!-- Empty State -->
@@ -784,6 +782,7 @@ import { useRoute, useRouter } from "vue-router";
 import { desktopAPI } from "../api/desktop";
 import type { WorkspaceContent } from "../data/app_sidebar";
 import { useBreadcrumbStore } from "../stores/breadcrumbs";
+import { useAppInfoStore } from "../stores/appInfo";
 import { useSidebarStore } from "../stores/sidebar";
 import { model } from "../data/model";
 import type { SidebarItem } from "../data/app_sidebar";
@@ -869,6 +868,7 @@ function clearAllWorkspaceCache(): void {
 const route = useRoute();
 const router = useRouter();
 const breadcrumbStore = useBreadcrumbStore();
+const appInfoStore = useAppInfoStore();
 const sidebarStore = useSidebarStore();
 const loading = ref(true);
 const workspaceLoading = ref(false);
@@ -945,6 +945,7 @@ const filteredDashboards = computed(() => {
 
 // Format label from slug
 function formatLabel(str: string): string {
+	debugger;
 	if (!str) return "";
 	return str.replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 }
@@ -1068,7 +1069,8 @@ function getDashboardRoute(item: SidebarItem) {
 watch(
 	moduleName,
 	() => {
-		breadcrumbStore.setForApp(moduleName.value, formatLabel(moduleName.value));
+		const appTitle = appInfoStore.currentAppTitle || formatLabel(moduleName.value);
+		breadcrumbStore.setForApp(moduleName.value, appTitle);
 	},
 	{ immediate: true },
 );
@@ -1099,11 +1101,8 @@ async function selectModule(module: ModuleInfo, forceRefresh = false) {
 				sidebarStore.setSelectedModule(moduleLinkTo);
 
 				// Update breadcrumbs
-				breadcrumbStore.setForApp(moduleName.value, formatLabel(moduleName.value));
-				breadcrumbStore.push({ label: module.label || module.name, type: "doctype" });
-
-				workspaceLoading.value = false;
-				return;
+				const appTitle = appInfoStore.currentAppTitle || formatLabel(moduleName.value);
+				breadcrumbStore.setForApp(moduleName.value, appTitle);
 			}
 		}
 
@@ -1163,7 +1162,8 @@ async function selectModule(module: ModuleInfo, forceRefresh = false) {
 		});
 
 		// Update breadcrumbs
-		breadcrumbStore.setForApp(moduleName.value, formatLabel(moduleName.value));
+		const appTitle = appInfoStore.currentAppTitle || formatLabel(moduleName.value);
+		breadcrumbStore.setForApp(moduleName.value, appTitle);
 		breadcrumbStore.push({ label: module.label || module.name, type: "doctype" });
 	} catch (error) {
 		console.error("Failed to load workspace content:", error);
@@ -1356,7 +1356,8 @@ async function refreshWorkspace() {
 }
 
 onMounted(async () => {
-	breadcrumbStore.setForApp(moduleName.value, formatLabel(moduleName.value));
+	const appTitle = appInfoStore.currentAppTitle || formatLabel(moduleName.value);
+	breadcrumbStore.setForApp(moduleName.value, appTitle);
 	await fetchModules(false);
 });
 

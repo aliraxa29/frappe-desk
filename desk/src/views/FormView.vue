@@ -2,11 +2,16 @@
 	<AppLayout>
 		<!-- Header -->
 		<template #header>
-			<div class="flex items-center justify-between gap-4 w-full py-4">
+			<div class="flex items-center justify-between gap-4 w-full py-3">
 				<h2 class="text-lg font-semibold text-slate-800 dark:text-white">
-					{{ doctype }}
+					{{ doctype
+					}}<span class="font-normal text-slate-600 dark:text-slate-400 ml-2">{{
+						isNewDocument ? "(New)" : documentName
+					}}</span>
 				</h2>
-				<span>{{ isNewDocument ? "(New)" : documentName }}</span>
+
+				<!-- Custom Form Buttons from Scripts -->
+				<FormButtons :buttons="customButtons" @execute="handleButtonExecute" />
 			</div>
 		</template>
 
@@ -33,16 +38,17 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import AppLayout from "../layout/AppLayout.vue";
-import { computed, ref, watch, onMounted } from "vue";
+import { computed, ref, watch } from "vue";
 import FormRenderer from "./FormRenderer.vue";
+import FormButtons from "../components/FormButtons.vue";
 import BottomActionBar from "../components/BottomActionBar.vue";
 import { useBreadcrumbStore } from "../stores/breadcrumbs";
+import type { FormButton } from "../composables/useFormButtons";
 
 const formContext = ref();
 const route = useRoute();
-const router = useRouter();
 const breadcrumbStore = useBreadcrumbStore();
 const loading = ref(false);
 
@@ -67,6 +73,10 @@ const isNewDocument = computed(() => {
 	return route.name === "NewForm" || documentName.value === null;
 });
 
+const customButtons = computed(() => {
+	return formContext.value?.customButtons || [];
+});
+
 // Update breadcrumbs
 watch(
 	[app, doctype, documentName],
@@ -75,10 +85,6 @@ watch(
 	},
 	{ immediate: true },
 );
-
-onMounted(() => {
-	breadcrumbStore.setForForm(app.value, doctype.value, documentName.value);
-});
 
 const handleSave = () => {
 	if (formContext.value?.handleSave) {
@@ -90,6 +96,11 @@ const handleDiscard = () => {
 	if (formContext.value?.handleDiscard) {
 		formContext.value.handleDiscard();
 	}
+};
+
+const handleButtonExecute = (button: FormButton) => {
+	console.log("Button executed:", button.name);
+	// Additional logic can be added here if needed
 };
 </script>
 

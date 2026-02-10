@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useAppInfoStore } from "./appInfo";
 
 export interface BreadcrumbItem {
   label: string;
@@ -47,8 +48,10 @@ export const useBreadcrumbStore = defineStore("breadcrumbs", {
 
     // Set breadcrumbs for list view
     setForList(app: string, doctype: string, doctypeLabel?: string) {
+      const appInfoStore = useAppInfoStore();
+      const appLabel = appInfoStore.currentAppTitle || formatLabel(app);
       this.items = [
-        { label: formatLabel(app), route: `/${app}`, type: "app" },
+        { label: appLabel, route: `/${app}`, type: "app" },
         {
           label: doctypeLabel || formatLabel(doctype),
           route: `/${app}/${doctype}`,
@@ -64,8 +67,10 @@ export const useBreadcrumbStore = defineStore("breadcrumbs", {
       name: string | null,
       doctypeLabel?: string,
     ) {
+      const appInfoStore = useAppInfoStore();
+      const appLabel = appInfoStore.currentAppTitle || formatLabel(app);
       this.items = [
-        { label: formatLabel(app), route: `/${app}`, type: "app" },
+        { label: appLabel, route: `/${app}`, type: "app" },
         {
           label: doctypeLabel || formatLabel(doctype),
           route: `/${app}/${doctype}`,
@@ -77,8 +82,10 @@ export const useBreadcrumbStore = defineStore("breadcrumbs", {
 
     // Set breadcrumbs for page view
     setForPage(app: string, pageName: string, pageLabel?: string) {
+      const appInfoStore = useAppInfoStore();
+      const appLabel = appInfoStore.currentAppTitle || formatLabel(app);
       this.items = [
-        { label: formatLabel(app), route: `/${app}`, type: "app" },
+        { label: appLabel, route: `/${app}`, type: "app" },
         { label: pageLabel || formatLabel(pageName), type: "page" },
       ];
     },

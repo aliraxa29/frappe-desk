@@ -46,10 +46,12 @@
 import { ref, computed, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useBreadcrumbStore } from "../stores/breadcrumbs";
+import { useAppInfoStore } from "../stores/appInfo";
 import AppLayout from "../layout/AppLayout.vue";
 
 const route = useRoute();
 const breadcrumbStore = useBreadcrumbStore();
+const appInfoStore = useAppInfoStore();
 const loading = ref(false);
 
 const appName = computed(() => (route.params.app as string) || "");
@@ -65,8 +67,9 @@ function formatLabel(str: string): string {
 watch(
 	[appName, reportName],
 	() => {
+		const appLabel = appInfoStore.currentAppTitle || formatLabel(appName.value);
 		breadcrumbStore.set([
-			{ label: formatLabel(appName.value), route: `/${appName.value}`, type: "app" },
+			{ label: appLabel, route: `/${appName.value}`, type: "app" },
 			{ label: reportName.value, type: "report" },
 		]);
 	},

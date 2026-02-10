@@ -161,6 +161,7 @@ export interface FormContext {
   doc: Document;
   meta: DocTypeMeta;
   dirty: boolean;
+  customButtons?: any[];
   set_value(field: string, value: any): void;
   get_value(field: string): any;
   refresh_field(field?: string): void;
@@ -171,6 +172,17 @@ export interface FormContext {
   submit(): Promise<void>;
   amend(): Promise<void>;
   duplicate(): Promise<void>;
+  add_custom_button(
+    label: string,
+    callback: () => void | Promise<void>,
+    options?: {
+      group?: string;
+      icon?: string;
+      className?: string;
+      variant?: "primary" | "secondary" | "tertiary" | "destructive" | "plain";
+      show_on?: "new" | "edit" | "always";
+    },
+  ): void;
 }
 
 export interface FieldState {

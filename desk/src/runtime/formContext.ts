@@ -8,11 +8,15 @@ export function createFormContext(
   doc: Document,
   meta: DocTypeMeta,
 ): FormContext {
+  const customButtons: any[] = [];
+  const buttonGroups = new Map<string, any[]>();
+
   const ctx = reactive<FormContext>({
     doctype,
     doc: reactive(doc),
     meta,
     dirty: false,
+    customButtons,
 
     set_value(field: string, value: any) {
       this.doc[field] = value;
@@ -73,6 +77,63 @@ export function createFormContext(
 
     async duplicate() {
       toast.warning("Duplicate functionality not yet implemented");
+    },
+
+    add_custom_button(
+      label: string,
+      callback: () => void | Promise<void>,
+      options: {
+        group?: string;
+        icon?: string;
+        className?: string;
+        variant?: "primary" | "secondary" | "danger";
+        show_on?: "new" | "edit" | "always";
+      } = {},
+    ) {
+      const isNew = !doc.name || doc.name.startsWith("new-") || doc.__islocal;
+
+      // Check visibility condition
+      if (options.show_on === "new" && !isNew) return;
+      if (options.show_on === "edit" && isNew) return;
+
+      const button: any = {
+        label,
+        name: label.toLowerCase().replace(/\s+/g, "_"),
+        onClick: callback,
+        icon: options.icon,
+        className: options.className,
+        variant: options.variant,
+        visible: true,
+      };
+
+      if (options.group) {
+        // Add to button group (dropdown)
+        if (!buttonGroups.has(options.group)) {
+          // Create group button
+          const groupButton: any = {
+            label: options.group,
+            name: options.group.toLowerCase().replace(/\s+/g, "_"),
+            buttons: [],
+            visible: true,
+          };
+          customButtons.push(groupButton);
+          buttonGroups.set(options.group, []);
+        }
+
+        // Add button to group
+        buttonGroups.get(options.group)!.push(button);
+
+        // Update the group in customButtons
+        const groupIndex = customButtons.findIndex(
+          (b) => "buttons" in b && b.label === options.group,
+        );
+        if (groupIndex >= 0) {
+          customButtons[groupIndex].buttons = buttonGroups.get(options.group)!;
+        }
+      } else {
+        // Add as standalone button
+        customButtons.push(button);
+      }
     },
   });
 
