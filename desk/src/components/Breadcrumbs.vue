@@ -6,20 +6,20 @@
 			<router-link
 				v-if="breadcrumbs[0]?.route"
 				:to="breadcrumbs[0].route"
-				class="text-gray-400 hover:text-white transition-colors truncate max-w-24"
+				class="dark:hover:text-white transition-colors truncate max-w-24"
 				:title="breadcrumbs[0].label"
 			>
 				{{ breadcrumbs[0].label }}
 			</router-link>
 
 			<!-- Separator -->
-			<span class="text-gray-600 shrink-0">/</span>
+			<span class="shrink-0">></span>
 
 			<!-- Ellipsis dropdown for middle items -->
 			<div class="relative" v-if="middleItems.length > 0">
 				<button
 					@click.stop="showMiddleDropdown = !showMiddleDropdown"
-					class="text-gray-500 hover:text-white px-1 transition-colors"
+					class="dark:hover:text-white px-1 transition-colors"
 					title="Show more"
 				>
 					...
@@ -34,7 +34,7 @@
 						v-for="(item, idx) in middleItems"
 						:key="idx"
 						:to="item.route || '#'"
-						class="block px-3 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-gray-700 truncate"
+						class="block px-3 py-1.5 text-sm dark:hover:text-white hover:bg-gray-700 truncate"
 						@click="showMiddleDropdown = false"
 					>
 						{{ item.label }}
@@ -43,7 +43,7 @@
 			</div>
 
 			<!-- Separator before last item -->
-			<span v-if="middleItems.length > 0" class="text-gray-600 shrink-0">/</span>
+			<span v-if="middleItems.length > 0" class="shrink-0">></span>
 		</template>
 
 		<!-- Normal breadcrumbs (not collapsed) -->
@@ -52,17 +52,17 @@
 				<router-link
 					v-if="crumb.route"
 					:to="crumb.route"
-					class="text-gray-400 hover:text-white transition-colors truncate max-w-28"
+					class="dark:hover:text-white transition-colors truncate max-w-28"
 					:title="crumb.label"
 				>
 					{{ crumb.label }}
 				</router-link>
-				<span v-else class="text-gray-400 truncate max-w-28" :title="crumb.label">
+				<span v-else class="truncate max-w-28" :title="crumb.label">
 					{{ crumb.label }}
 				</span>
 
 				<!-- Separator -->
-				<span class="text-gray-600 shrink-0">/</span>
+				<span class="shrink-0">></span>
 			</template>
 		</template>
 
@@ -70,7 +70,7 @@
 		<button
 			v-if="lastItem"
 			@click="copyToClipboard"
-			class="text-gray-200 font-medium truncate max-w-48 hover:text-white transition-colors cursor-copy group flex items-center gap-1"
+			class="font-medium truncate max-w-48 dark:hover:text-white transition-colors cursor-copy group flex items-center gap-1"
 			:title="`${lastItem.label} (Click to copy)`"
 		>
 			<span class="truncate">{{ lastItem.label }}</span>

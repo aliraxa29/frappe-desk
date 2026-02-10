@@ -498,11 +498,11 @@ class SearchManager {
         results.push({
           type: "doctype" as const,
           name: item.name,
-          label: `${markedLabel}`,
-          description: "List",
+          label: `${markedLabel} List`,
+          description: item.module,
           module: item.module,
           score: score + 0.05,
-          markedLabel: markedLabel,
+          markedLabel: `${markedLabel} List`,
           route: ["List", item.name],
           onclick: () => {
             router.push({
@@ -518,8 +518,9 @@ class SearchManager {
             type: "new" as const,
             name: item.name,
             label: `New ${markedLabel}`,
+            description: item.module,
             module: item.module,
-            score: score - 0.5, // Lower than list so "Item" comes before "New Item"
+            score: score - 0.5, // Lower than list so "Item List" comes before "New Item"
             markedLabel: `New ${markedLabel}`,
             onclick: () => {
               router.push({

@@ -2,35 +2,27 @@
 	<nav
 		class="sticky top-0 z-40 flex items-center justify-between gap-6 px-6 py-1 bg-white/90 dark:bg-gray-950 backdrop-blur border-b border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white transition-colors"
 	>
-		<div class="flex items-center min-w-0 gap-3">
+		<div class="flex items-center gap-3">
 			<button
 				@click="goHome"
-				class="text-slate-900 dark:text-white shrink-0 w-20 flex items-center gap-2 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition"
+				class="text-slate-900 dark:text-white w-26 flex items-center text-center gap-3 px-2 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition"
 			>
-				<Icon icon="material-symbols-light:grid-on-sharp" class="w-6 h-6" />
+				<Grid class="w-7 h-7 text-slate-900 dark:text-white shrink-0" />
 				<span class="hidden sm:inline text-lg font-semibold">{{ __("Apps") }}</span>
 			</button>
 
 			<!-- Breadcrumbs -->
-			<div class="flex-1 min-w-0 overflow-hidden">
+			<div
+				class="w-56 sm:w-64 md:w-80 lg:w-96 shrink-0 overflow-hidden whitespace-nowrap text-ellipsis"
+			>
 				<Breadcrumbs />
 			</div>
 		</div>
 		<div class="hidden md:flex flex-1 max-w-sm mx-auto">
 			<div class="relative w-full cursor-pointer" @click="openCommandDialog">
-				<svg
+				<Search
 					class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-400"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-					/>
-				</svg>
+				/>
 
 				<input
 					type="text"
@@ -64,7 +56,7 @@
 					v-else
 					class="w-9 h-9 rounded-full flex items-center justify-center text-white shrink-0 bg-linear-to-br from-blue-500 to-purple-500"
 				>
-					<Icon icon="ph:user" class="w-5 h-5" />
+					<User class="w-5 h-5" />
 				</div>
 			</button>
 
@@ -85,7 +77,7 @@
 							v-else
 							class="w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0 bg-linear-to-br from-blue-500 to-purple-500"
 						>
-							<Icon icon="ph:user" class="w-6 h-6" />
+							<User class="w-6 h-6" />
 						</div>
 
 						<div class="min-w-0 flex-1">
@@ -104,10 +96,8 @@
 						@click="themeStore.toggleTheme()"
 						class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-600 transition cursor-pointer"
 					>
-						<Icon
-							:icon="isDark ? 'ph:sun-fill' : 'ph:moon-fill'"
-							class="w-4 h-4 shrink-0"
-						/>
+						<Sun v-if="isDark" class="w-4 h-4 shrink-0" />
+						<Moon v-else class="w-4 h-4 shrink-0" />
 						{{ isDark ? __("Switch to light mode") : __("Switch to dark mode") }}
 					</button>
 
@@ -115,7 +105,7 @@
 						@click="reloadApp"
 						class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-600 transition cursor-pointer"
 					>
-						<Icon icon="ph:arrows-clockwise" class="w-4 h-4 shrink-0" />
+						<ArrowsClockwise class="w-4 h-4 shrink-0" />
 						{{ __("Reload app") }}
 					</button>
 
@@ -123,7 +113,7 @@
 						@click="clearCacheAndReload"
 						class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-600 transition cursor-pointer"
 					>
-						<Icon icon="ph:trash" class="w-4 h-4 shrink-0" />
+						<Trash class="w-4 h-4 shrink-0" />
 						{{ __("Clear cache and reload") }}
 					</button>
 
@@ -131,19 +121,7 @@
 						@click="handleLogout"
 						class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-600 transition cursor-pointer"
 					>
-						<svg
-							class="w-4 h-4 shrink-0"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-							/>
-						</svg>
+						<Logout class="w-4 h-4 shrink-0" />
 						{{ __("Logout") }}
 					</button>
 				</div>
@@ -158,12 +136,19 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { user } from "../utils/user";
 import { useAuthStore } from "../stores/auth";
 import { useThemeStore } from "../stores/theme";
-import { Icon } from "@iconify/vue";
 import { router } from "../router";
 import { useRoute } from "vue-router";
 import CommandDialog from "../components/CommandDialog.vue";
 import Breadcrumbs from "../components/Breadcrumbs.vue";
 import { __ } from "../utils/translate";
+import Grid from "../assets/icons/Grid.vue";
+import User from "../assets/icons/User.vue";
+import Sun from "../assets/icons/Sun.vue";
+import Moon from "../assets/icons/Moon.vue";
+import ArrowsClockwise from "../assets/icons/ArrowsClockwise.vue";
+import Trash from "../assets/icons/Trash.vue";
+import Logout from "../assets/icons/Logout.vue";
+import Search from "../assets/icons/Search.vue";
 
 const showUserMenu = ref(false);
 const userFullName = ref("User");
