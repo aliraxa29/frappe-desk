@@ -44,7 +44,10 @@
 					autocomplete="off"
 				/>
 				<!-- Link dropdown -->
-				<div v-if="showLinkDropdown && linkResults.length > 0" class="link-dropdown">
+				<div
+					v-if="showLinkDropdown && linkResults.length > 0"
+					class="link-dropdown scroll-area"
+				>
 					<div
 						v-for="(item, idx) in linkResults"
 						:key="item.value"

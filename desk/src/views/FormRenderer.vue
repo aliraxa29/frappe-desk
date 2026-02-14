@@ -13,15 +13,15 @@
 			<template v-for="(tab, tabIdx) in parsedTabs" :key="tab.fieldname" #[`tab-${tabIdx}`]>
 				<div class="flex flex-col">
 					<template
-						v-for="(section, sectionIdx) in tab.sections"
+						v-for="section in tab.sections"
 						:key="section.fieldname || section.label"
 					>
 						<!-- Section with accordion if collapsible -->
 						<Accordion
 							v-if="section.collapsible"
-							:label="section.label || 'Details'"
+							:label="section.label || __('Details')"
 							:default-open="!section.collapsed"
-							:class="getAccordionClasses(tab.sections, sectionIdx)"
+							class="rounded-2xl"
 						>
 							<div class="flex flex-col md:flex-row gap-6 mx-2">
 								<div
@@ -41,31 +41,38 @@
 						</Accordion>
 
 						<!-- Regular section without accordion -->
-						<div v-else class="mb-6">
-							<div v-if="section.label" class="mb-4 pb-3 border-b border-gray-200">
-								<h3 class="text-sm font-semibold text-slate-800 m-0">
-									{{ section.label }}
-								</h3>
+						<div v-else class="mb-4">
+							<div
+								class="rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-600 dark:bg-slate-800/70 shadow-sm p-6"
+							>
+								<div v-if="section.label" class="mb-4 flex items-center gap-2">
+									<div class="h-6 w-1 rounded bg-blue-500/70 mr-2"></div>
+									<h3
+										class="text-base font-semibold text-slate-800 dark:text-white m-0"
+									>
+										{{ section.label }}
+									</h3>
+								</div>
 								<p
 									v-if="section.description"
-									class="text-xs text-slate-500 mt-1 m-0"
+									class="text-xs text-slate-500 mt-1 mb-4 m-0"
 								>
 									{{ section.description }}
 								</p>
-							</div>
-							<div class="flex flex-col md:flex-row gap-6 mx-2">
-								<div
-									v-for="(column, colIdx) in section.columns"
-									:key="colIdx"
-									class="flex-1 flex flex-col gap-4 min-w-0"
-								>
-									<FieldRenderer
-										v-for="field in column.fields"
-										:key="field.fieldname"
-										:field="field"
-										:ctx="ctx"
-										@field-change="onFieldChange"
-									/>
+								<div class="flex flex-col md:flex-row gap-6">
+									<div
+										v-for="(column, colIdx) in section.columns"
+										:key="colIdx"
+										class="flex-1 flex flex-col gap-4 min-w-0"
+									>
+										<FieldRenderer
+											v-for="field in column.fields"
+											:key="field.fieldname"
+											:field="field"
+											:ctx="ctx"
+											@field-change="onFieldChange"
+										/>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -76,16 +83,13 @@
 
 		<!-- No tabs - render sections directly -->
 		<template v-else>
-			<template
-				v-for="(section, sectionIdx) in parsedSections"
-				:key="section.fieldname || section.label"
-			>
+			<template v-for="section in parsedSections" :key="section.fieldname || section.label">
 				<!-- Section with accordion if collapsible -->
 				<Accordion
 					v-if="section.collapsible"
-					:label="section.label || 'Details'"
+					:label="section.label || __('Details')"
 					:default-open="!section.collapsed"
-					:class="getAccordionClasses(parsedSections, sectionIdx)"
+					class="rounded-2xl"
 				>
 					<div class="flex flex-col md:flex-row gap-6 mx-2">
 						<div
@@ -105,28 +109,33 @@
 				</Accordion>
 
 				<!-- Regular section without accordion -->
-				<div v-else class="mb-6">
-					<div v-if="section.label" class="mb-4 pb-3 border-b border-gray-200">
-						<h3 class="text-sm font-semibold text-slate-800 m-0">
-							{{ section.label }}
-						</h3>
-						<p v-if="section.description" class="text-xs text-slate-500 mt-1 m-0">
+				<div v-else class="mb-4">
+					<div
+						class="rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-600 dark:bg-slate-800/70 shadow-sm p-6"
+					>
+						<div v-if="section.label" class="mb-4 flex items-center gap-2">
+							<div class="h-6 w-1 rounded bg-blue-500/70 mr-2"></div>
+							<h3 class="text-base font-bold text-slate-800 dark:text-white m-0">
+								{{ section.label }}
+							</h3>
+						</div>
+						<p v-if="section.description" class="text-xs text-slate-500 mt-1 mb-4 m-0">
 							{{ section.description }}
 						</p>
-					</div>
-					<div class="flex flex-col md:flex-row gap-6 mx-2 mt-2">
-						<div
-							v-for="(column, colIdx) in section.columns"
-							:key="colIdx"
-							class="flex-1 flex flex-col gap-4 min-w-0"
-						>
-							<FieldRenderer
-								v-for="field in column.fields"
-								:key="field.fieldname"
-								:field="field"
-								:ctx="ctx"
-								@field-change="onFieldChange"
-							/>
+						<div class="flex flex-col md:flex-row gap-6">
+							<div
+								v-for="(column, colIdx) in section.columns"
+								:key="colIdx"
+								class="flex-1 flex flex-col gap-4 min-w-0"
+							>
+								<FieldRenderer
+									v-for="field in column.fields"
+									:key="field.fieldname"
+									:field="field"
+									:ctx="ctx"
+									@field-change="onFieldChange"
+								/>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -148,7 +157,6 @@ import { model } from "../data/model";
 import { useRoute } from "vue-router";
 import { router } from "../router";
 import { realtime } from "../utils/socketio/client";
-import { useToastStore } from "../stores/toast";
 
 // Types for parsed layout
 interface ParsedColumn {
@@ -184,7 +192,6 @@ const emit = defineEmits<{
 	loading: [value: boolean];
 }>();
 
-const toast = useToastStore();
 const loading = ref(true);
 const error = ref("");
 const meta = ref<DocTypeMeta | null>(null);
@@ -334,13 +341,13 @@ function getAccordionClasses(sections: ParsedSection[], idx: number): string {
 	if (prevIsAccordion) {
 		classes.push("rounded-t-none", "border-t-0");
 	} else {
-		classes.push("rounded-t-lg");
+		classes.push("rounded-t-2xl");
 	}
 
 	if (nextIsAccordion) {
 		classes.push("rounded-b-none", "mb-0");
 	} else {
-		classes.push("rounded-b-lg", "mb-6");
+		classes.push("rounded-b-2xl", "mb-6");
 	}
 
 	return classes.join(" ");

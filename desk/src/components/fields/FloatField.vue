@@ -57,9 +57,8 @@ const isFocused = ref(false);
 const originalValue = ref<any>(null);
 
 function validateKeypress(e: KeyboardEvent) {
-	debugger;
 	// Allow: backspace, delete, tab, escape, enter, arrows
-	if ([8, 9, 27, 13, 46, 37, 38, 39, 40].includes(e.code)) {
+	if ([8, 9, 27, 13, 46, 37, 38, 39, 40].includes(e.code as number)) {
 		return;
 	}
 

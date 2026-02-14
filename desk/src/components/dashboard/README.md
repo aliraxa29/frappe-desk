@@ -5,6 +5,7 @@ This directory contains comprehensive dashboard components for creating interact
 ## Components
 
 ### 1. **DashboardChart**
+
 Main component for displaying individual dashboard charts with data loading and management.
 
 ```vue
@@ -18,6 +19,7 @@ Main component for displaying individual dashboard charts with data loading and 
 ```
 
 **Props:**
+
 - `chartName` (string): Name of the Dashboard Chart DocType record
 - `chart` (DashboardChart): Direct chart object (optional)
 - `showMetrics` (boolean): Show metrics in footer (default: true)
@@ -25,12 +27,14 @@ Main component for displaying individual dashboard charts with data loading and 
 - `autoRefresh` (number): Auto-refresh interval in seconds (default: 0)
 
 **Events:**
+
 - `loaded`: Emitted when chart data loads successfully
 - `error`: Emitted when chart fails to load
 
 ---
 
 ### 2. **DashboardChartGrid**
+
 Grid layout component for displaying multiple dashboard charts responsively.
 
 ```vue
@@ -43,6 +47,7 @@ Grid layout component for displaying multiple dashboard charts responsively.
 ```
 
 **Props:**
+
 - `chartNames` (string[]): Array of chart names to display
 - `columns` (number | 'responsive'): Number of columns or responsive layout (default: 'responsive')
 - `gap` ('sm' | 'md' | 'lg'): Gap between charts (default: 'md')
@@ -51,6 +56,7 @@ Grid layout component for displaying multiple dashboard charts responsively.
 ---
 
 ### 3. **DashboardMetricCard**
+
 Card component for displaying KPI metrics with sparklines and trends.
 
 ```vue
@@ -66,6 +72,7 @@ Card component for displaying KPI metrics with sparklines and trends.
 ```
 
 **Props:**
+
 - `label` (string): Metric label
 - `value` (number): Metric value
 - `valueType` ('number' | 'currency' | 'percent'): How to format the value
@@ -77,6 +84,7 @@ Card component for displaying KPI metrics with sparklines and trends.
 ---
 
 ### 4. **DashboardContainer**
+
 Main dashboard layout with filters, metrics grid, and chart grid.
 
 ```vue
@@ -93,6 +101,7 @@ Main dashboard layout with filters, metrics grid, and chart grid.
 ```
 
 **Props:**
+
 - `title` (string): Dashboard title
 - `description` (string): Dashboard description
 - `chartNames` (string[]): Chart names to display
@@ -105,6 +114,7 @@ Main dashboard layout with filters, metrics grid, and chart grid.
 ---
 
 ### 5. **DashboardFilterButton**
+
 Button-based filter component for quick filtering.
 
 ```vue
@@ -113,7 +123,7 @@ Button-based filter component for quick filtering.
   label="Region"
   :items="[
     { label: 'North', value: 'north' },
-    { label: 'South', value: 'south' }
+    { label: 'South', value: 'south' },
   ]"
   multiple
 />
@@ -122,6 +132,7 @@ Button-based filter component for quick filtering.
 ---
 
 ### 6. **DashboardChartConfigurator**
+
 Interactive tool for creating and configuring chart types.
 
 ```vue
@@ -131,6 +142,7 @@ Interactive tool for creating and configuring chart types.
 ---
 
 ### 7. **DashboardChartGallery**
+
 Showcase of all available ApexCharts chart types with examples.
 
 ```vue
@@ -143,49 +155,45 @@ Showcase of all available ApexCharts chart types with examples.
 
 All ApexCharts types are supported:
 
-| Type | Icon | Use Case |
-|------|------|----------|
-| Line | 📈 | Trends over time |
-| Area | 📊 | Cumulative distribution |
-| Bar | 📊 | Category comparison |
-| Pie | 🥧 | Composition/proportions |
-| Donut | 🍩 | Centered pie chart |
-| Radar | 🎯 | Multi-dimensional comparison |
-| Scatter | 🔵 | Correlation analysis |
-| Bubble | 🫧 | 3-variable correlation |
-| Heatmap | 🔥 | Intensity variation |
-| Candlestick | 🕯️ | OHLC data |
-| Radial Bar | 📍 | Circular metrics |
-| Timeline | ⏱️ | Time-based events |
-| Treemap | 📦 | Hierarchical data |
-| Sunburst | ☀️ | Multi-level hierarchy |
+| Type        | Icon | Use Case                     |
+| ----------- | ---- | ---------------------------- |
+| Line        | 📈   | Trends over time             |
+| Area        | 📊   | Cumulative distribution      |
+| Bar         | 📊   | Category comparison          |
+| Pie         | 🥧   | Composition/proportions      |
+| Donut       | 🍩   | Centered pie chart           |
+| Radar       | 🎯   | Multi-dimensional comparison |
+| Scatter     | 🔵   | Correlation analysis         |
+| Bubble      | 🫧   | 3-variable correlation       |
+| Heatmap     | 🔥   | Intensity variation          |
+| Candlestick | 🕯️   | OHLC data                    |
+| Radial Bar  | 📍   | Circular metrics             |
+| Timeline    | ⏱️   | Time-based events            |
+| Treemap     | 📦   | Hierarchical data            |
+| Sunburst    | ☀️   | Multi-level hierarchy        |
 
 ---
 
 ## Composables
 
 ### `useDashboardChart(chartName: string)`
+
 Hook for loading and managing single chart data.
 
 ```typescript
-const {
-  chart,
-  data,
-  loading,
-  error,
-  options,
-  refresh
-} = useDashboardChart('Sales by Region')
+const { chart, data, loading, error, options, refresh } =
+  useDashboardChart("Sales by Region");
 ```
 
 ### `useDashboardCharts(chartNames: string[])`
+
 Hook for loading multiple charts.
 
 ```typescript
 const { charts, allData, loading, error } = useDashboardCharts([
-  'Sales by Region',
-  'Revenue Trend'
-])
+  "Sales by Region",
+  "Revenue Trend",
+]);
 ```
 
 ---
@@ -204,21 +212,21 @@ import {
   chartColorPalettes,
   calculateChartHeight,
   getTooltipFormatter,
-  getResponsiveOptions
-} from '@/utils/chartUtils'
+  getResponsiveOptions,
+} from "@/utils/chartUtils";
 
 // Get template for chart type
-const lineTemplate = getChartTemplate('line')
+const lineTemplate = getChartTemplate("line");
 
 // Format numbers
-formatNumber(1234.5, 2) // "1,234.50"
-formatCurrency(1000) // "$1,000.00"
-formatChartDate(new Date(), 'long') // "January 1, 2024"
+formatNumber(1234.5, 2); // "1,234.50"
+formatCurrency(1000); // "$1,000.00"
+formatChartDate(new Date(), "long"); // "January 1, 2024"
 
 // Use color palettes
-chartColorPalettes.default // Array of 10 colors
-chartColorPalettes.pastel
-chartColorPalettes.vibrant
+chartColorPalettes.default; // Array of 10 colors
+chartColorPalettes.pastel;
+chartColorPalettes.vibrant;
 ```
 
 ---
@@ -228,13 +236,16 @@ chartColorPalettes.vibrant
 Use pre-built dashboard configurations:
 
 ```typescript
-import { getDashboardConfig, availableDashboards } from '@/data/dashboardConfigs'
+import {
+  getDashboardConfig,
+  availableDashboards,
+} from "@/data/dashboardConfigs";
 
 // Get specific dashboard config
-const salesConfig = getDashboardConfig('sales')
+const salesConfig = getDashboardConfig("sales");
 
 // List all available dashboards
-console.log(availableDashboards)
+console.log(availableDashboards);
 // [
 //   { name: 'sales', title: 'Sales Dashboard', ... },
 //   { name: 'inventory', title: 'Inventory Dashboard', ... },
@@ -259,36 +270,36 @@ console.log(availableDashboards)
 </template>
 
 <script setup>
-import { DashboardContainer } from '@/components/dashboard'
+import { DashboardContainer } from "@/components/dashboard";
 
 const metrics = [
   {
-    label: 'Total Revenue',
+    label: "Total Revenue",
     value: 125000,
-    valueType: 'currency',
-    icon: 'lucide:dollar-sign',
-    change: 12.5
+    valueType: "currency",
+    icon: "lucide:dollar-sign",
+    change: 12.5,
   },
   {
-    label: 'Total Orders',
+    label: "Total Orders",
     value: 1234,
-    valueType: 'number',
-    icon: 'lucide:shopping-cart',
-    change: 8.3
-  }
-]
+    valueType: "number",
+    icon: "lucide:shopping-cart",
+    change: 8.3,
+  },
+];
 
 const filters = [
   {
-    name: 'dateRange',
-    label: 'Date Range',
-    type: 'select',
+    name: "dateRange",
+    label: "Date Range",
+    type: "select",
     options: [
-      { label: 'Last 7 Days', value: '7d' },
-      { label: 'Last 30 Days', value: '30d' }
-    ]
-  }
-]
+      { label: "Last 7 Days", value: "7d" },
+      { label: "Last 30 Days", value: "30d" },
+    ],
+  },
+];
 </script>
 ```
 
@@ -306,20 +317,20 @@ const filters = [
 </template>
 
 <script setup>
-import { DashboardChartGrid } from '@/components/dashboard'
+import { DashboardChartGrid } from "@/components/dashboard";
 
 const chartNames = [
-  'Sales by Region',
-  'Revenue Trend',
-  'Top Products',
-  'Customer Acquisition'
-]
+  "Sales by Region",
+  "Revenue Trend",
+  "Top Products",
+  "Customer Acquisition",
+];
 
 const spanConfig = {
   0: 2, // First chart spans 2 columns
   1: 2, // Second chart spans 2 columns
   // Others default to 1
-}
+};
 </script>
 ```
 
@@ -346,7 +357,7 @@ const spanConfig = {
 </template>
 
 <script setup>
-import { DashboardMetricCard, DashboardChart } from '@/components/dashboard'
+import { DashboardMetricCard, DashboardChart } from "@/components/dashboard";
 </script>
 ```
 
@@ -360,7 +371,7 @@ import { DashboardMetricCard, DashboardChart } from '@/components/dashboard'
 </template>
 
 <script setup>
-import { DashboardChartGallery } from '@/components/dashboard'
+import { DashboardChartGallery } from "@/components/dashboard";
 </script>
 ```
 
@@ -396,6 +407,7 @@ Example configuration:
 ## Styling
 
 All components respect Tailwind dark mode with `dark:` classes. They integrate with the existing design system and use:
+
 - Slate color palette for UI
 - Blue accents for interactive elements
 - Custom color palettes for chart data
@@ -421,13 +433,13 @@ To customize data loading, override the `useDashboardChart` composable in your v
 const customOptions = {
   chart: {
     height: 500,
-    zoom: { enabled: true }
+    zoom: { enabled: true },
   },
-  colors: ['#3b82f6', '#ef4444'],
-  dataLabels: { enabled: true }
-}
+  colors: ["#3b82f6", "#ef4444"],
+  dataLabels: { enabled: true },
+};
 
-const merged = mergeChartOptions('bar', customOptions, data)
+const merged = mergeChartOptions("bar", customOptions, data);
 ```
 
 ---
@@ -445,15 +457,18 @@ const merged = mergeChartOptions('bar', customOptions, data)
 ## Troubleshooting
 
 ### Chart not displaying data
+
 - Check browser console for API errors
 - Verify Dashboard Chart doctype exists
 - Check data source doctype has data
 
 ### Colors not applying
+
 - Ensure custom_options is valid JSON
 - Use hex color codes (#RRGGBB format)
 
 ### Performance issues
+
 - Reduce auto-refresh interval
 - Limit number of data points displayed
 - Use pagination on large queries

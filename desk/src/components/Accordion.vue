@@ -1,15 +1,15 @@
 <template>
 	<div
-		class="border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 overflow-hidden mx-2"
+		class="rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-600 dark:bg-slate-800/70 shadow-sm mb-4"
 	>
 		<button
 			type="button"
-			class="flex items-center justify-between w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer text-left transition-colors duration-200"
+			class="flex items-center justify-between w-full px-6 py-4 bg-slate-100 dark:bg-slate-900/60 hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer text-left transition-colors duration-200 rounded-2xl"
 			:class="{ 'border-b border-slate-200 dark:border-slate-700': isOpen }"
 			@click="toggle"
 		>
 			<div
-				class="flex items-center gap-2 font-semibold text-sm text-slate-700 dark:text-slate-200"
+				class="flex items-center gap-2 font-bold text-base text-slate-800 dark:text-white"
 			>
 				<slot name="icon">
 					<svg
@@ -28,6 +28,7 @@
 						/>
 					</svg>
 				</slot>
+				<div class="h-6 w-1 rounded bg-blue-500/70 mr-2"></div>
 				<span class="flex-1">{{ label }}</span>
 				<span
 					v-if="badge"
@@ -39,11 +40,17 @@
 			<slot name="actions" />
 		</button>
 
-		<div v-if="isOpen" class="overflow-hidden">
-			<div class="py-2">
-				<slot />
+		<transition name="accordion-fade" mode="out-in">
+			<div
+				v-show="isOpen"
+				class="overflow-hidden transition-all duration-300"
+				:style="isOpen ? 'max-height: 2000px;' : 'max-height: 0;'"
+			>
+				<div class="py-2 px-6">
+					<slot />
+				</div>
 			</div>
-		</div>
+		</transition>
 	</div>
 </template>
 
@@ -102,3 +109,25 @@ function toggle() {
 	emit("toggle", isOpen.value);
 }
 </script>
+
+<style scoped>
+.accordion-fade-enter-active,
+.accordion-fade-leave-active {
+	transition:
+		max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+		opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	overflow: hidden;
+}
+
+.accordion-fade-enter-from,
+.accordion-fade-leave-to {
+	max-height: 0;
+	opacity: 0;
+}
+
+.accordion-fade-enter-to,
+.accordion-fade-leave-from {
+	max-height: 2000px;
+	opacity: 1;
+}
+</style>

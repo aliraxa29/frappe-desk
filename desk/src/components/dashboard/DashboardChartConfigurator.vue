@@ -134,7 +134,7 @@
 				>Generated Configuration</label
 			>
 			<div class="bg-slate-900 dark:bg-slate-950 rounded-lg p-4">
-				<pre class="text-xs text-slate-100 overflow-x-auto">{{
+				<pre class="text-xs text-slate-100 overflow-x-auto scroll-area">{{
 					JSON.stringify(generatedConfig, null, 2)
 				}}</pre>
 			</div>

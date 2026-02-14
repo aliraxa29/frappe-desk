@@ -532,7 +532,7 @@
 								class="group flex items-center gap-4 p-4 rounded-lg cursor-pointer bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-cyan-400 hover:bg-cyan-50 dark:hover:bg-slate-700/50 hover:shadow-sm transition-all duration-200"
 							>
 								<div
-									class="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center flex-shrink-0"
+									class="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center shrink-0"
 								>
 									<span class="text-lg">{{ item.icon || "📄" }}</span>
 								</div>
@@ -544,7 +544,7 @@
 									</span>
 								</div>
 								<svg
-									class="w-4 h-4 text-slate-400 group-hover:text-cyan-500 transition-colors flex-shrink-0"
+									class="w-4 h-4 text-slate-400 group-hover:text-cyan-500 transition-colors shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -592,7 +592,7 @@
 								class="group flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-slate-700/50 hover:shadow-sm transition-all duration-200"
 							>
 								<div
-									class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0"
+									class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0"
 								>
 									<span class="text-lg">{{ item.icon || "📊" }}</span>
 								</div>
@@ -604,7 +604,7 @@
 									</span>
 								</div>
 								<svg
-									class="w-4 h-4 text-slate-400 group-hover:text-purple-500 transition-colors flex-shrink-0"
+									class="w-4 h-4 text-slate-400 group-hover:text-purple-500 transition-colors shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -652,7 +652,7 @@
 								class="group flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-green-400 hover:bg-green-50 dark:hover:bg-slate-700/50 hover:shadow-sm transition-all duration-200"
 							>
 								<div
-									class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0"
+									class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0"
 								>
 									<span class="text-lg">{{ item.icon || "📑" }}</span>
 								</div>
@@ -664,7 +664,7 @@
 									</span>
 								</div>
 								<svg
-									class="w-4 h-4 text-slate-400 group-hover:text-green-500 transition-colors flex-shrink-0"
+									class="w-4 h-4 text-slate-400 group-hover:text-green-500 transition-colors shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -712,7 +712,7 @@
 								class="group flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-orange-400 hover:bg-orange-50 dark:hover:bg-slate-700/50 hover:shadow-sm transition-all duration-200"
 							>
 								<div
-									class="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center flex-shrink-0"
+									class="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center shrink-0"
 								>
 									<span class="text-lg">{{ item.icon || "📈" }}</span>
 								</div>
@@ -724,7 +724,7 @@
 									</span>
 								</div>
 								<svg
-									class="w-4 h-4 text-slate-400 group-hover:text-orange-500 transition-colors flex-shrink-0"
+									class="w-4 h-4 text-slate-400 group-hover:text-orange-500 transition-colors shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -945,7 +945,6 @@ const filteredDashboards = computed(() => {
 
 // Format label from slug
 function formatLabel(str: string): string {
-	debugger;
 	if (!str) return "";
 	return str.replace(/[-_]/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 }

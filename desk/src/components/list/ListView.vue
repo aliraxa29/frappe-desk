@@ -83,7 +83,7 @@
 			/>
 
 			<!-- Table -->
-			<div class="overflow-x-auto" ref="tableContainerRef">
+			<div class="overflow-x-auto scroll-area" ref="tableContainerRef">
 				<table class="w-full">
 					<thead
 						class="sticky top-0 z-10 bg-slate-50 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800"

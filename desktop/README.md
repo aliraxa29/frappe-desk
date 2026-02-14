@@ -10,7 +10,7 @@ The Desktop app now includes a complete TypeScript script discovery system that 
 ✅ **Zero Frappe Modifications** - All code in Desktop app  
 🎯 **Two Registration Methods** - File-based (auto) and Hook-based (explicit)  
 📦 **Single API Call** - Scripts included in metadata response  
-📊 **Performance Optimized** - 50% fewer network calls  
+📊 **Performance Optimized** - 50% fewer network calls
 
 ## System Overview
 
@@ -29,11 +29,13 @@ Form/List Handlers Active
 ### For App Developers
 
 **Option 1: File-Based (Recommended)**
+
 ```
 your_app/doctype/invoice/invoice.form.ts     # Auto-discovered
 ```
 
 **Option 2: Hook-Based (Explicit)**
+
 ```python
 # hooks.py
 desk_doctype_form_scripts = {
@@ -44,22 +46,24 @@ desk_doctype_form_scripts = {
 ### For Frontend Developers
 
 **Before:**
+
 ```typescript
 const metadata = await frappe.call({
-  method: 'frappe.desk.form.load.getdoctype',
-  args: { doctype: 'Invoice' }
+  method: "frappe.desk.form.load.getdoctype",
+  args: { doctype: "Invoice" },
 });
 const { scripts } = await frappe.call({
-  method: 'desktop.doctype_scripts.get_scripts',
-  args: { doctype: 'Invoice' }
+  method: "desktop.doctype_scripts.get_scripts",
+  args: { doctype: "Invoice" },
 });
 ```
 
 **After:**
+
 ```typescript
 const metadata = await frappe.call({
-  method: 'desktop.doctype_scripts.get_doctype_with_scripts',
-  args: { doctype: 'Invoice' }
+  method: "desktop.doctype_scripts.get_doctype_with_scripts",
+  args: { doctype: "Invoice" },
 });
 const scripts = metadata.docs[0].__ts_scripts;
 ```
@@ -69,14 +73,17 @@ const scripts = metadata.docs[0].__ts_scripts;
 Start with the guide that matches your role:
 
 ### For Backend Developers
+
 1. **[SCRIPT_REGISTRATION_GUIDE.md](./SCRIPT_REGISTRATION_GUIDE.md)** - How to register scripts
 2. **[API_REFERENCE.md](./API_REFERENCE.md)** - Complete API documentation
 
 ### For Frontend Developers
+
 1. **[FRONTEND_INTEGRATION_GUIDE.md](./FRONTEND_INTEGRATION_GUIDE.md)** - Integration steps
 2. **[API_REFERENCE.md](./API_REFERENCE.md)** - API response format
 
 ### For System Administrators
+
 1. **[IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)** - Architecture overview
 2. **[VERIFICATION_CHECKLIST.md](./VERIFICATION_CHECKLIST.md)** - Deployment checklist
 
@@ -131,27 +138,27 @@ frappe.call({
 
 ```typescript
 // apps/erpnext/erpnext/doctype/invoice/invoice.form.ts
-const doctype = 'Invoice'
+const doctype = "Invoice";
 
 desk.script.defineForm(doctype, {
   setup(ctx) {
-    console.log(`[invoice.form.ts] setup for ${ctx.doctype}`)
+    console.log(`[invoice.form.ts] setup for ${ctx.doctype}`);
   },
 
   validate(ctx) {
     if (!ctx.doc.customer) {
-      ctx.throw('Customer is required')
-      return false
+      ctx.throw("Customer is required");
+      return false;
     }
-    return true
+    return true;
   },
 
   field_changed(ctx) {
-    if (ctx.field === 'customer') {
-      console.log('Customer changed:', ctx.value)
+    if (ctx.field === "customer") {
+      console.log("Customer changed:", ctx.value);
     }
-  }
-})
+  },
+});
 ```
 
 **Result**: Auto-discovered and included in `__ts_scripts`
@@ -194,17 +201,17 @@ desk_doctype_form_scripts = {
         "name": "Invoice",
         "doctype": "DocType",
         "fields": [...],
-        
+
         // NEW: TypeScript Scripts
         "__ts_scripts": [
           "apps/erpnext/erpnext/doctype/invoice/invoice.form.ts",
           "apps/custom_app/custom_app/invoice_handlers.ts"
         ],
-        
+
         "__ts_list_scripts": [
           "apps/erpnext/erpnext/doctype/invoice/invoice.list.ts"
         ],
-        
+
         // Standard Frappe assets (unchanged)
         "__js": [...],
         "__css": [...]
@@ -217,43 +224,49 @@ desk_doctype_form_scripts = {
 ## Design Decisions
 
 ### 1. Non-Invasive (No Frappe Modifications)
+
 - ✅ Desktop app wraps Frappe's getdoctype()
-- ✅ Adds __ts_scripts to response
+- ✅ Adds \_\_ts_scripts to response
 - ✅ No Frappe code changes
 
 ### 2. Metadata Response Pattern
+
 - ✅ Scripts in response like other assets
 - ✅ Single API call instead of separate calls
 - ✅ Follows Frappe conventions
 
 ### 3. Hybrid Registration
+
 - ✅ File-based (auto) for conventions
 - ✅ Hook-based (explicit) for flexibility
 - ✅ Both methods supported
 
 ### 4. Automatic Deduplication
+
 - ✅ Same script from different sources only appears once
 - ✅ Order preserved
 - ✅ Transparent to frontend
 
 ## Performance
 
-| Metric | Impact |
-|--------|--------|
-| Discovery time | 15-70ms per DocType |
-| Response size | ~1KB per DocType (negligible) |
-| Network calls | 50% reduction (1 call instead of 2) |
-| Caching | Supported via cached_timestamp |
+| Metric         | Impact                              |
+| -------------- | ----------------------------------- |
+| Discovery time | 15-70ms per DocType                 |
+| Response size  | ~1KB per DocType (negligible)       |
+| Network calls  | 50% reduction (1 call instead of 2) |
+| Caching        | Supported via cached_timestamp      |
 
 ## Testing
 
 ### Run Unit Tests
+
 ```bash
 cd /home/erp/bench15
 bench --site site.local run-tests --app desktop --verbose
 ```
 
 ### Manual Verification
+
 ```python
 import frappe
 from desktop.doctype_scripts import get_doctype_with_scripts
@@ -284,10 +297,12 @@ If you have existing script registration:
 ### Scripts Not Found
 
 **Check naming**: `{doctype}.{context}.ts`
+
 - Example: `invoice.form.ts` for form context
 - Location: `app_name/doctype/{doctype_name}/`
 
 **Check hooks**: Verify `hooks.py` syntax
+
 ```python
 desk_doctype_form_scripts = {  # Not desk_doctype_form_script
     "Invoice": [...]
@@ -297,6 +312,7 @@ desk_doctype_form_scripts = {  # Not desk_doctype_form_script
 ### Scripts Not Loading in Frontend
 
 **Verify metadata response**:
+
 ```python
 frappe.call({
     method: 'desktop.doctype_scripts.get_doctype_with_scripts',
@@ -312,14 +328,18 @@ frappe.call({
 ### Handler Not Registering
 
 **Verify script imports store**:
+
 ```typescript
-import { useFormStore } from '@/stores/formStore';
+import { useFormStore } from "@/stores/formStore";
 ```
 
 **Verify auto-call**:
+
 ```typescript
-export function register() { /* ... */ }
-register();  // Must be called
+export function register() {
+  /* ... */
+}
+register(); // Must be called
 ```
 
 ## Frequently Asked Questions
@@ -331,6 +351,7 @@ register();  // Must be called
 ### Q: Should I use file-based or hook-based?
 
 **A**: Use file-based (convention) by default. Use hooks only for:
+
 - Multiple scripts per DocType
 - Scripts outside doctype folder
 - Complex organization needs
@@ -361,11 +382,13 @@ register();  // Must be called
 ## Support
 
 ### Documentation
+
 - API Reference: [API_REFERENCE.md](./API_REFERENCE.md)
 - Frontend Integration: [FRONTEND_INTEGRATION_GUIDE.md](./FRONTEND_INTEGRATION_GUIDE.md)
 - Script Registration: [SCRIPT_REGISTRATION_GUIDE.md](./SCRIPT_REGISTRATION_GUIDE.md)
 
 ### Code
+
 - Implementation: `desktop/doctype_scripts.py`
 - Tests: `desktop/tests/test_doctype_scripts.py`
 
@@ -379,7 +402,7 @@ Check [VERIFICATION_CHECKLIST.md](./VERIFICATION_CHECKLIST.md) for common issues
 📋 **Frontend**: Ready for integration  
 ✅ **Documentation**: Comprehensive (38+ KB)  
 ✅ **Testing**: Framework available  
-✅ **Deployment**: Zero Frappe modifications  
+✅ **Deployment**: Zero Frappe modifications
 
 ## Version Info
 

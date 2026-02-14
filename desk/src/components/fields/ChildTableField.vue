@@ -1,5 +1,5 @@
 <template>
-	<div class="child-table-field-wrapper">
+	<div class="mb-6 flex flex-col gap-2">
 		<ChildTableEditor
 			:rows="rows"
 			:child-meta="childMeta"
@@ -8,7 +8,9 @@
 			:parent-name="ctx.doc?.name"
 			@update:rows="updateRows"
 		/>
-		<p v-if="field.description" class="field-description">{{ field.description }}</p>
+		<p v-if="field.description" class="text-slate-500 mt-1 text-[0.8125rem]">
+			{{ field.description }}
+		</p>
 	</div>
 </template>
 
@@ -16,7 +18,7 @@
 import { ref, computed, onMounted, watch } from "vue";
 import type { Field, FormContext, DocTypeMeta } from "../../types";
 import { model } from "../../data/model";
-import ChildTableEditor from "../ChildTableEditorEnhanced.vue";
+import ChildTableEditor from "../ChildTableEditor.vue";
 
 declare const locals: any;
 
@@ -104,17 +106,4 @@ function updateRows(updatedRows: Record<string, any>[]) {
 }
 </script>
 
-<style scoped>
-.child-table-field-wrapper {
-	margin-bottom: 1.5rem;
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-}
-
-.field-description {
-	color: #64748b;
-	margin: 0.25rem 0 0 0;
-	font-size: 0.8125rem;
-}
-</style>
+<style scoped></style>

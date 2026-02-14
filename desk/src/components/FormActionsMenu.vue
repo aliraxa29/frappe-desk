@@ -3,18 +3,14 @@
 		<button
 			ref="triggerRef"
 			type="button"
-			class="inline-flex items-center justify-center h-9 w-9 rounded-md border border-slate-300 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+			class="inline-flex items-center justify-center h-9 w-9 rounded-md border border-slate-300 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 cursor-pointer"
 			:aria-expanded="isOpen"
 			aria-haspopup="menu"
 			aria-label="More actions"
 			@click="toggleMenu"
 			@keydown="onTriggerKeydown"
 		>
-			<svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-				<circle cx="10" cy="4" r="1.6" />
-				<circle cx="10" cy="10" r="1.6" />
-				<circle cx="10" cy="16" r="1.6" />
-			</svg>
+			<DotsVertical />
 		</button>
 
 		<Transition
@@ -27,7 +23,7 @@
 		>
 			<div
 				v-if="isOpen"
-				class="absolute right-0 top-full mt-2 w-64 max-h-96 rounded-lg border border-slate-200 bg-white shadow-lg ring-1 ring-black/5 z-50 py-1 overflow-y-auto dark:border-slate-700 dark:bg-slate-900"
+				class="absolute right-0 top-full mt-2 w-64 max-h-96 rounded-lg border border-slate-200 bg-white shadow-lg ring-1 ring-black/5 z-50 py-1 overflow-y-auto scroll-area dark:border-slate-700 dark:bg-slate-900"
 				role="menu"
 				@keydown="onMenuKeydown"
 			>
@@ -62,6 +58,7 @@
 
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, onUnmounted } from "vue";
+import DotsVertical from "../icons/DotsVertical.vue";
 
 export interface MenuAction {
 	name: string;

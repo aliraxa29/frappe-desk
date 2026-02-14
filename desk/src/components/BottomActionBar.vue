@@ -15,7 +15,7 @@
 					>
 						{{ discardText }}
 					</Button>
-					<Button @click="$emit('save')" size="sm" :disabled="loading">
+					<Button @click="$emit('save')" size="sm" :disabled="loading" variant="primary">
 						{{ loading ? loadingText : saveText }}
 					</Button>
 				</div>
@@ -25,6 +25,7 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "../utils/translate";
 import Button from "./Button.vue";
 
 interface Props {
@@ -38,10 +39,10 @@ interface Props {
 
 withDefaults(defineProps<Props>(), {
 	loading: false,
-	message: "Do you want to save changes?",
-	saveText: "Save changes",
-	discardText: "Discard",
-	loadingText: "Saving...",
+	message: __("Do you want to save changes?"),
+	saveText: __("Save changes"),
+	discardText: __("Discard"),
+	loadingText: __("Saving..."),
 });
 
 defineEmits<{

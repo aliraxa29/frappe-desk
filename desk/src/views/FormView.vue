@@ -1,19 +1,21 @@
 <template>
 	<AppLayout>
-		<!-- Header -->
 		<template #header>
-			<div class="flex flex-wrap items-center justify-between gap-4 w-full py-3">
+			<div class="flex flex-wrap items-center justify-between gap-4 w-full py-2">
 				<h2 class="text-lg font-semibold text-slate-800 dark:text-white">
-					{{ doctype
-					}}<span class="font-normal text-slate-600 dark:text-slate-400 ml-2">{{
-						isNewDocument ? "(New)" : documentName
-					}}</span>
+					{{ doctype }}
+					<span
+						v-if="!currentMeta?.issingle"
+						class="font-normal text-slate-600 dark:text-slate-400 ml-2"
+					>
+						{{ isNewDocument ? "(New)" : documentName }}
+					</span>
 				</h2>
 
 				<div class="flex items-center gap-2">
 					<FormButtons :buttons="customButtons" @execute="handleButtonExecute" />
 					<FormActionsMenu :actions="menuActions" @select="handleMenuAction" />
-					<div class="flex items-center gap-1">
+					<div class="flex items-center gap-2">
 						<Button
 							variant="secondary"
 							size="sm"
@@ -23,16 +25,10 @@
 							aria-label="Previous document"
 							title="Previous (Shift+ArrowUp)"
 						>
-							<svg
-								class="h-6 w-4 text-gray-800"
-								viewBox="0 0 20 20"
-								fill="currentColor"
+							<ChevronLeft
+								class="h-6 w-4 text-gray-800 dark:text-white"
 								aria-hidden="true"
-							>
-								<path
-									d="M12.78 4.22a.75.75 0 010 1.06L8.56 9.5l4.22 4.22a.75.75 0 11-1.06 1.06L6.97 10.03a.75.75 0 010-1.06l4.75-4.75a.75.75 0 011.06 0z"
-								/>
-							</svg>
+							/>
 						</Button>
 						<Button
 							variant="secondary"
@@ -43,25 +39,18 @@
 							aria-label="Next document"
 							title="Next (Shift+ArrowDown)"
 						>
-							<svg
-								class="h-6 w-4 text-gray-800"
-								viewBox="0 0 20 20"
-								fill="currentColor"
+							<ChevronRight
+								class="h-6 w-4 text-gray-800 dark:text-white"
 								aria-hidden="true"
-							>
-								<path
-									d="M7.22 15.78a.75.75 0 010-1.06L11.44 10 7.22 5.78a.75.75 0 111.06-1.06l4.75 4.75c.3.3.3.77 0 1.06l-4.75 4.75a.75.75 0 01-1.06 0z"
-								/>
-							</svg>
+							/>
 						</Button>
 					</div>
 				</div>
 			</div>
 		</template>
 
-		<!-- Content -->
 		<template #content>
-			<div class="relative">
+			<div class="relative" :class="{ 'pb-12': isDirty }">
 				<FormRenderer
 					ref="formContext"
 					:doctype="doctype"
@@ -96,6 +85,9 @@ import { desk } from "../utils/desk";
 import { dialog } from "../stores/dialog";
 import { useToastStore } from "../stores/toast";
 import Button from "../components/Button.vue";
+import { __ } from "../utils/translate";
+import ChevronLeft from "../icons/ChevronLeft.vue";
+import ChevronRight from "../icons/ChevronRight.vue";
 
 const formContext = ref();
 const route = useRoute();
@@ -145,28 +137,41 @@ const menuActions = computed<MenuAction[]>(() => {
 	const allowRename = currentMeta.value?.allow_rename !== 0;
 	const hasDoc = !!docName && !isNewDocument.value;
 	const canUndo = isDirty.value;
-
-	return [
-		{ name: "print", label: "Print", shortcut: "Ctrl+P", disabled: !hasDoc },
-		{ name: "email", label: "Email", shortcut: "Ctrl+E", disabled: !hasDoc },
-		{ name: "jump", label: "Jump to field", shortcut: "Ctrl+J" },
-		{ name: "links", label: "Links", disabled: !hasDoc },
-		{ name: "duplicate", label: "Duplicate", shortcut: "Shift+D", disabled: !hasDoc },
-		{ name: "copy", label: "Copy to Clipboard", disabled: !hasDoc },
-		{ name: "rename", label: "Rename", disabled: !hasDoc || !allowRename },
-		{ name: "reload", label: "Reload" },
-		{
-			name: "delete",
-			label: "Delete",
-			shortcut: "Ctrl+Shift+D",
-			disabled: !canEdit,
-			destructive: true,
-		},
-		{ name: "remind", label: "Remind Me", shortcut: "Shift+R" },
-		{ name: "undo", label: "Undo", shortcut: "Ctrl+Z", disabled: !canUndo },
-		{ name: "redo", label: "Redo", shortcut: "Ctrl+Y", disabled: true },
-		{ name: "new", label: `New ${doctype.value}`, shortcut: "Ctrl+B" },
-	];
+	if (currentMeta.value?.issingle) {
+		return [
+			{ name: "email", label: __("Email"), shortcut: "Ctrl+E", disabled: !hasDoc },
+			{ name: "jump", label: __("Jump to field"), shortcut: "Ctrl+J" },
+			{ name: "copy_to_clipboard", label: __("Copy to Clipboard"), disabled: !hasDoc },
+			{ name: "reload", label: __("Reload") },
+			{ name: "remind", label: __("Remind Me"), shortcut: "Shift+R" },
+			{ name: "undo", label: __("Undo"), shortcut: "Ctrl+Z", disabled: !canUndo },
+			{ name: "redo", label: __("Redo"), shortcut: "Ctrl+Y", disabled: true },
+			{ name: "customize", label: __("Customize Form") },
+			{ name: "edit_doctype", label: __("Edit DocType") },
+		];
+	} else {
+		return [
+			{ name: "print", label: __("Print"), shortcut: "Ctrl+P", disabled: !hasDoc },
+			{ name: "email", label: __("Email"), shortcut: "Ctrl+E", disabled: !hasDoc },
+			{ name: "jump", label: __("Jump to field"), shortcut: "Ctrl+J" },
+			{ name: "links", label: __("Links"), disabled: !hasDoc },
+			{ name: "duplicate", label: __("Duplicate"), shortcut: "Shift+D", disabled: !hasDoc },
+			{ name: "copy", label: __("Copy to Clipboard"), disabled: !hasDoc },
+			{ name: "rename", label: __("Rename"), disabled: !hasDoc || !allowRename },
+			{ name: "reload", label: __("Reload") },
+			{
+				name: "delete",
+				label: __("Delete"),
+				shortcut: "Ctrl+Shift+D",
+				disabled: !canEdit,
+				destructive: true,
+			},
+			{ name: "remind", label: __("Remind Me"), shortcut: "Shift+R" },
+			{ name: "undo", label: __("Undo"), shortcut: "Ctrl+Z", disabled: !canUndo },
+			{ name: "redo", label: __("Redo"), shortcut: "Ctrl+Y", disabled: true },
+			{ name: "new", label: `New ${doctype.value}`, shortcut: "Ctrl+B" },
+		];
+	}
 });
 
 // Update breadcrumbs
@@ -500,7 +505,7 @@ async function duplicateDocument(doc: Record<string, any>) {
 	if (!meta) return;
 	const payload: Record<string, any> = {};
 
-	meta.fields.forEach((field) => {
+	meta.fields.forEach((field: any) => {
 		const value = doc[field.fieldname];
 		if (value === undefined) return;
 		if (field.fieldtype === "Table" && Array.isArray(value)) {

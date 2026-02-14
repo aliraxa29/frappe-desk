@@ -3,7 +3,7 @@
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
-			class="font-medium mb-1 text-sm text-slate-700"
+			class="font-medium mb-1 text-sm text-slate-700 dark:text-slate-300"
 		>
 			{{ field.label }}
 			<span v-if="field.reqd" class="text-red-500 ml-1">*</span>
@@ -67,7 +67,7 @@
 			<!-- Dropdown Options -->
 			<div
 				v-if="showDropdown"
-				class="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-[#ddd] dark:border-slate-700 rounded shadow-lg z-18 max-h-87.5 overflow-y-auto"
+				class="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-[#ddd] dark:border-slate-700 rounded shadow-lg z-180 max-h-87.5 overflow-y-auto scroll-area"
 			>
 				<!-- Loading State -->
 				<div v-if="loading" class="p-3 text-center text-sm text-slate-500">
@@ -75,7 +75,7 @@
 						<div
 							class="w-4 h-4 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"
 						></div>
-						Loading options...
+						{{ __("Loading options...") }}
 					</div>
 				</div>
 
@@ -88,19 +88,21 @@
 						class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-b-0 cursor-pointer"
 						:class="
 							selectedIdx === idx
-								? 'bg-blue-100 text-blue-900 dark:text-blue-200'
+								? 'bg-blue-100 text-blue-900 dark:text-slate-600 hover:dark:text-white'
 								: 'text-slate-700 dark:text-slate-200'
 						"
 						@click="selectItem(item)"
 						@mouseenter="selectedIdx = idx"
 					>
 						<div class="font-medium">{{ item.label }}</div>
-						<div v-if="item.description" class="text-xs text-slate-500 mt-0.5">
+						<div
+							v-if="item.description"
+							class="text-xs text-slate-500 mt-0.5 dark:text-white"
+						>
 							{{ item.description }}
 						</div>
 					</button>
 
-					<!-- Action Options (Create, Advanced Search, etc) -->
 					<div
 						v-if="actionItems.length > 0"
 						class="border-t border-slate-200 dark:border-slate-700"
@@ -112,7 +114,7 @@
 							class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-b-0 text-slate-600 dark:text-slate-200 flex items-center gap-2 cursor-pointer"
 							:class="
 								selectedIdx === filteredResults.length + idx
-									? 'bg-blue-100 text-blue-900 dark:text-blue-200'
+									? 'bg-blue-100 text-blue-900 dark:text-slate-600 hover:dark:text-white'
 									: ''
 							"
 							@click="selectItem(item)"
@@ -129,12 +131,12 @@
 					v-else-if="!loading && searchText"
 					class="p-3 text-center text-sm text-slate-500"
 				>
-					No results for "{{ searchText }}"
+					{{ __(`No results for ${searchText}`) }}
 				</div>
 
 				<!-- Empty State Hint -->
 				<div v-else class="p-3 text-center text-sm text-slate-500">
-					Start typing to search...
+					{{ __("Start typing to search...") }}
 				</div>
 			</div>
 		</div>
@@ -149,6 +151,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import type { Field, FormContext } from "../../types";
 import { desk } from "../../utils/desk";
+import { __ } from "../../utils/translate";
 
 interface Props {
 	field: Field;
@@ -192,13 +195,13 @@ const filteredResults = computed(() => {
 const actionItems = computed(() => {
 	const actions: LinkItem[] = [];
 	actions.push({
-		label: `Create a new ${props.field.options}`,
+		label: __("Create a new {0}", [props.field.options]),
 		value: "create_new__link_option",
-		icon: "➕",
+		icon: "+",
 		action: () => createNewDoc(),
 	});
 	actions.push({
-		label: "Advanced Search",
+		label: __("Advanced Search"),
 		value: "advanced_search__link_option",
 		icon: "🔍",
 		action: () => openAdvancedSearch(),

@@ -34,13 +34,13 @@ Desktop is a fast, clean, open-source dashboard built on the [Frappe Framework](
 
 ## Tech Stack
 
-| Layer       | Technology                          |
-|-------------|-------------------------------------|
+| Layer       | Technology                            |
+| ----------- | ------------------------------------- |
 | Frontend    | Vue 3, TypeScript, Vite, Tailwind CSS |
-| Backend     | Python, Frappe Framework v15        |
-| Database    | MariaDB                            |
-| Cache/Queue | Redis                              |
-| Realtime    | Node.js (Socket.IO)                |
+| Backend     | Python, Frappe Framework v15          |
+| Database    | MariaDB                               |
+| Cache/Queue | Redis                                 |
+| Realtime    | Node.js (Socket.IO)                   |
 
 ## Prerequisites
 

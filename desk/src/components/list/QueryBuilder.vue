@@ -27,7 +27,7 @@
 					</div>
 
 					<!-- Filter Rows -->
-					<div class="p-3 max-h-[60vh] overflow-y-auto space-y-2.5">
+					<div class="p-3 max-h-[60vh] overflow-y-auto scroll-area space-y-2.5">
 						<div v-if="filters.length === 0" class="text-center py-6">
 							<svg
 								class="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-2"

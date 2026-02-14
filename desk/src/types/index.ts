@@ -114,7 +114,8 @@ export type FieldType =
   | "Column Break"
   | "Section Break"
   | "Tab Break"
-  | "Button";
+  | "Button"
+  | "Read Only";
 
 export interface Permission {
   role: string;

@@ -15,7 +15,7 @@
 		<Navbar class="shrink-0" />
 
 		<!-- Apps section (scrollable) -->
-		<div class="flex-1 overflow-y-auto px-6 py-8 md:px-6 md:py-8 sm:px-4 sm:py-6">
+		<div class="flex-1 overflow-y-auto scroll-area px-6 py-8 md:px-6 md:py-8 sm:px-4 sm:py-6">
 			<!-- Installed apps -->
 			<div class="mb-10">
 				<div class="mb-6">

@@ -1,6 +1,24 @@
 @import "tailwindcss";
 
-/* Tailwind v4: Configure dark mode to use class selector */
+.scroll-area {
+	overflow: auto;
+}
+
+/* Webkit browsers */
+.scroll-area::-webkit-scrollbar {
+	width: 4px;
+	height: 4px;
+}
+
+.scroll-area::-webkit-scrollbar-thumb {
+	background: #cbd5e1;
+	border-radius: 4px;
+}
+
+.scroll-area::-webkit-scrollbar-track {
+	background: transparent;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 * {

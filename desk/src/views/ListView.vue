@@ -34,7 +34,7 @@
 			<div
 				class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-gray-950 overflow-hidden m-2"
 			>
-				<ListViewEnhanced ref="listViewRef" :doctype="doctype" @select="handleSelect" />
+				<ListView ref="listViewRef" :doctype="doctype" @select="handleSelect" />
 			</div>
 		</template>
 	</AppLayout>
@@ -47,7 +47,7 @@ import type { DocTypeMeta } from "../types";
 import { frappeClient } from "../api/resource";
 import { useBreadcrumbStore } from "../stores/breadcrumbs";
 import AppLayout from "../layout/AppLayout.vue";
-import ListViewEnhanced from "../components/list/ListViewEnhanced.vue";
+import ListView from "../components/list/ListView.vue";
 import Button from "../components/Button.vue";
 import { realtime } from "../utils/socketio/client";
 
@@ -58,7 +58,7 @@ const breadcrumbStore = useBreadcrumbStore();
 const doctype = computed(() => (route.params.doctype as string) || "");
 const app = computed(() => (route.params.app as string) || "");
 
-const listViewRef = ref<InstanceType<typeof ListViewEnhanced> | null>(null);
+const listViewRef = ref<InstanceType<typeof ListView> | null>(null);
 const meta = ref<DocTypeMeta | null>(null);
 const selectedRows = ref<string[]>([]);
 
@@ -135,6 +135,19 @@ onMounted(async () => {
 	try {
 		const response = await frappeClient.getDocTypeMeta(doctype.value);
 		meta.value = response.docs?.[0] || null;
+
+		// If issingle, redirect to form view for the single doc
+		if (meta.value?.issingle) {
+			router.push({
+				name: "EditForm",
+				params: {
+					app: app.value,
+					doctype: doctype.value,
+					name: doctype.value,
+				},
+			});
+			return;
+		}
 
 		// Update breadcrumbs with proper label
 		breadcrumbStore.setForList(app.value, doctype.value, meta.value?.label || doctype.value);

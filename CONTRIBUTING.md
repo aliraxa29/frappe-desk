@@ -80,7 +80,7 @@ pre-commit run --all-files
 
 When opening a PR:
 
-- Explain *why* the change is needed and what it does.
+- Explain _why_ the change is needed and what it does.
 - Include screenshots/screen recordings for UI changes.
 - Add/adjust tests where it makes sense.
 - Ensure `pre-commit` passes.

@@ -10,8 +10,7 @@
 <script setup lang="ts">
 import type { Field, FormContext, FieldType } from "../types";
 import { getFieldComponent } from "../fields/registry";
-import { defineAsyncComponent, onMounted } from "vue";
-import TextEditorField from "../components/fields/TextEditorField.vue";
+import { defineAsyncComponent } from "vue";
 
 const props = defineProps({
 	field: {
@@ -52,6 +51,7 @@ const fieldComponents = {
 	TextEditorField: defineAsyncComponent(
 		() => import("../components/fields/TextEditorField.vue"),
 	),
+	ReadOnlyField: defineAsyncComponent(() => import("../components/fields/ReadOnlyField.vue")),
 };
 
 function getFieldComponentName(fieldtype: FieldType): any {
@@ -91,7 +91,8 @@ function getFieldComponentName(fieldtype: FieldType): any {
 			return fieldComponents.ChildTableField;
 		case "TextEditorField":
 			return fieldComponents.TextEditorField;
-
+		case "ReadOnlyField":
+			return fieldComponents.ReadOnlyField;
 		default:
 			break;
 	}

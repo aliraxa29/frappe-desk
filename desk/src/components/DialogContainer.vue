@@ -104,7 +104,7 @@
 						</div>
 
 						<!-- Body -->
-						<div class="dialog-body">
+						<div class="dialog-body scroll-area">
 							<!-- Custom component -->
 							<component
 								v-if="dialog.type === 'custom' && dialog.component"

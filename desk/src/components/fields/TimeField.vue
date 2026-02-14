@@ -102,12 +102,7 @@
 
 				<!-- Now Button -->
 				<div class="border-t border-gray-200 pt-2 mt-3">
-					<Button
-						@click="setNow"
-						class="w-full px-3 py-1.5 bg-blue-600 text-white rounded font-medium text-sm hover:bg-blue-700 transition-colors duration-200"
-					>
-						Now
-					</Button>
+					<Button variant="primary" @click="setNow" class="w-full"> Now </Button>
 				</div>
 			</div>
 		</Transition>

@@ -85,7 +85,7 @@
 		</div>
 
 		<!-- Table -->
-		<div class="overflow-x-auto">
+		<div class="scroll-area overflow-x-auto">
 			<table class="w-full text-sm">
 				<thead>
 					<tr
@@ -454,7 +454,7 @@
 						</div>
 
 						<!-- Modal body - full form layout -->
-						<div class="flex-1 overflow-y-auto px-5 py-4">
+						<div class="flex-1 overflow-y-auto px-5 py-4 scroll-area">
 							<!-- Tabs -->
 							<div v-if="formLayout.tabs.length > 1" class="mb-4">
 								<div
@@ -563,7 +563,7 @@
 								</svg>
 							</button>
 						</div>
-						<div class="flex-1 overflow-y-auto p-4 space-y-1">
+						<div class="flex-1 overflow-y-auto p-4 space-y-1 scroll-area">
 							<label
 								v-for="field in allTableFields"
 								:key="field.fieldname"

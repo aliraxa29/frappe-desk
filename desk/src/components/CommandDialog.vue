@@ -41,7 +41,7 @@
 					</div>
 
 					<!-- Results -->
-					<div class="flex-1 overflow-y-auto py-2" ref="resultsRef">
+					<div class="flex-1 overflow-y-auto scroll-area py-2" ref="resultsRef">
 						<!-- Loading state -->
 						<div
 							v-if="loading"

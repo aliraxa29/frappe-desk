@@ -1,4 +1,4 @@
-import type { FieldType } from "@/types";
+import type { FieldType } from "../types";
 
 // Component registry for field types
 export const fieldComponentMap: Record<FieldType, string> = {
@@ -8,7 +8,7 @@ export const fieldComponentMap: Record<FieldType, string> = {
   Attach: "AttachField",
   Currency: "CurrencyField",
   Date: "DateField",
-  Datetime: "DateTimeField",
+  DateTime: "DateTimeField",
   Time: "TimeField",
   Float: "FloatField",
   Int: "IntField",
@@ -33,6 +33,8 @@ export const fieldComponentMap: Record<FieldType, string> = {
   "Column Break": "ColumnBreakField",
   "Section Break": "SectionBreakField",
   "Tab Break": "TabBreakField",
+  "Read Only": "ReadOnlyField",
+  Button: "ButtonField",
 };
 
 // Layout field types that don't render as editable fields

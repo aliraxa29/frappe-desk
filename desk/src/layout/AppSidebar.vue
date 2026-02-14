@@ -23,7 +23,10 @@
 		</div>
 
 		<!-- Sidebar Content - Scrollable -->
-		<div ref="sidebarContentRef" class="flex-1 overflow-y-auto px-2 py-3 dark:bg-gray-950">
+		<div
+			ref="sidebarContentRef"
+			class="scroll-area flex-1 overflow-y-auto px-2 py-3 dark:bg-gray-950"
+		>
 			<!-- Loading -->
 			<div v-if="loading" class="py-10 text-center text-sm text-slate-400">Loading...</div>
 

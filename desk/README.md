@@ -31,7 +31,7 @@ desk/
 │   ├── App.vue           # Root component
 │   └── main.ts           # Entry point
 ├── public/               # Static assets
-├── vite.config.ts        # Vite configuration (with proxies) ⭐ 
+├── vite.config.ts        # Vite configuration (with proxies) ⭐
 ├── index.html            # Entry HTML with boot data
 └── package.json          # Dependencies (socket.io-client added)
 ```
@@ -39,6 +39,7 @@ desk/
 ## 🚀 Quick Start
 
 ### 1. Install Dependencies
+
 ```bash
 cd /home/erp/bench15/apps/desktop/desk
 yarn install
@@ -47,23 +48,27 @@ yarn install
 ### 2. Start Services (3 terminals)
 
 **Terminal 1: Frappe Backend**
+
 ```bash
 cd /home/erp/bench15
 bench serve                    # :8000
 ```
 
 **Terminal 2: Frontend Dev**
+
 ```bash
 cd /home/erp/bench15/apps/desktop/desk
 yarn dev                       # :5173
 ```
 
 **Terminal 3: Redis (for realtime)**
+
 ```bash
 redis-server config/redis_cache.conf
 ```
 
 ### 3. Open Application
+
 ```
 http://localhost:5173
 ```
@@ -71,6 +76,7 @@ http://localhost:5173
 ## 🔌 What's New: Socket.IO Realtime Integration
 
 ### Automatic Features
+
 - ✅ Document updates sync in real-time across tabs
 - ✅ List updates when other users make changes
 - ✅ Form viewer tracking (see who's editing)
@@ -81,25 +87,25 @@ http://localhost:5173
 
 ```typescript
 // Document realtime subscription
-import { useDocRealtime } from '@/utils/socketio'
+import { useDocRealtime } from "@/utils/socketio";
 
 useDocRealtime(
   () => doctype,
   () => docname,
   (data) => {
-    console.log('Document updated:', data)
-  }
-)
+    console.log("Document updated:", data);
+  },
+);
 
 // List realtime subscription
-import { useListRealtime } from '@/utils/socketio'
+import { useListRealtime } from "@/utils/socketio";
 
 useListRealtime(
   () => doctype,
   (data) => {
-    console.log('List updated:', data)
-  }
-)
+    console.log("List updated:", data);
+  },
+);
 ```
 
 See **SOCKETIO_QUICK_REFERENCE.md** for more examples.
@@ -109,11 +115,13 @@ See **SOCKETIO_QUICK_REFERENCE.md** for more examples.
 ### Vite Proxy Setup
 
 All requests are properly routed:
+
 - Development: `localhost:5173` → Proxies to `localhost:8000` (Frappe)
 - Production: Served directly from `localhost:8000/assets/desktop/dashboard/`
 - Socket.IO: Proxied to `localhost:9000` for realtime
 
 **Proxied Routes**:
+
 - `/api/*` → Frappe API
 - `/method/*` → RPC calls
 - `/assets/*` → Static files
@@ -134,17 +142,21 @@ NODE_ENV=development
 ## 📚 Documentation
 
 ### Setup & Development
+
 - **[DEVELOPMENT_SETUP.md](./DEVELOPMENT_SETUP.md)** ⭐ START HERE - Complete development guide
 - **[VITE_SETUP_COMPLETE.md](./VITE_SETUP_COMPLETE.md)** - Vite configuration summary
 
 ### Socket.IO Realtime
+
 - **[SOCKETIO_INTEGRATION.md](./SOCKETIO_INTEGRATION.md)** - Complete Socket.IO API reference
 - **[SOCKETIO_QUICK_REFERENCE.md](./SOCKETIO_QUICK_REFERENCE.md)** - Quick code examples
 
 ### Proxy & Networking
+
 - **[VITE_PROXY_CONFIG.md](./VITE_PROXY_CONFIG.md)** - Detailed proxy configuration
 
 ### Locals System (Legacy)
+
 - **[SETUP.md](./SETUP.md)** - Installation guide
 - **[QUICK_START.md](./QUICK_START.md)** - Quick examples
 - **[LOCALS_DOCUMENTATION.md](./LOCALS_DOCUMENTATION.md)** - Complete API reference
@@ -152,11 +164,13 @@ NODE_ENV=development
 ## 💻 Development Commands
 
 ### Install Dependencies
+
 ```bash
 yarn install
 ```
 
 ### Run Development Server
+
 ```bash
 yarn dev
 # Runs on http://localhost:5173
@@ -164,17 +178,20 @@ yarn dev
 ```
 
 ### Build for Production
+
 ```bash
 yarn build
 # Output: ../../desktop/desktop/public/dashboard/
 ```
 
 ### Preview Production Build
+
 ```bash
 yarn preview
 ```
 
 ### Type Check
+
 ```bash
 yarn type-check
 ```
@@ -182,6 +199,7 @@ yarn type-check
 ## 🏗️ Architecture
 
 ### Development Server Flow
+
 ```
 Browser :5173
     ↓
@@ -193,6 +211,7 @@ Vite Dev Server (hot reload)
 ```
 
 ### Production Flow
+
 ```
 Browser
     ↓
@@ -205,28 +224,32 @@ Frappe :8000
 ## 🎯 Real-time Features
 
 ### Document Subscriptions
+
 ```typescript
-realtime.docSubscribe(doctype, docname, callback)
-realtime.docOpen(doctype, docname)          // Track viewers
-realtime.docClose(doctype, docname)         // Stop tracking
+realtime.docSubscribe(doctype, docname, callback);
+realtime.docOpen(doctype, docname); // Track viewers
+realtime.docClose(doctype, docname); // Stop tracking
 ```
 
 ### List Subscriptions
+
 ```typescript
-realtime.doctypeSubscribe(doctype, callback)
+realtime.doctypeSubscribe(doctype, callback);
 ```
 
 ### Task Progress
+
 ```typescript
-realtime.taskSubscribe(taskId, callback)
+realtime.taskSubscribe(taskId, callback);
 ```
 
 ### Global Events
+
 ```typescript
-realtime.on('msgprint', (data) => {})
-realtime.on('progress', (data) => {})
-realtime.on('doc_update', (data) => {})
-realtime.on('list_update', (data) => {})
+realtime.on("msgprint", (data) => {});
+realtime.on("progress", (data) => {});
+realtime.on("doc_update", (data) => {});
+realtime.on("list_update", (data) => {});
 ```
 
 See **SOCKETIO_QUICK_REFERENCE.md** for complete API.
@@ -234,6 +257,7 @@ See **SOCKETIO_QUICK_REFERENCE.md** for complete API.
 ## 🔍 Debugging
 
 ### Check Services
+
 ```bash
 # Frappe backend
 curl http://localhost:8000
@@ -246,18 +270,20 @@ curl http://localhost:9000/socket.io
 ```
 
 ### Browser Console
+
 ```javascript
 // Check realtime connection
-console.log('Connected:', window.dash.realtime?.isConnected?.())
+console.log("Connected:", window.dash.realtime?.isConnected?.());
 
 // View boot data
-console.log(window.dash.boot)
+console.log(window.dash.boot);
 
 // Manual event test
-window.dash.realtime?.on('doc_update', console.log)
+window.dash.realtime?.on("doc_update", console.log);
 ```
 
 ### View Logs
+
 ```bash
 # Frappe logs
 tail -f /home/erp/bench15/logs/frappe.log
@@ -286,12 +312,14 @@ tail -f /home/erp/bench15/logs/frappe.log
 ## Getting Started
 
 ### New to this project?
+
 1. Read [SETUP.md](./SETUP.md) for installation
 2. Read [QUICK_START.md](./QUICK_START.md) for quick examples
 3. Check [src/components/LocalsDemoComponent.vue](./src/components/LocalsDemoComponent.vue) for a working example
 4. Review [LOCALS_DOCUMENTATION.md](./LOCALS_DOCUMENTATION.md) for complete API
 
 ### Want to add a feature?
+
 1. Understand the locals system
 2. Create your component using composables
 3. Integrate with server APIs as needed
@@ -299,6 +327,7 @@ tail -f /home/erp/bench15/logs/frappe.log
 ## API Examples
 
 ### Create a New Document
+
 ```typescript
 import { useLocalsStore } from "@/stores/locals";
 
@@ -307,11 +336,12 @@ store.addToLocals({
   doctype: "Customer",
   name: "CUST-NEW",
   title: "New Customer",
-  __islocal: true
+  __islocal: true,
 });
 ```
 
 ### Search Documents
+
 ```typescript
 import { searchDocuments } from "@/utils/localsAdvanced";
 
@@ -319,6 +349,7 @@ const results = searchDocuments("Customer", "ABC", ["name", "title"]);
 ```
 
 ### Get Statistics
+
 ```typescript
 import { getDocTypeStats } from "@/utils/localsAdvanced";
 
@@ -327,12 +358,13 @@ const stats = getDocTypeStats("Customer");
 ```
 
 ### Batch Operations
+
 ```typescript
 import { batchAddToLocals } from "@/utils/localsAdvanced";
 
 const customers = [
   { doctype: "Customer", name: "C1", title: "Customer 1" },
-  { doctype: "Customer", name: "C2", title: "Customer 2" }
+  { doctype: "Customer", name: "C2", title: "Customer 2" },
 ];
 batchAddToLocals(customers);
 ```
@@ -340,6 +372,7 @@ batchAddToLocals(customers);
 ## File Structure Details
 
 ### Core Locals System
+
 - `src/stores/locals.ts` - Pinia store (100+ lines)
 - `src/types/locals.ts` - Type definitions (60+ lines)
 - `src/utils/sync.ts` - Sync utilities (180+ lines)
@@ -349,10 +382,12 @@ batchAddToLocals(customers);
 - `src/utils/localsAdvanced.ts` - Advanced utilities (350+ lines)
 
 ### Example & Tests
+
 - `src/components/LocalsDemoComponent.vue` - Full working example
 - `src/utils/localsTests.ts` - Test suite
 
 ### Global Types
+
 - `src/types/global.d.ts` - Type declarations for window.locals
 
 ## Status
@@ -360,6 +395,7 @@ batchAddToLocals(customers);
 ✅ **Complete and Ready to Use**
 
 All files created and integrated:
+
 - ✅ Core locals system implemented
 - ✅ Vue 3 composables created
 - ✅ TypeScript types defined

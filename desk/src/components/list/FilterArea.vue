@@ -105,7 +105,7 @@
 							/>
 						</div>
 						<!-- Field list -->
-						<div class="max-h-60 overflow-y-auto py-1">
+						<div class="max-h-60 overflow-y-auto py-1 scroll-area">
 							<button
 								v-for="f in filteredFieldOptions"
 								:key="f.fieldname"
