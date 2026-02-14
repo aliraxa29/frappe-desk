@@ -74,11 +74,8 @@ yarn build
 ### Start Backend Services
 
 ```bash
-# Terminal 1 — Web server on port 8000
-bench serve
-
-# Terminal 2 — File watcher for auto-reload
-bench watch
+# Terminal 1 — Run bench using this command
+bench start
 ```
 
 ### Start Frontend Dev Server
