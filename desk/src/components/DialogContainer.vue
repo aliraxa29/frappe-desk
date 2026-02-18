@@ -29,7 +29,7 @@
 								<div
 									v-if="dialog.icon"
 									:class="[
-										'flex items-center justify-center w-10 h-10 rounded-full flex-shrink-0',
+										'flex items-center justify-center w-10 h-10 rounded-full shrink-0',
 										dialog.icon === 'success'
 											? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400'
 											: dialog.icon === 'error'
@@ -67,7 +67,7 @@
 							</div>
 							<button
 								v-if="dialog.showClose !== false"
-								class="flex items-center justify-center w-8 h-8 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 rounded transition-colors flex-shrink-0"
+								class="flex items-center justify-center w-8 h-8 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 rounded transition-colors shrink-0"
 								@click="handleCancel(dialog)"
 								aria-label="Close"
 							>

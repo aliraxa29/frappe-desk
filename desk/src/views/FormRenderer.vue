@@ -8,7 +8,6 @@
 	</div>
 
 	<div v-else-if="ctx">
-		<!-- If we have tabs, render with FormTabs -->
 		<FormTabs v-if="hasTabs" :tabs="parsedTabs" :ctx="ctx">
 			<template v-for="(tab, tabIdx) in parsedTabs" :key="tab.fieldname" #[`tab-${tabIdx}`]>
 				<FormLayout
@@ -20,7 +19,6 @@
 			</template>
 		</FormTabs>
 
-		<!-- No tabs - render sections directly -->
 		<FormLayout
 			v-else
 			:sections="parsedSections"
@@ -33,7 +31,15 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, onUnmounted, nextTick } from "vue";
-import type { DocTypeMeta, Document, FormContext, Field } from "../types";
+import type {
+	DocTypeMeta,
+	Document,
+	FormContext,
+	Field,
+	ParsedTab,
+	ParsedSection,
+	ParsedColumn,
+} from "../types";
 import { createFormContext, formRegistry } from "../runtime/formContext";
 import { loadDoctypeScriptsFromMetadata } from "../runtime/scriptLoader";
 import FormLayout from "../components/FormLayout.vue";
@@ -44,28 +50,7 @@ import { useRoute } from "vue-router";
 import { router } from "../router";
 import { realtime } from "../utils/socketio/client";
 import { __ } from "../utils/translate";
-
-// Types for parsed layout
-interface ParsedColumn {
-	fields: Field[];
-}
-
-interface ParsedSection {
-	fieldname?: string;
-	label?: string;
-	description?: string;
-	collapsible?: boolean;
-	collapsed?: boolean;
-	columns: ParsedColumn[];
-}
-
-interface ParsedTab {
-	fieldname?: string;
-	label?: string;
-	fields: Field[];
-	sections: ParsedSection[];
-	hidden?: boolean;
-}
+import { HIDDEN_FORM_FIELDS } from "../constants";
 
 const props = defineProps<{
 	doctype: string;
@@ -87,37 +72,19 @@ const originalDoc = ref<Document | null>(null);
 const route = useRoute();
 const viewers = ref<Array<{ user: string; full_name: string }>>([]);
 
-// Realtime subscription tracking
 const unsubscribeDoc = ref<(() => void) | null>(null);
 
-// Check if form has tabs
 const hasTabs = computed(() => {
 	if (!meta.value?.fields) return false;
 	return meta.value.fields.some((f) => f.fieldtype === "Tab Break");
 });
 
-// Find first image field (Attach Image type)
 const imageFieldname = computed<string | undefined>(() => {
 	if (!meta.value?.fields) return undefined;
 	const imageField = meta.value.fields.find((f) => f.fieldtype === "Attach Image" && !f.hidden);
 	return imageField?.fieldname || undefined;
 });
 
-// System fields that should never appear on forms
-const HIDDEN_FORM_FIELDS = new Set([
-	"name",
-	"creation",
-	"modified",
-	"modified_by",
-	"owner",
-	"docstatus",
-	"idx",
-	"parent",
-	"parenttype",
-	"parentfield",
-]);
-
-// Parse fields into tabs structure
 const parsedTabs = computed<ParsedTab[]>(() => {
 	if (!meta.value?.fields) return [];
 
@@ -129,7 +96,6 @@ const parsedTabs = computed<ParsedTab[]>(() => {
 
 	for (const field of fields) {
 		if (field.fieldtype === "Tab Break") {
-			// Start new tab
 			currentTab = {
 				fieldname: field.fieldname,
 				label: field.label,
@@ -138,13 +104,14 @@ const parsedTabs = computed<ParsedTab[]>(() => {
 				hidden: !!field.hidden,
 				depends_on: field.depends_on,
 			};
-			tabs.push(currentTab);
+			if (currentTab) {
+				tabs.push(currentTab);
+			}
 		} else if (currentTab) {
 			currentTab.fields.push(field);
 		}
 	}
 
-	// Parse sections within each tab
 	for (const tab of tabs) {
 		tab.sections = parseFieldsIntoSections(tab.fields);
 	}
@@ -152,7 +119,6 @@ const parsedTabs = computed<ParsedTab[]>(() => {
 	return tabs.filter((t) => !t.hidden);
 });
 
-// Parse fields into sections (for non-tabbed forms)
 const parsedSections = computed<ParsedSection[]>(() => {
 	if (!meta.value?.fields || hasTabs.value) return [];
 
@@ -162,13 +128,11 @@ const parsedSections = computed<ParsedSection[]>(() => {
 	return parseFieldsIntoSections(fields);
 });
 
-// Helper to parse fields into sections with columns
 function parseFieldsIntoSections(fields: Field[]): ParsedSection[] {
 	const sections: ParsedSection[] = [];
 	let currentSection: ParsedSection | null = null;
 	let currentColumn: ParsedColumn | null = null;
 
-	// Create default section if first field is not a section break
 	const firstNonLayoutField = fields.find(
 		(f) => !["Tab Break", "Section Break", "Column Break"].includes(f.fieldtype),
 	);
@@ -184,12 +148,10 @@ function parseFieldsIntoSections(fields: Field[]): ParsedSection[] {
 
 	for (const field of fields) {
 		if (field.fieldtype === "Tab Break") {
-			// Skip tab breaks in section parsing
 			continue;
 		}
 
 		if (field.fieldtype === "Section Break") {
-			// Start new section
 			currentSection = {
 				fieldname: field.fieldname,
 				label: field.label,
@@ -203,17 +165,14 @@ function parseFieldsIntoSections(fields: Field[]): ParsedSection[] {
 			currentColumn = currentSection.columns[0] as ParsedColumn;
 			sections.push(currentSection);
 		} else if (field.fieldtype === "Column Break") {
-			// Start new column in current section
 			if (currentSection) {
 				currentColumn = { fields: [] };
 				currentSection.columns.push(currentColumn);
 			}
 		} else {
-			// Regular field - add to current column
 			if (currentColumn) {
 				currentColumn.fields.push(field);
 			} else if (currentSection) {
-				// Fallback: add to first column
 				const firstColumn = currentSection.columns[0];
 				if (firstColumn) {
 					firstColumn.fields.push(field);
@@ -222,7 +181,6 @@ function parseFieldsIntoSections(fields: Field[]): ParsedSection[] {
 		}
 	}
 
-	// Filter out empty sections
 	return sections.filter((s) => s.columns.some((c) => c.fields.length > 0));
 }
 
@@ -230,9 +188,6 @@ onMounted(async () => {
 	await onLoad();
 });
 
-/**
- * Create a new document with default values from the DocType meta
- */
 function createNewDocument(doctype: string, meta: DocTypeMeta): Document {
 	const doc: Document = {
 		doctype: doctype,
@@ -241,15 +196,12 @@ function createNewDocument(doctype: string, meta: DocTypeMeta): Document {
 		docstatus: 0,
 	};
 
-	// Apply default values from fields
 	for (const field of meta.fields) {
 		if (field.default) {
 			doc[field.fieldname] = field.default;
 		} else if (field.fieldtype === "Table") {
-			// Initialize empty child tables
 			doc[field.fieldname] = [];
 		} else if (field.fieldtype === "Check") {
-			// Initialize checkboxes to 0
 			doc[field.fieldname] = 0;
 		}
 	}
@@ -270,9 +222,6 @@ function triggerFormEvent(doctype: string, event: string, context: any) {
 	}
 }
 
-/**
- * Setup realtime subscriptions for form updates
- */
 function setupRealtimeSubscriptions() {
 	if (!ctx.value || !ctx.value.doc.name || ctx.value.doc.__islocal) {
 		return;
@@ -281,12 +230,10 @@ function setupRealtimeSubscriptions() {
 	const doctype = props.doctype;
 	const docname = ctx.value.doc.name;
 
-	// Subscribe to document updates
 	const handleDocUpdate = (data: any) => {
 		if (data.doctype === doctype && data.name === docname) {
 			console.log("[Realtime] Document updated:", data);
 
-			// Refresh the form with updated data
 			if (ctx.value) {
 				Object.assign(ctx.value.doc, data.doc || {});
 				ctx.value.notify(`Document updated by another user`, "info");
@@ -294,7 +241,6 @@ function setupRealtimeSubscriptions() {
 		}
 	};
 
-	// Subscribe to doc_viewers to show who is editing
 	const handleDocViewers = (data: any) => {
 		if (data.doctype === doctype && data.name === docname) {
 			viewers.value = data.viewers || [];
@@ -302,15 +248,12 @@ function setupRealtimeSubscriptions() {
 		}
 	};
 
-	// Register global event listeners
 	realtime.on("doc_update", handleDocUpdate);
 	realtime.on("doc_viewers", handleDocViewers);
 
-	// Subscribe to this specific document
 	realtime.docSubscribe(doctype, docname, handleDocUpdate);
 	realtime.docOpen(doctype, docname, handleDocViewers);
 
-	// Store cleanup function
 	unsubscribeDoc.value = () => {
 		realtime.off("doc_update", handleDocUpdate);
 		realtime.off("doc_viewers", handleDocViewers);
@@ -319,9 +262,6 @@ function setupRealtimeSubscriptions() {
 	};
 }
 
-/**
- * Cleanup realtime subscriptions
- */
 function cleanupRealtimeSubscriptions() {
 	if (unsubscribeDoc.value) {
 		unsubscribeDoc.value();
@@ -383,26 +323,88 @@ function loadMeta(doctype: string): Promise<DocTypeMeta> {
 	});
 }
 
+function getAutonameField(docMeta: DocTypeMeta | null, isNew: boolean): Field | null {
+	if (!isNew || !docMeta?.autoname) return null;
+
+	const autoname = docMeta.autoname.trim().toLowerCase();
+
+	if (autoname === "prompt") {
+		return {
+			fieldname: "__newname",
+			label: __(`${docMeta.name} Name`),
+			fieldtype: "Data",
+			reqd: 1,
+		};
+	}
+	if (autoname.startsWith("naming_series:")) {
+		const seriesString = docMeta.autoname.substring("naming_series:".length).trim();
+		const options = seriesString
+			.split("\n")
+			.map((s: string) => s.trim())
+			.filter(Boolean)
+			.join("\n");
+
+		return {
+			fieldname: "naming_series",
+			label: __("Naming Series"),
+			fieldtype: "Select",
+			options: options,
+			reqd: 1,
+			default: options.split("\n")[0] || "",
+		};
+	}
+	return null;
+}
+
+function applyAutonameFields(docMeta: DocTypeMeta | null, isNew: boolean): Field[] {
+	let fields = [...(docMeta?.fields || [])];
+
+	if (!fields) return [];
+
+	fields = fields.filter((f) => f.fieldname !== "__newname");
+
+	const autonameField = getAutonameField(docMeta, isNew);
+
+	if (!autonameField) {
+		return fields;
+	}
+
+	if (autonameField.fieldname === "naming_series") {
+		const existingIdx = fields.findIndex((f) => f.fieldname === "naming_series");
+		if (existingIdx !== -1) {
+			fields[existingIdx] = {
+				...fields[existingIdx],
+				...autonameField,
+				label: fields[existingIdx].label || autonameField.label,
+			} as Field;
+		} else {
+			fields.unshift(autonameField);
+		}
+		return fields;
+	}
+
+	fields.unshift(autonameField);
+	return fields;
+}
+
 async function onLoad() {
 	loading.value = true;
 	emit("loading", true);
 	error.value = "";
-
-	// Cleanup previous subscriptions
+	const isNewDocument = !props.docname || props.docname === "new" || props.docname === null;
 	cleanupRealtimeSubscriptions();
 
 	try {
-		// Load DocType metadata
 		if (!locals.DocType[props.doctype]) {
 			meta.value = await loadMeta(props.doctype);
 		} else {
 			meta.value = locals.DocType[props.doctype];
 		}
 		if (meta.value) {
+			meta.value.fields = applyAutonameFields(meta.value, isNewDocument);
 			loadDoctypeScriptsFromMetadata(meta.value, "form");
 		}
 
-		// Check if this is a single doctype - redirect if necessary
 		if (meta.value?.issingle && props.docname !== props.doctype) {
 			router.push({
 				name: "EditForm",
@@ -417,18 +419,13 @@ async function onLoad() {
 
 		let doc: Document;
 
-		// Determine if this is a new or existing document
-		const isNewDocument = !props.docname || props.docname === "new" || props.docname === null;
-
 		if (!isNewDocument && props.docname) {
 			doc = await frappeClient.getDocument(props.doctype, props.docname);
 
-			// Validate document was loaded
 			if (!doc || typeof doc !== "object") {
 				throw new Error("Failed to load document: Invalid response");
 			}
 
-			// Store a deep copy of the original document for discard functionality
 			try {
 				originalDoc.value = JSON.parse(JSON.stringify(doc));
 			} catch (e) {
@@ -438,7 +435,6 @@ async function onLoad() {
 		} else {
 			doc = props.doc || createNewDocument(props.doctype, meta.value as DocTypeMeta);
 
-			// Store a deep copy for discard
 			try {
 				originalDoc.value = JSON.parse(JSON.stringify(doc));
 			} catch (e) {
@@ -447,15 +443,12 @@ async function onLoad() {
 			}
 		}
 
-		// Create form context
 		if (meta.value) {
 			ctx.value = createFormContext(props.doctype, doc, meta.value);
 
-			// Trigger setup and load events
 			triggerFormEvent(props.doctype, "setup", ctx.value);
 			triggerFormEvent(props.doctype, "load", ctx.value);
 
-			// Setup realtime subscriptions for existing documents
 			if (!isNewDocument && ctx.value.doc.name) {
 				setupRealtimeSubscriptions();
 			}
@@ -471,11 +464,9 @@ async function onLoad() {
 	}
 }
 
-// Watch for route changes to reload the form
 watch(
 	() => [route.params.doctype, route.params.name],
 	async (newParams, oldParams) => {
-		// Only reload if doctype or name actually changed
 		if (JSON.stringify(newParams) !== JSON.stringify(oldParams)) {
 			await onLoad();
 		}
@@ -522,7 +513,6 @@ const isDirty = computed(() => {
 function handleDiscard() {
 	if (!ctx.value || !originalDoc.value) return;
 
-	// Reset to original document
 	ctx.value.doc = JSON.parse(JSON.stringify(originalDoc.value));
 	ctx.value.dirty = false;
 }
@@ -533,13 +523,11 @@ async function reload() {
 
 function focusFirstField() {
 	nextTick(() => {
-		// Select the first visible, non-disabled input/select/textarea
 		const selector = `input:not([type='hidden']):not([disabled]), select:not([disabled]), textarea:not([disabled]), [contenteditable='true']:not([disabled])`;
 		const formContent = document.querySelector("[data-form-content]");
 		const el = formContent?.querySelector(selector) || document.querySelector(selector);
 		if (el && el instanceof HTMLElement) {
 			el.focus({ preventScroll: true });
-			// Scroll field into view with a small delay
 			setTimeout(() => {
 				el.scrollIntoView({ behavior: "smooth", block: "center" });
 			}, 100);

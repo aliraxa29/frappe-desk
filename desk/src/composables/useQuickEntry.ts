@@ -65,8 +65,8 @@ export async function openQuickEntry(options: QuickEntryOptions) {
  */
 export function setupQuickEntryShortcut(doctype: string) {
   const handleKeyDown = (event: KeyboardEvent) => {
-    // Ctrl+Shift+N for new document
-    if (event.ctrlKey && event.shiftKey && event.key === "N") {
+    // Ctrl+B for new document
+    if (event.ctrlKey && event.key === "B") {
       event.preventDefault();
       openQuickEntry({ doctype }).catch(console.error);
     }
@@ -78,36 +78,4 @@ export function setupQuickEntryShortcut(doctype: string) {
   return () => {
     document.removeEventListener("keydown", handleKeyDown);
   };
-}
-
-/**
- * Open a quick entry dialog with custom fields only
- * Example: Quick invoice with just customer and amount
- */
-export async function openQuickEntryWithFields(
-  doctype: string,
-  fieldsToShow: string[],
-  title?: string,
-) {
-  return openQuickEntry({
-    doctype,
-    fields: fieldsToShow,
-    title: title || `Quick ${doctype} Entry`,
-  });
-}
-
-/**
- * Open a quick entry dialog with pre-filled defaults
- * Example: Quick expense entry with current date
- */
-export async function openQuickEntryWithDefaults(
-  doctype: string,
-  defaults: Record<string, any>,
-  title?: string,
-) {
-  return openQuickEntry({
-    doctype,
-    defaultValues: defaults,
-    title: title || `New ${doctype}`,
-  });
 }

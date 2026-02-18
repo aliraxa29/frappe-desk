@@ -1,11 +1,9 @@
 <template>
 	<div data-form-content class="flex flex-col gap-6">
-		<!-- Image Field at Top -->
 		<div v-if="imageField && ctx" class="mb-4">
 			<div
 				class="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800/50 dark:border-slate-600 shadow-sm p-6"
 			>
-				<!-- Image Preview Area -->
 				<div v-if="imageValue" class="mb-4 flex justify-center">
 					<div class="relative group">
 						<img
@@ -23,14 +21,11 @@
 					</div>
 				</div>
 
-				<!-- Upload Area -->
 				<FieldRenderer :field="imageField" :ctx="ctx" @field-change="onFieldChange" />
 			</div>
 		</div>
 
-		<!-- Form Sections -->
 		<template v-for="section in sections" :key="section.fieldname || section.label">
-			<!-- Collapsible Section -->
 			<Accordion
 				v-if="section.collapsible && isSectionVisible(section)"
 				:label="section.label || __('Details')"
@@ -46,7 +41,6 @@
 				</div>
 			</Accordion>
 
-			<!-- Regular Section -->
 			<div v-else-if="isSectionVisible(section)" class="mb-4">
 				<div
 					class="rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-600 dark:bg-slate-800/70 shadow-sm p-6"
