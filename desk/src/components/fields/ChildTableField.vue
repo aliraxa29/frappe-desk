@@ -2,6 +2,7 @@
 	<div class="mb-6 flex flex-col gap-2">
 		<ChildTableEditor
 			:rows="rows"
+			:reqd="field.reqd"
 			:child-meta="childMeta"
 			:field-label="field.label || field.fieldname"
 			:parent-doctype="ctx.doctype"

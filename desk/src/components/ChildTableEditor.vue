@@ -7,9 +7,10 @@
 			class="flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700"
 		>
 			<div class="flex items-center gap-2">
-				<span class="text-sm font-semibold text-slate-800 dark:text-slate-200">{{
-					fieldLabel
-				}}</span>
+				<span class="text-sm font-semibold text-slate-800 dark:text-slate-200">
+					{{ fieldLabel }}
+				</span>
+				<span v-if="reqd" class="text-red-500 ml-1">*</span>
 				<span
 					class="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-200/60 dark:bg-slate-700 px-1.5 py-0.5 rounded-full"
 				>
@@ -515,6 +516,7 @@ const dialogStore = useDialogStore();
 
 const props = defineProps<{
 	rows: ChildRow[];
+	reqd?: number;
 	childMeta: DocTypeMeta | null;
 	fieldLabel: string;
 	parentDoctype?: string;
