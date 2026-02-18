@@ -1,8 +1,3 @@
-/**
- * desk.call - A Frappe-like RPC caller using native fetch API
- * Similar to frappe.call but using raw fetch and returning promises
- */
-
 import { useFreezeStore } from "../stores/freeze";
 
 export interface DeskCallOptions {
@@ -24,9 +19,6 @@ export interface DeskCallResponse {
   _server_messages?: string[];
 }
 
-/**
- * Get CSRF token from cookies
- */
 function getCookie(name: string): string {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -34,9 +26,6 @@ function getCookie(name: string): string {
   return "";
 }
 
-/**
- * Main desk.call function - similar to frappe.call
- */
 export async function call(options: DeskCallOptions): Promise<any> {
   const {
     method,
@@ -58,7 +47,6 @@ export async function call(options: DeskCallOptions): Promise<any> {
     "X-Frappe-CSRF-Token": getCookie("frappe_csrf_token") || "",
   };
 
-  // Freeze if requested
   let freezeStore: ReturnType<typeof useFreezeStore> | null = null;
   if (freeze) {
     freezeStore = useFreezeStore();
@@ -75,19 +63,16 @@ export async function call(options: DeskCallOptions): Promise<any> {
 
     const data: DeskCallResponse = await response.json();
 
-    // Handle custom status code callbacks
     if (statusCode[response.status]) {
       statusCode[response.status](data);
       return data;
     }
 
-    // Handle 401 Unauthorized - redirect to login
     if (response.status === 401) {
       window.location.href = "/app/login";
       throw new Error("Unauthorized");
     }
 
-    // Handle errors
     if (!response.ok) {
       const error = new Error(
         data.message || `HTTP Error: ${response.status}`,
@@ -104,7 +89,6 @@ export async function call(options: DeskCallOptions): Promise<any> {
       throw error;
     }
 
-    // Execute callback if provided
     if (callback) {
       callback(data);
     }
@@ -116,16 +100,12 @@ export async function call(options: DeskCallOptions): Promise<any> {
     }
     throw err;
   } finally {
-    // Always unfreeze
     if (freeze && freezeStore) {
       freezeStore.unfreeze();
     }
   }
 }
 
-/**
- * POST request helper using desk.call
- */
 export async function post(
   method: string,
   args?: Record<string, any>,
@@ -133,9 +113,6 @@ export async function post(
   return call({ method, args });
 }
 
-/**
- * GET request helper using fetch
- */
 export async function get(url: string): Promise<any> {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -156,9 +133,6 @@ export async function get(url: string): Promise<any> {
   return data;
 }
 
-/**
- * Build URL with query parameters
- */
 export function buildUrl(base: string, params?: Record<string, any>): string {
   if (!params || Object.keys(params).length === 0) {
     return base;
@@ -174,28 +148,21 @@ export function buildUrl(base: string, params?: Record<string, any>): string {
   return `${base}?${searchParams.toString()}`;
 }
 
-/**
- * desk namespace for easier importing
- */
 export const desk = {
   call,
   post,
   get,
   buildUrl,
-  // Expose freeze functions for custom scripting
   freeze: (message?: string) => {
     const freezeStore = useFreezeStore();
     let finalMessage = message || "Loading...";
 
-    // Try to get translated message if available
     try {
       const __ = (window as any).__;
       if (typeof __ === "function") {
         finalMessage = message || __("Loading...");
       }
-    } catch (e) {
-      // Translation not available, use default
-    }
+    } catch (e) {}
 
     freezeStore.freeze(finalMessage);
   },
@@ -205,7 +172,6 @@ export const desk = {
   },
 };
 
-// Make desk available globally for custom scripting
 if (typeof window !== "undefined" && window) {
   try {
     (window as any).desk = desk;

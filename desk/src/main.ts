@@ -11,7 +11,7 @@ import { realtime } from "./utils/socketio/client";
 import { initializeRealtimeNotifications } from "./utils/socketio/notifications";
 import { useThemeStore } from "./stores/theme";
 import { useTranslationStore } from "./stores/translation";
-import "./utils/translate"; // Import to register global __ function
+import "./utils/translate";
 
 initializeGlobals();
 
