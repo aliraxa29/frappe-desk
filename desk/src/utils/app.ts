@@ -39,4 +39,25 @@ export function initializeGlobals() {
   window.desk.provide("desk.listview_settings");
   window.desk.provide("desk.tour");
   window.desk.provide("desk.listview_parent_route");
+
+  // Bridge boot data: window.dash.boot → window.desk.boot
+  // This makes boot data available to model.ts, formatters.ts, etc.
+  // which reference desk.boot.user, desk.boot.sysdefaults, etc.
+  const boot = (window as any).dash?.boot;
+  if (boot) {
+    window.desk.boot = boot;
+    window.desk._messages =
+      (window as any).dash?._messages || boot.__messages || {};
+
+    // Set up commonly accessed boot properties as top-level desk properties
+    // so model.ts references like desk.session.user, desk.user_roles work
+    window.desk.session = {
+      user: boot.user?.name || "Guest",
+      user_email: boot.user?.email || "",
+      user_fullname: boot.user?.first_name || "",
+    };
+    window.desk.user_roles = boot.user?.roles || [];
+    window.desk.sys_defaults = boot.sysdefaults || {};
+    window.desk.user_info = boot.user_info || {};
+  }
 }

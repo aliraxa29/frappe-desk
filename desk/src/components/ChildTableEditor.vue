@@ -28,14 +28,7 @@
 						title="Delete selected"
 						@click="deleteSelected"
 					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-							/>
-						</svg>
+						<Trash class="w-4 h-4" />
 					</button>
 					<button
 						type="button"
@@ -43,14 +36,7 @@
 						title="Deselect all"
 						@click="selectedIndices.clear()"
 					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M6 18L18 6M6 6l12 12"
-							/>
-						</svg>
+						<Close class="w-4 h-4" />
 					</button>
 					<div class="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-0.5" />
 				</template>
@@ -61,25 +47,11 @@
 					title="Column Settings"
 					@click="showColumnSettings = true"
 				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-						/>
-					</svg>
+					<Settings class="w-4 h-4" />
 				</button>
 				<button type="button" class="add-row-btn" @click="addNewRow">
-					<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M12 4v16m8-8H4"
-						/>
-					</svg>
-					Add Row
+					<Plus class="w-3.5 h-3.5" />
+					{{ __("Add Row") }}
 				</button>
 			</div>
 		</div>
@@ -121,7 +93,7 @@
 						<th
 							class="w-20 px-2 py-2 text-center text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase"
 						>
-							Actions
+							{{ __("Actions") }}
 						</th>
 					</tr>
 				</thead>
@@ -197,19 +169,7 @@
 									title="Edit"
 									@click.stop="openRowModal(index)"
 								>
-									<svg
-										class="w-3.5 h-3.5"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-										/>
-									</svg>
+									<Edit class="w-3.5 h-3.5" />
 								</button>
 								<button
 									type="button"
@@ -217,19 +177,7 @@
 									title="Duplicate"
 									@click.stop="duplicateRow(index)"
 								>
-									<svg
-										class="w-3.5 h-3.5"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-										/>
-									</svg>
+									<Duplicate class="w-3.5 h-3.5" />
 								</button>
 								<button
 									type="button"
@@ -237,19 +185,7 @@
 									title="Delete"
 									@click.stop="deleteRow(index)"
 								>
-									<svg
-										class="w-3.5 h-3.5"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-										/>
-									</svg>
+									<Trash class="w-3.5 h-3.5" />
 								</button>
 								<!-- Move up -->
 								<button
@@ -259,19 +195,7 @@
 									title="Move up"
 									@click.stop="moveRow(index, -1)"
 								>
-									<svg
-										class="w-3.5 h-3.5"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M5 15l7-7 7 7"
-										/>
-									</svg>
+									<ChevronUp class="w-3.5 h-3.5" />
 								</button>
 								<!-- Move down -->
 								<button
@@ -281,19 +205,7 @@
 									title="Move down"
 									@click.stop="moveRow(index, 1)"
 								>
-									<svg
-										class="w-3.5 h-3.5"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M19 9l-7 7-7-7"
-										/>
-									</svg>
+									<ChevronDown class="w-3.5 h-3.5" />
 								</button>
 							</div>
 						</td>
@@ -320,20 +232,8 @@
 								</svg>
 								<p class="text-xs">No rows added</p>
 								<button type="button" class="add-row-btn mt-1" @click="addNewRow">
-									<svg
-										class="w-3.5 h-3.5"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M12 4v16m8-8H4"
-										/>
-									</svg>
-									Add First Row
+									<Plus class="w-3.5 h-3.5" />
+									{{ __("Add First Row") }}
 								</button>
 							</div>
 						</td>
@@ -348,14 +248,15 @@
 			class="flex items-center justify-between px-3 py-1.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20"
 		>
 			<span class="text-[10px] text-slate-400 dark:text-slate-500">
-				Double-click to edit &middot; Ctrl+D to duplicate &middot; Del to delete
+				{{ __("Double-click to edit") }} &middot; {{ __("Ctrl+D to duplicate") }} &middot;
+				{{ __("Del to delete") }}
 			</span>
 			<button
 				type="button"
 				class="text-[11px] text-blue-600 dark:text-blue-400 hover:underline"
 				@click="addNewRow"
 			>
-				+ Add Row
+				+ {{ __("Add Row") }}
 			</button>
 		</div>
 
@@ -391,19 +292,7 @@
 									@click="navigateRow(-1)"
 									title="Previous row"
 								>
-									<svg
-										class="w-4 h-4"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M15 19l-7-7 7-7"
-										/>
-									</svg>
+									<ChevronLeft class="w-4 h-4" />
 								</button>
 								<span class="text-xs text-slate-500 dark:text-slate-400"
 									>{{ editingRowIndex + 1 }} / {{ rows.length }}</span
@@ -415,19 +304,7 @@
 									@click="navigateRow(1)"
 									title="Next row"
 								>
-									<svg
-										class="w-4 h-4"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M9 5l7 7-7 7"
-										/>
-									</svg>
+									<ChevronRight class="w-4 h-4" />
 								</button>
 								<div class="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-1" />
 								<button
@@ -436,19 +313,7 @@
 									@click="closeRowModal"
 									title="Close"
 								>
-									<svg
-										class="w-4 h-4"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M6 18L18 6M6 6l12 12"
-										/>
-									</svg>
+									<Close class="w-4 h-4" />
 								</button>
 							</div>
 						</div>
@@ -548,19 +413,7 @@
 								class="btn-icon-sm"
 								@click="showColumnSettings = false"
 							>
-								<svg
-									class="w-4 h-4"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M6 18L18 6M6 6l12 12"
-									/>
-								</svg>
+								<Close class="w-4 h-4" />
 							</button>
 						</div>
 						<div class="flex-1 overflow-y-auto p-4 space-y-1 scroll-area">
@@ -617,6 +470,16 @@ import CellDisplay from "./childtable/CellDisplay.vue";
 import InlineCellEditor from "./childtable/InlineCellEditor.vue";
 import FormSectionRenderer from "./childtable/FormSectionRenderer.vue";
 import { useDialogStore } from "../stores/dialog";
+import Trash from "../icons/Trash.vue";
+import Close from "../icons/Close.vue";
+import Settings from "../icons/Settings.vue";
+import Plus from "../icons/Plus.vue";
+import Edit from "../icons/Edit.vue";
+import Duplicate from "../icons/Duplicate.vue";
+import ChevronUp from "../icons/ChevronUp.vue";
+import ChevronDown from "../icons/ChevronDown.vue";
+import ChevronLeft from "../icons/ChevronLeft.vue";
+import ChevronRight from "../icons/ChevronRight.vue";
 
 export interface ChildRow {
 	[key: string]: any;

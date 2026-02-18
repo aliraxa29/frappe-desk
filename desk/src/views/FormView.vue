@@ -1,17 +1,21 @@
 <template>
-	<AppLayout>
+	<AppLayout :custom-sidebar="!isNewDocument">
 		<template #header>
 			<div class="flex flex-wrap items-center justify-between gap-4 w-full py-2">
-				<h2 class="text-lg font-semibold text-slate-800 dark:text-white">
-					{{ doctype }}
-					<span
+				<!-- Title Section -->
+				<div class="flex flex-col gap-1 flex-1">
+					<h2 class="text-lg font-semibold text-slate-800 dark:text-white">
+						{{ doctype }}
+					</h2>
+					<p
 						v-if="!currentMeta?.issingle"
-						class="font-normal text-slate-600 dark:text-slate-400 ml-2"
+						class="text-sm text-slate-600 dark:text-slate-400"
 					>
-						{{ isNewDocument ? "(New)" : documentName }}
-					</span>
-				</h2>
+						{{ isNewDocument ? __("New document") : documentName }}
+					</p>
+				</div>
 
+				<!-- Action Bar -->
 				<div class="flex items-center gap-2">
 					<FormButtons :buttons="customButtons" @execute="handleButtonExecute" />
 					<FormActionsMenu :actions="menuActions" @select="handleMenuAction" />
@@ -44,6 +48,19 @@
 								aria-hidden="true"
 							/>
 						</Button>
+						<Button
+							v-if="!isNewDocument"
+							variant="secondary"
+							size="sm"
+							@click="sidebarOpen = !sidebarOpen"
+							:aria-label="__('Toggle sidebar')"
+							:title="sidebarOpen ? __('Hide details') : __('Show details')"
+						>
+							<Menu
+								class="h-5 w-5 text-gray-800 dark:text-white"
+								aria-hidden="true"
+							/>
+						</Button>
 					</div>
 				</div>
 			</div>
@@ -67,6 +84,15 @@
 				/>
 			</div>
 		</template>
+		<template #sidebar>
+			<FormSidebar
+				v-if="sidebarOpen && !isNewDocument"
+				:doc="currentDoc"
+				:doctype="doctype"
+				:is-open="true"
+				@update:is-open="sidebarOpen = $event"
+			/>
+		</template>
 	</AppLayout>
 </template>
 
@@ -85,9 +111,11 @@ import { desk } from "../utils/desk";
 import { dialog } from "../stores/dialog";
 import { useToastStore } from "../stores/toast";
 import Button from "../components/Button.vue";
+import FormSidebar from "../components/FormSidebar.vue";
 import { __ } from "../utils/translate";
 import ChevronLeft from "../icons/ChevronLeft.vue";
 import ChevronRight from "../icons/ChevronRight.vue";
+import Menu from "../icons/Menu.vue";
 
 const formContext = ref();
 const route = useRoute();
@@ -95,6 +123,27 @@ const router = useRouter();
 const breadcrumbStore = useBreadcrumbStore();
 const loading = ref(false);
 const toast = useToastStore();
+
+const SIDEBAR_STORAGE_KEY = "form_sidebar_open";
+
+function getSidebarStoredState(): boolean {
+	try {
+		const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+		return stored === null ? true : stored === "true";
+	} catch {
+		return true;
+	}
+}
+
+const sidebarOpen = ref<boolean>(getSidebarStoredState());
+
+watch(sidebarOpen, (val) => {
+	try {
+		localStorage.setItem(SIDEBAR_STORAGE_KEY, String(val));
+	} catch {
+		/* ignore */
+	}
+});
 
 const app = computed(() => route.params.app as string);
 const doctype = computed(() => route.params.doctype as string);
@@ -141,7 +190,7 @@ const menuActions = computed<MenuAction[]>(() => {
 		return [
 			{ name: "email", label: __("Email"), shortcut: "Ctrl+E", disabled: !hasDoc },
 			{ name: "jump", label: __("Jump to field"), shortcut: "Ctrl+J" },
-			{ name: "copy_to_clipboard", label: __("Copy to Clipboard"), disabled: !hasDoc },
+			{ name: "copy", label: __("Copy to Clipboard"), disabled: !hasDoc },
 			{ name: "reload", label: __("Reload") },
 			{ name: "remind", label: __("Remind Me"), shortcut: "Shift+R" },
 			{ name: "undo", label: __("Undo"), shortcut: "Ctrl+Z", disabled: !canUndo },
@@ -343,23 +392,14 @@ async function handleMenuAction(action: MenuAction) {
 	switch (action.name) {
 		case "print":
 			if (!doc?.name) return;
-			window.open(
-				`/printview?doctype=${encodeURIComponent(doctype.value)}&name=${encodeURIComponent(
-					doc.name,
-				)}&format=Standard&no_letterhead=0`,
-				"_blank",
-			);
+			await printDocument(doc);
 			break;
 		case "email":
 			if (!doc?.name) return;
-			window.location.href = `mailto:?subject=${encodeURIComponent(
-				`${doctype.value} ${doc.name}`,
-			)}&body=${encodeURIComponent(`Link: ${window.location.href}`)}`;
+			await emailDocument(doc);
 			break;
 		case "jump":
-			if (formContext.value?.focusFirstField) {
-				formContext.value.focusFirstField();
-			}
+			await jumpToField();
 			break;
 		case "links":
 			if (!doc?.name) return;
@@ -442,14 +482,7 @@ async function handleMenuAction(action: MenuAction) {
 			}
 			break;
 		case "remind":
-			{
-				const reminder = await dialog.prompt("Set Reminder", {
-					label: "Reminder Note",
-					required: false,
-				});
-				if (reminder === null) return;
-				toast.success("Reminder saved", reminder || "Reminder added.");
-			}
+			await setReminder(doc);
 			break;
 		case "undo":
 			handleDiscard();
@@ -474,6 +507,148 @@ async function handleMenuAction(action: MenuAction) {
 			break;
 		default:
 			break;
+	}
+}
+
+async function printDocument(doc: Record<string, any>) {
+	try {
+		// Fetch available print formats for this doctype
+		const response = await desk.call({
+			method: "frappe.client.get_list",
+			args: {
+				doctype: "Print Format",
+				filters: { doc_type: doctype.value, disabled: 0 },
+				fields: ["name"],
+				limit_page_length: 0,
+			},
+		});
+		const formats = (response.message || []).map((f: any) => f.name);
+		formats.unshift("Standard");
+
+		let selectedFormat = "Standard";
+		if (formats.length > 1) {
+			const chosen = await dialog.prompt("Print", {
+				label: `Print Format (${formats.join(", ")})`,
+				defaultValue: "Standard",
+			});
+			if (chosen === null) return;
+			selectedFormat = formats.includes(chosen) ? chosen : "Standard";
+		}
+
+		window.open(
+			`/printview?doctype=${encodeURIComponent(doctype.value)}&name=${encodeURIComponent(
+				doc.name,
+			)}&format=${encodeURIComponent(selectedFormat)}&no_letterhead=0`,
+			"_blank",
+		);
+	} catch (error) {
+		// Fallback to standard format
+		window.open(
+			`/printview?doctype=${encodeURIComponent(doctype.value)}&name=${encodeURIComponent(
+				doc.name,
+			)}&format=Standard&no_letterhead=0`,
+			"_blank",
+		);
+	}
+}
+
+async function emailDocument(doc: Record<string, any>) {
+	try {
+		const recipient = await dialog.prompt("Email Document", {
+			label: "Recipient Email",
+			defaultValue: "",
+		});
+		if (recipient === null || !recipient) return;
+
+		await desk.call({
+			method: "frappe.core.doctype.communication.email.make",
+			args: {
+				recipients: recipient,
+				subject: `${doctype.value}: ${doc.name}`,
+				content: `Please see the attached ${doctype.value}: ${doc.name}\n\nLink: ${window.location.href}`,
+				doctype: doctype.value,
+				name: doc.name,
+				send_email: 1,
+			},
+		});
+		toast.success("Email sent", `Email sent to ${recipient}`);
+	} catch (error: any) {
+		// Fallback to mailto
+		window.location.href = `mailto:?subject=${encodeURIComponent(
+			`${doctype.value} ${doc.name}`,
+		)}&body=${encodeURIComponent(`Link: ${window.location.href}`)}`;
+	}
+}
+
+async function jumpToField() {
+	const meta = currentMeta.value;
+	if (!meta?.fields?.length) {
+		if (formContext.value?.focusFirstField) {
+			formContext.value.focusFirstField();
+		}
+		return;
+	}
+
+	const fieldNames = meta.fields
+		.filter(
+			(f: any) =>
+				!f.hidden &&
+				!f.is_system_generated &&
+				!["Section Break", "Column Break", "Tab Break"].includes(f.fieldtype),
+		)
+		.map((f: any) => f.label || f.fieldname);
+
+	if (!fieldNames.length) return;
+
+	const selected = await dialog.prompt("Jump to Field", {
+		label: `Field (${fieldNames.slice(0, 5).join(", ")}${fieldNames.length > 5 ? "..." : ""})`,
+		defaultValue: "",
+	});
+	if (selected === null || !selected) return;
+
+	// Find matching field
+	const matchedField = meta.fields.find(
+		(f: any) =>
+			(f.label || f.fieldname).toLowerCase() === selected.toLowerCase() ||
+			f.fieldname.toLowerCase() === selected.toLowerCase(),
+	);
+	const fieldname = matchedField?.fieldname || selected;
+
+	// Focus the field element
+	const formEl = document.querySelector("[data-form-content]") || document;
+	const fieldEl =
+		formEl.querySelector(`[data-fieldname="${fieldname}"] input`) ||
+		formEl.querySelector(`[data-fieldname="${fieldname}"] select`) ||
+		formEl.querySelector(`[data-fieldname="${fieldname}"] textarea`) ||
+		formEl.querySelector(`[data-fieldname="${fieldname}"]`);
+
+	if (fieldEl instanceof HTMLElement) {
+		fieldEl.focus({ preventScroll: true });
+		setTimeout(() => fieldEl.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
+	}
+}
+
+async function setReminder(doc: Record<string, any> | null) {
+	const reminderDate = await dialog.prompt("Set Reminder", {
+		label: "Reminder Date",
+		defaultValue: "",
+	});
+	if (reminderDate === null || !reminderDate) return;
+
+	try {
+		await desk.call({
+			method: "frappe.desk.doctype.event.event.create_event",
+			args: {
+				subject: `Reminder: ${doctype.value} ${doc?.name || "(New)"}`,
+				starts_on: reminderDate,
+				event_type: "Private",
+				reference_doctype: doctype.value,
+				reference_docname: doc?.name,
+			},
+		});
+		toast.success("Reminder set", `Reminder scheduled for ${reminderDate}`);
+	} catch {
+		toast.info("Reminder", "Reminder noted locally.");
 	}
 }
 

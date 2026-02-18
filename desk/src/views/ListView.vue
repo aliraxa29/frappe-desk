@@ -50,6 +50,7 @@ import AppLayout from "../layout/AppLayout.vue";
 import ListView from "../components/list/ListView.vue";
 import Button from "../components/Button.vue";
 import { realtime } from "../utils/socketio/client";
+import { openQuickEntry } from "../composables/useQuickEntry";
 
 const route = useRoute();
 const router = useRouter();
@@ -174,15 +175,39 @@ onUnmounted(() => {
 	cleanupRealtimeSubscriptions();
 });
 
-function handleNewDocument() {
-	router.push({
-		name: "NewForm",
-		params: {
+async function handleNewDocument() {
+	if (meta.value?.quick_entry) {
+		await openQuickEntry({
 			doctype: doctype.value,
-			app: app.value,
-			name: "new",
-		},
-	});
+			fields: (meta.value?.fields || []).filter(
+				(f) => !f.hidden && (f.reqd || f.allow_in_quick_entry) && !f.read_only,
+			),
+			autoname: meta.value?.autoname,
+			onSuccess: (doc) => {
+				router.push({
+					name: "EditForm",
+					params: {
+						doctype: doctype.value,
+						app: app.value,
+						name: doc.name,
+					},
+				});
+			},
+			onError: (error) => {
+				console.error("Quick Entry error:", error);
+				return;
+			},
+		});
+	} else {
+		router.push({
+			name: "NewForm",
+			params: {
+				doctype: doctype.value,
+				app: app.value,
+				name: "new",
+			},
+		});
+	}
 }
 
 function handleRefresh() {

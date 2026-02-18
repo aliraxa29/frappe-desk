@@ -1,80 +1,27 @@
 <template>
-	<div class="field-wrapper">
-		<label v-if="field.label" :for="`field-${field.fieldname}`" class="field-label">
-			{{ field.label }}
-			<span v-if="field.reqd" class="required">*</span>
-		</label>
-		<textarea
-			:id="`field-${field.fieldname}`"
-			:value="ctx.doc[field.fieldname]"
-			:readonly="field.read_only"
-			:required="field.reqd"
-			class="field-textarea"
-			rows="4"
-			@input="updateValue"
-		/>
-		<small v-if="field.description" class="field-description">{{ field.description }}</small>
-	</div>
+	<TextArea
+		:field="field"
+		:model-value="ctx.doc?.[field.fieldname] ?? ''"
+		:error="fieldError"
+		@update:model-value="onUpdate"
+		@blur="onBlur"
+	/>
 </template>
 
 <script setup lang="ts">
-import type { Field, FormContext } from "@/types";
+import { computed } from "vue";
+import type { Field, FormContext } from "../../types";
+import TextArea from "../controls/TextArea.vue";
 
-defineProps<{ field: Field; ctx: FormContext }>();
+const props = defineProps<{ field: Field; ctx: FormContext }>();
+const emit = defineEmits<{ fieldChange: [value: any] }>();
 
-const emit = defineEmits<{
-	fieldChange: [value: any];
-}>();
+const fieldError = computed(() => (props.ctx as any).fieldErrors?.[props.field.fieldname]);
 
-function updateValue(e: Event) {
-	const value = (e.target as HTMLTextAreaElement).value;
-	ctx.set_value(field.fieldname, value);
+function onUpdate(value: any) {
+	props.ctx.set_value(props.field.fieldname, value);
 	emit("fieldChange", value);
 }
+
+function onBlur() {}
 </script>
-
-<style scoped>
-.field-wrapper {
-	margin-bottom: 1rem;
-	display: flex;
-	flex-direction: column;
-}
-
-.field-label {
-	font-weight: 500;
-	margin-bottom: 0.25rem;
-	font-size: 0.95rem;
-}
-
-.required {
-	color: #dc3545;
-	margin-left: 0.25rem;
-}
-
-.field-textarea {
-	padding: 0.5rem 0.75rem;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	font-size: 0.95rem;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-	transition: border-color 0.2s;
-}
-
-.field-textarea:focus {
-	outline: none;
-	border-color: #0066cc;
-	box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-}
-
-.field-textarea:readonly {
-	background-color: #f5f5f5;
-	cursor: not-allowed;
-}
-
-.field-description {
-	display: block;
-	color: #666;
-	margin-top: 0.25rem;
-	font-size: 0.85rem;
-}
-</style>

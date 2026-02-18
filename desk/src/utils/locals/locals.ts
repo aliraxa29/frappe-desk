@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import type {
   DeskDocument,
   DocTypeMetadata,
@@ -7,6 +7,7 @@ import type {
   DocumentInfo,
   ModelDocInfo,
 } from "../../types/locals";
+import { model } from "../../data/model";
 
 /**
  * Main locals store for managing documents in memory
@@ -129,6 +130,13 @@ export const useLocalsStore = defineStore("locals", () => {
    * Get DocType metadata
    */
   const getMeta = (doctype: string): DocTypeMetadata | null => {
+    if (!meta.value[doctype]) {
+      model.with_doctype(doctype, (result: any) => {
+        if (!meta.value[doctype]) {
+          meta.value[doctype] = result.message || {};
+        }
+      });
+    }
     return meta.value[doctype] || null;
   };
 

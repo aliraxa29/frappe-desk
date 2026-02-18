@@ -1,172 +1,253 @@
 <template>
 	<aside
-		class="fixed left-0 top-15 bottom-0 w-64 flex flex-col bg-white dark:bg-gray-950 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 z-30"
+		:class="[
+			'relative flex flex-col bg-white dark:bg-gray-950 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 h-full shrink-0 transition-all duration-200',
+			sidebarStore.collapsed ? 'w-0 overflow-hidden border-r-0' : 'w-64',
+		]"
 	>
 		<!-- Sidebar Header -->
-		<div class="px-6 py-3 border-b border-slate-200 dark:border-gray-800 shrink-0">
+		<div
+			class="px-4 py-3 border-b border-slate-100 dark:border-slate-800 shrink-0 flex items-center justify-between gap-2"
+		>
 			<h2
-				class="text-lg font-semibold text-slate-800 dark:text-white truncate"
-				:title="appInfoStore.currentAppTitle || route.params.app"
+				class="text-sm font-bold text-slate-900 dark:text-white truncate flex-1"
+				:title="appInfoStore.currentAppTitle || String(route.params.app || '')"
 			>
 				{{ appInfoStore.currentAppTitle || route.params.app }}
 			</h2>
+			<button
+				@click="sidebarStore.toggleCollapsed()"
+				class="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+				:title="__('Collapse sidebar')"
+			>
+				<svg
+					class="h-4 w-4"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
+					/>
+				</svg>
+			</button>
 		</div>
 
 		<!-- Search -->
-		<div class="px-4 py-3 border-b border-slate-200 dark:border-slate-800 shrink-0">
-			<input
-				v-model="searchQuery"
-				type="text"
-				placeholder="Search…"
-				class="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-700 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
-			/>
+		<div class="px-3 py-2 border-b border-slate-100 dark:border-slate-800 shrink-0">
+			<div class="relative">
+				<svg
+					class="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="2"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+					/>
+				</svg>
+				<input
+					v-model="searchQuery"
+					type="text"
+					:placeholder="__('Search...')"
+					class="w-full rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 pl-8 pr-3 py-1.5 text-xs text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+				/>
+			</div>
 		</div>
 
 		<!-- Sidebar Content - Scrollable -->
 		<div
 			ref="sidebarContentRef"
-			class="scroll-area flex-1 overflow-y-auto px-2 py-3 dark:bg-gray-950"
+			class="scroll-area flex-1 overflow-y-auto px-2 py-2 dark:bg-gray-950"
 		>
 			<!-- Loading -->
-			<div v-if="loading" class="py-10 text-center text-sm text-slate-400">Loading...</div>
+			<div v-if="loading" class="py-8 flex justify-center">
+				<svg
+					class="animate-spin h-5 w-5 text-slate-400"
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+				>
+					<circle
+						class="opacity-25"
+						cx="12"
+						cy="12"
+						r="10"
+						stroke="currentColor"
+						stroke-width="4"
+					/>
+					<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+				</svg>
+			</div>
 
 			<!-- Empty -->
-			<div v-else-if="allSidebarEmpty" class="py-10 text-center text-sm text-slate-400">
-				No sidebar items
+			<div v-else-if="allSidebarEmpty" class="py-8 text-center">
+				<svg
+					class="mx-auto h-8 w-8 text-slate-300 dark:text-slate-600 mb-2"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					stroke-width="1.5"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+					/>
+				</svg>
+				<p class="text-xs text-slate-400">{{ __("No items") }}</p>
 			</div>
 
 			<!-- Workspace Mode: Show workspaces as sidebar items -->
-			<div v-else-if="sidebarSource === 'workspaces'" class="space-y-1">
+			<div v-else-if="sidebarSource === 'workspaces'" class="space-y-0.5">
 				<div
 					v-for="item in filteredWorkspaces"
 					:key="`ws-${item.name}`"
 					@click="handleWorkspaceClick(item)"
 					:class="[
-						'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition cursor-pointer',
+						'group flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition-all cursor-pointer',
 						isWorkspaceActive(item)
-							? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold'
-							: 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800',
+							? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold'
+							: 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200',
 					]"
 				>
-					<span class="text-base">{{ getWorkspaceIcon(item.icon) }}</span>
+					<span class="text-sm shrink-0">{{ getWorkspaceIcon(item.icon) }}</span>
 					<span class="truncate">{{ item.label || item.name }}</span>
 				</div>
 			</div>
 
 			<!-- Module Mode: Show modules as sidebar items -->
-			<div v-else-if="sidebarSource === 'modules'" class="space-y-1">
+			<div v-else-if="sidebarSource === 'modules'" class="space-y-0.5">
 				<div
 					v-for="item in filteredModules"
 					:key="`mod-${item.name}`"
 					@click="handleModuleClick(item)"
 					:class="[
-						'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition cursor-pointer',
+						'group flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition-all cursor-pointer',
 						isModuleActive(item)
-							? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold'
-							: 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800',
+							? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold'
+							: 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200',
 					]"
 				>
-					<span class="text-base">{{ getWorkspaceIcon(item.icon) }}</span>
+					<span class="text-sm shrink-0">{{ getWorkspaceIcon(item.icon) }}</span>
 					<span class="truncate">{{ item.label || item.name }}</span>
 				</div>
 			</div>
 
 			<!-- App Sidebar Mode: Show grouped items (DocTypes, Pages, Reports, Dashboards) -->
-			<div v-else class="space-y-6">
+			<div v-else class="space-y-5">
 				<!-- DocTypes -->
 				<div v-if="groupedSidebar.doctypes.length">
 					<h4
-						class="px-3 mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500"
+						class="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500"
 					>
-						DocTypes
+						{{ __("DocTypes") }}
 					</h4>
 
-					<div
-						v-for="item in groupedSidebar.doctypes"
-						:key="`doctype-${item.name}`"
-						@click="handleDoctypeClick(item)"
-						:class="[
-							'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition cursor-pointer',
-							isItemActive(item)
-								? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold'
-								: 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800',
-						]"
-					>
-						<span class="text-base">{{ getWorkspaceIcon(item.icon) }}</span>
-						<span class="truncate">{{ item.label || item.name }}</span>
+					<div class="space-y-0.5">
+						<div
+							v-for="item in groupedSidebar.doctypes"
+							:key="`doctype-${item.name}`"
+							@click="handleDoctypeClick(item)"
+							:class="[
+								'group flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[13px] transition-all cursor-pointer',
+								isItemActive(item)
+									? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold'
+									: 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200',
+							]"
+						>
+							<span class="text-sm shrink-0">{{ getWorkspaceIcon(item.icon) }}</span>
+							<span class="truncate">{{ item.label || item.name }}</span>
+						</div>
 					</div>
 				</div>
 
 				<!-- Pages -->
 				<div v-if="groupedSidebar.pages.length">
 					<h4
-						class="px-3 mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500"
+						class="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500"
 					>
-						Pages
+						{{ __("Pages") }}
 					</h4>
 
-					<router-link
-						v-for="item in groupedSidebar.pages"
-						:key="`page-${item.name}`"
-						:to="getRoute(item)"
-						:class="[
-							'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition',
-							isPageActive(item)
-								? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold'
-								: 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800',
-						]"
-					>
-						<span class="text-base">{{ getWorkspaceIcon(item.icon) }}</span>
-						<span class="truncate">{{ item.label || item.name }}</span>
-					</router-link>
+					<div class="space-y-0.5">
+						<router-link
+							v-for="item in groupedSidebar.pages"
+							:key="`page-${item.name}`"
+							:to="getRoute(item)"
+							:class="[
+								'group flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[13px] transition-all',
+								isPageActive(item)
+									? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold'
+									: 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200',
+							]"
+						>
+							<span class="text-sm shrink-0">{{ getWorkspaceIcon(item.icon) }}</span>
+							<span class="truncate">{{ item.label || item.name }}</span>
+						</router-link>
+					</div>
 				</div>
 
 				<!-- Reports -->
 				<div v-if="groupedSidebar.reports.length">
 					<h4
-						class="px-3 mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500"
+						class="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500"
 					>
-						Reports
+						{{ __("Reports") }}
 					</h4>
 
-					<router-link
-						v-for="item in groupedSidebar.reports"
-						:key="`report-${item.name}`"
-						:to="getRoute(item)"
-						:class="[
-							'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition',
-							isPageActive(item)
-								? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold'
-								: 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800',
-						]"
-					>
-						<span class="text-base">{{ getWorkspaceIcon(item.icon) || "📊" }}</span>
-						<span class="truncate">{{ item.label || item.name }}</span>
-					</router-link>
+					<div class="space-y-0.5">
+						<router-link
+							v-for="item in groupedSidebar.reports"
+							:key="`report-${item.name}`"
+							:to="getRoute(item)"
+							:class="[
+								'group flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[13px] transition-all',
+								isPageActive(item)
+									? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold'
+									: 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200',
+							]"
+						>
+							<span class="text-sm shrink-0">{{
+								getWorkspaceIcon(item.icon) || "📊"
+							}}</span>
+							<span class="truncate">{{ item.label || item.name }}</span>
+						</router-link>
+					</div>
 				</div>
 
 				<!-- Dashboards -->
 				<div v-if="groupedSidebar.dashboards.length">
 					<h4
-						class="px-3 mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500"
+						class="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500"
 					>
-						Dashboards
+						{{ __("Dashboards") }}
 					</h4>
 
-					<router-link
-						v-for="item in groupedSidebar.dashboards"
-						:key="`dashboard-${item.name}`"
-						:to="getRoute(item)"
-						:class="[
-							'group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition',
-							isPageActive(item)
-								? 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold'
-								: 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800',
-						]"
-					>
-						<span class="text-base">{{ getWorkspaceIcon(item.icon) || "📈" }}</span>
-						<span class="truncate">{{ item.label || item.name }}</span>
-					</router-link>
+					<div class="space-y-0.5">
+						<router-link
+							v-for="item in groupedSidebar.dashboards"
+							:key="`dashboard-${item.name}`"
+							:to="getRoute(item)"
+							:class="[
+								'group flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[13px] transition-all',
+								isPageActive(item)
+									? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold'
+									: 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200',
+							]"
+						>
+							<span class="text-sm shrink-0">{{
+								getWorkspaceIcon(item.icon) || "📈"
+							}}</span>
+							<span class="truncate">{{ item.label || item.name }}</span>
+						</router-link>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -176,10 +257,12 @@
 <script lang="ts" setup>
 import { useRoute, useRouter } from "vue-router";
 import type { SidebarItem } from "../data/app_sidebar";
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, onMounted } from "vue";
 import { model } from "../data/model";
 import { useSidebarStore } from "../stores/sidebar";
 import { useAppInfoStore } from "../stores/appInfo";
+import { desktopAPI } from "../api/desktop";
+import { __ } from "../utils/translate";
 
 declare const locals: any;
 
@@ -194,6 +277,38 @@ const sidebarContentRef = ref<HTMLElement | null>(null);
 const sidebarItems = computed(() => sidebarStore.items);
 const sidebarSource = computed(() => sidebarStore.source);
 const loading = computed(() => sidebarStore.loading);
+
+/**
+ * Auto-fetch sidebar items when store is empty but app param exists.
+ * This handles direct URL navigation (e.g. /:app/:doctype/:name) where
+ * AppView never mounts to populate the sidebar store.
+ */
+async function ensureSidebarLoaded() {
+	const app = route.params.app as string;
+	if (!app || sidebarStore.items.length > 0 || sidebarStore.loading) return;
+
+	sidebarStore.loading = true;
+	try {
+		const sb = await desktopAPI.getModuleSidebar(app);
+		if (sb.source === "modules") {
+			// For multi-module apps, we show modules themselves as sidebar items
+			sidebarStore.setSidebarItems(sb.items, "modules");
+		} else {
+			sidebarStore.setSidebarItems(
+				sb.items,
+				sb.source as "app_sidebar" | "modules" | "workspaces",
+			);
+		}
+	} catch (error) {
+		console.error("Failed to auto-fetch sidebar for", app, error);
+	} finally {
+		sidebarStore.loading = false;
+	}
+}
+
+onMounted(() => {
+	ensureSidebarLoaded();
+});
 
 // Icon mapping for workspace icons (Frappe icon names to emoji)
 const iconMap: Record<string, string> = {
@@ -413,12 +528,16 @@ const allSidebarEmpty = computed(() => {
 });
 
 // Removed fetchSidebar - AppView now manages sidebar state via store
-// Just scroll to top when route changes
+// Just scroll to top when route changes, and auto-fetch if empty
 watch(
 	() => route.params.app,
-	() => {
+	(newApp, oldApp) => {
 		if (sidebarContentRef.value) {
 			sidebarContentRef.value.scrollTop = 0;
+		}
+		// If the app changed and sidebar is empty, auto-fetch
+		if (newApp && newApp !== oldApp && sidebarStore.items.length === 0) {
+			ensureSidebarLoaded();
 		}
 	},
 );

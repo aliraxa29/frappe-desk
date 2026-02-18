@@ -3,8 +3,12 @@ import { ref, computed } from "vue";
 import { desk } from "../utils/desk";
 
 export const useAuthStore = defineStore("auth", () => {
-  const user = ref<string | null>(null);
-  const isAuthenticated = ref(false);
+  // Initialize from boot data — no API call needed on page load
+  const boot = (window as any).dash?.boot;
+  const bootUser = boot?.user?.name || null;
+
+  const user = ref<string | null>(bootUser);
+  const isAuthenticated = ref(!!bootUser && bootUser !== "Guest");
   const loading = ref(false);
   const error = ref<string | null>(null);
 
@@ -13,9 +17,15 @@ export const useAuthStore = defineStore("auth", () => {
   );
 
   /**
-   * Check if user is authenticated by calling backend
+   * Check if user is authenticated.
+   * Uses boot data on first check, falls back to API if needed.
    */
   const checkAuth = async () => {
+    // If already initialized from boot data, return immediately
+    if (isAuthenticated.value && user.value) {
+      return true;
+    }
+
     loading.value = true;
     error.value = null;
     try {

@@ -7,140 +7,27 @@
 		{{ error }}
 	</div>
 
-	<div v-else-if="ctx" data-form-content class="flex flex-col gap-0 pt-4">
+	<div v-else-if="ctx">
 		<!-- If we have tabs, render with FormTabs -->
-		<FormTabs v-if="hasTabs" :tabs="parsedTabs">
+		<FormTabs v-if="hasTabs" :tabs="parsedTabs" :ctx="ctx">
 			<template v-for="(tab, tabIdx) in parsedTabs" :key="tab.fieldname" #[`tab-${tabIdx}`]>
-				<div class="flex flex-col">
-					<template
-						v-for="section in tab.sections"
-						:key="section.fieldname || section.label"
-					>
-						<!-- Section with accordion if collapsible -->
-						<Accordion
-							v-if="section.collapsible"
-							:label="section.label || __('Details')"
-							:default-open="!section.collapsed"
-							class="rounded-2xl"
-						>
-							<div class="flex flex-col md:flex-row gap-6 mx-2">
-								<div
-									v-for="(column, colIdx) in section.columns"
-									:key="colIdx"
-									class="flex-1 flex flex-col gap-4 min-w-0"
-								>
-									<FieldRenderer
-										v-for="field in column.fields"
-										:key="field.fieldname"
-										:field="field"
-										:ctx="ctx"
-										@field-change="onFieldChange"
-									/>
-								</div>
-							</div>
-						</Accordion>
-
-						<!-- Regular section without accordion -->
-						<div v-else class="mb-4">
-							<div
-								class="rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-600 dark:bg-slate-800/70 shadow-sm p-6"
-							>
-								<div v-if="section.label" class="mb-4 flex items-center gap-2">
-									<div class="h-6 w-1 rounded bg-blue-500/70 mr-2"></div>
-									<h3
-										class="text-base font-semibold text-slate-800 dark:text-white m-0"
-									>
-										{{ section.label }}
-									</h3>
-								</div>
-								<p
-									v-if="section.description"
-									class="text-xs text-slate-500 mt-1 mb-4 m-0"
-								>
-									{{ section.description }}
-								</p>
-								<div class="flex flex-col md:flex-row gap-6">
-									<div
-										v-for="(column, colIdx) in section.columns"
-										:key="colIdx"
-										class="flex-1 flex flex-col gap-4 min-w-0"
-									>
-										<FieldRenderer
-											v-for="field in column.fields"
-											:key="field.fieldname"
-											:field="field"
-											:ctx="ctx"
-											@field-change="onFieldChange"
-										/>
-									</div>
-								</div>
-							</div>
-						</div>
-					</template>
-				</div>
+				<FormLayout
+					:sections="tab.sections"
+					:ctx="ctx"
+					:image-fieldname="imageFieldname"
+					@field-change="onFieldChange"
+				/>
 			</template>
 		</FormTabs>
 
 		<!-- No tabs - render sections directly -->
-		<template v-else>
-			<template v-for="section in parsedSections" :key="section.fieldname || section.label">
-				<!-- Section with accordion if collapsible -->
-				<Accordion
-					v-if="section.collapsible"
-					:label="section.label || __('Details')"
-					:default-open="!section.collapsed"
-					class="rounded-2xl"
-				>
-					<div class="flex flex-col md:flex-row gap-6 mx-2">
-						<div
-							v-for="(column, colIdx) in section.columns"
-							:key="colIdx"
-							class="flex-1 flex flex-col gap-4 min-w-0"
-						>
-							<FieldRenderer
-								v-for="field in column.fields"
-								:key="field.fieldname"
-								:field="field"
-								:ctx="ctx"
-								@field-change="onFieldChange"
-							/>
-						</div>
-					</div>
-				</Accordion>
-
-				<!-- Regular section without accordion -->
-				<div v-else class="mb-4">
-					<div
-						class="rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-600 dark:bg-slate-800/70 shadow-sm p-6"
-					>
-						<div v-if="section.label" class="mb-4 flex items-center gap-2">
-							<div class="h-6 w-1 rounded bg-blue-500/70 mr-2"></div>
-							<h3 class="text-base font-bold text-slate-800 dark:text-white m-0">
-								{{ section.label }}
-							</h3>
-						</div>
-						<p v-if="section.description" class="text-xs text-slate-500 mt-1 mb-4 m-0">
-							{{ section.description }}
-						</p>
-						<div class="flex flex-col md:flex-row gap-6">
-							<div
-								v-for="(column, colIdx) in section.columns"
-								:key="colIdx"
-								class="flex-1 flex flex-col gap-4 min-w-0"
-							>
-								<FieldRenderer
-									v-for="field in column.fields"
-									:key="field.fieldname"
-									:field="field"
-									:ctx="ctx"
-									@field-change="onFieldChange"
-								/>
-							</div>
-						</div>
-					</div>
-				</div>
-			</template>
-		</template>
+		<FormLayout
+			v-else
+			:sections="parsedSections"
+			:ctx="ctx"
+			:image-fieldname="imageFieldname"
+			@field-change="onFieldChange"
+		/>
 	</div>
 </template>
 
@@ -149,14 +36,14 @@ import { ref, computed, onMounted, watch, onUnmounted, nextTick } from "vue";
 import type { DocTypeMeta, Document, FormContext, Field } from "../types";
 import { createFormContext, formRegistry } from "../runtime/formContext";
 import { loadDoctypeScriptsFromMetadata } from "../runtime/scriptLoader";
-import FieldRenderer from "../fields/FieldRenderer.vue";
-import Accordion from "../components/Accordion.vue";
+import FormLayout from "../components/FormLayout.vue";
 import FormTabs from "../components/FormTabs.vue";
 import { frappeClient } from "../api/resource";
 import { model } from "../data/model";
 import { useRoute } from "vue-router";
 import { router } from "../router";
 import { realtime } from "../utils/socketio/client";
+import { __ } from "../utils/translate";
 
 // Types for parsed layout
 interface ParsedColumn {
@@ -209,6 +96,13 @@ const hasTabs = computed(() => {
 	return meta.value.fields.some((f) => f.fieldtype === "Tab Break");
 });
 
+// Find first image field (Attach Image type)
+const imageFieldname = computed<string | undefined>(() => {
+	if (!meta.value?.fields) return undefined;
+	const imageField = meta.value.fields.find((f) => f.fieldtype === "Attach Image" && !f.hidden);
+	return imageField?.fieldname || undefined;
+});
+
 // System fields that should never appear on forms
 const HIDDEN_FORM_FIELDS = new Set([
 	"name",
@@ -242,6 +136,7 @@ const parsedTabs = computed<ParsedTab[]>(() => {
 				fields: [],
 				sections: [],
 				hidden: !!field.hidden,
+				depends_on: field.depends_on,
 			};
 			tabs.push(currentTab);
 		} else if (currentTab) {
@@ -301,6 +196,8 @@ function parseFieldsIntoSections(fields: Field[]): ParsedSection[] {
 				description: field.description,
 				collapsible: !!field.collapsible,
 				collapsed: !!field.collapsible && !!field.collapsible_depends_on,
+				depends_on: field.depends_on,
+				collapsible_depends_on: field.collapsible_depends_on,
 				columns: [{ fields: [] }],
 			};
 			currentColumn = currentSection.columns[0] as ParsedColumn;
@@ -317,40 +214,16 @@ function parseFieldsIntoSections(fields: Field[]): ParsedSection[] {
 				currentColumn.fields.push(field);
 			} else if (currentSection) {
 				// Fallback: add to first column
-				if (!currentSection.columns[0]) {
-					currentSection.columns.push({ fields: [] });
+				const firstColumn = currentSection.columns[0];
+				if (firstColumn) {
+					firstColumn.fields.push(field);
 				}
-				currentSection.columns[0].fields.push(field);
 			}
 		}
 	}
 
 	// Filter out empty sections
 	return sections.filter((s) => s.columns.some((c) => c.fields.length > 0));
-}
-
-function getAccordionClasses(sections: ParsedSection[], idx: number): string {
-	const current = sections[idx];
-	if (!current?.collapsible) return "";
-
-	const prevIsAccordion = sections[idx - 1]?.collapsible;
-	const nextIsAccordion = sections[idx + 1]?.collapsible;
-
-	const classes: string[] = [];
-
-	if (prevIsAccordion) {
-		classes.push("rounded-t-none", "border-t-0");
-	} else {
-		classes.push("rounded-t-2xl");
-	}
-
-	if (nextIsAccordion) {
-		classes.push("rounded-b-none", "mb-0");
-	} else {
-		classes.push("rounded-b-2xl", "mb-6");
-	}
-
-	return classes.join(" ");
 }
 
 onMounted(async () => {
@@ -456,7 +329,7 @@ function cleanupRealtimeSubscriptions() {
 	}
 }
 
-function onFieldChange(value: any) {
+function onFieldChange(_field: Field) {
 	// Field change is handled by formContext
 }
 
@@ -484,11 +357,8 @@ async function handleSave() {
 				},
 			});
 		} else {
-			savedDoc = await frappeClient.updateDocument(
-				props.doctype,
-				ctx.value.doc.name,
-				ctx.value.doc,
-			);
+			const docName = ctx.value.doc.name || "";
+			savedDoc = await frappeClient.updateDocument(props.doctype, docName, ctx.value.doc);
 
 			ctx.value.notify("Document updated successfully", "success");
 			ctx.value.doc = savedDoc;
@@ -502,10 +372,6 @@ async function handleSave() {
 	} finally {
 		emit("loading", false);
 	}
-}
-
-function handleClose() {
-	emit("close");
 }
 
 function loadMeta(doctype: string): Promise<DocTypeMeta> {

@@ -35,14 +35,7 @@
 					title="Clear"
 					@mousedown.prevent="clearSelection"
 				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						/>
-					</svg>
+					<Close class="w-4 h-4" />
 				</button>
 
 				<button
@@ -51,14 +44,7 @@
 					:class="{ 'rotate-180': showDropdown }"
 					@mousedown.prevent="toggleDropdown"
 				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M19 9l-7 7-7-7"
-						/>
-					</svg>
+					<ChevronDown class="w-4 h-4" />
 				</button>
 			</div>
 
@@ -102,6 +88,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
+import Close from "../../icons/Close.vue";
+import ChevronDown from "../../icons/ChevronDown.vue";
 
 interface AutocompleteItem {
 	label: string;

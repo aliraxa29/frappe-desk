@@ -5,7 +5,7 @@
 			<div class="flex flex-col items-center gap-3">
 				<div
 					class="w-8 h-8 border-2 border-slate-200 dark:border-slate-700 border-t-blue-600 rounded-full animate-spin"
-				/>
+				></div>
 				<span class="text-sm text-slate-500 dark:text-slate-400">Loading...</span>
 			</div>
 		</div>
@@ -16,19 +16,7 @@
 			class="m-4 p-4 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-700"
 		>
 			<div class="flex items-center gap-2">
-				<svg
-					class="w-5 h-5 text-red-500 shrink-0"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-					/>
-				</svg>
+				<ErrorCircle class="w-5 h-5 text-red-500 shrink-0" />
 				<span class="text-sm text-red-700 dark:text-red-300">{{ error }}</span>
 			</div>
 		</div>
@@ -103,11 +91,12 @@
 							<!-- Like column -->
 							<th class="w-8 px-1 py-2.5" />
 
-							<!-- Serial # column -->
+							<!-- ID column (replaces serial No.) -->
 							<th
-								class="w-12 px-2 py-2.5 text-left text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
+								v-if="!listSettings.hide_serial_column"
+								class="w-16 px-2 py-2.5 text-left text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
 							>
-								No.
+								{{ listSettings.show_id_column !== false ? "ID" : "No." }}
 							</th>
 
 							<!-- Data columns -->
@@ -127,43 +116,25 @@
 								>
 									<span>{{ col.label || col.df?.label || col.type }}</span>
 									<template v-if="sortField === getColumnFieldname(col)">
-										<svg
+										<SortAsc
+											v-if="sortOrder === 'asc'"
 											class="w-3 h-3 text-blue-500"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												v-if="sortOrder === 'asc'"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M5 15l7-7 7 7"
-											/>
-											<path
-												v-else
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M19 9l-7 7-7-7"
-											/>
-										</svg>
+										/>
+										<SortDesc v-else class="w-3 h-3 text-blue-500" />
 									</template>
-									<svg
+									<SortDefault
 										v-else
 										class="w-3 h-3 text-slate-300 dark:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-										/>
-									</svg>
+									/>
 								</div>
+							</th>
+
+							<!-- Actions column header (from custom script) -->
+							<th
+								v-if="hasRowActions"
+								class="w-24 px-3 py-2.5 text-right text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
+							>
+								Actions
 							</th>
 						</tr>
 					</thead>
@@ -202,27 +173,27 @@
 									"
 									@click="toggleLike(row)"
 								>
-									<svg
+									<Heart
 										class="w-4 h-4"
 										:fill="isLiked(row) ? 'currentColor' : 'none'"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-										/>
-									</svg>
+									/>
 								</button>
 							</td>
 
-							<!-- Serial # -->
+							<!-- ID / Serial # -->
 							<td
+								v-if="!listSettings.hide_serial_column"
 								class="px-2 py-2.5 text-xs text-slate-400 dark:text-slate-500 tabular-nums"
+								:title="row.name"
 							>
-								{{ startIndex + index + 1 }}
+								<template v-if="listSettings.show_id_column !== false">
+									<span class="truncate max-w-24 inline-block align-middle">{{
+										row.name
+									}}</span>
+								</template>
+								<template v-else>
+									{{ startIndex + index + 1 }}
+								</template>
 							</td>
 
 							<!-- Data cells -->
@@ -271,6 +242,51 @@
 										:row="row"
 									/>
 								</template>
+							</td>
+
+							<!-- Custom action button (from listview_settings.button) -->
+							<td v-if="hasRowActions" class="px-3 py-2.5 text-right" @click.stop>
+								<!-- Single primary button -->
+								<button
+									v-if="
+										listSettings.button &&
+										(!listSettings.button.show ||
+											listSettings.button.show(row))
+									"
+									type="button"
+									class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 transition-colors"
+									:title="listSettings.button.get_description?.(row) || ''"
+									@click="listSettings.button.action?.(row)"
+								>
+									{{ listSettings.button.get_label?.() || "Action" }}
+								</button>
+								<!-- Row actions dropdown -->
+								<div
+									v-else-if="getVisibleRowActions(row).length"
+									class="relative inline-block"
+								>
+									<button
+										type="button"
+										class="inline-flex items-center px-2 py-1 text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+										@click="toggleRowActionMenu(row.name!)"
+									>
+										···
+									</button>
+									<div
+										v-if="activeRowActionMenu === row.name"
+										class="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1"
+									>
+										<button
+											v-for="action in getVisibleRowActions(row)"
+											:key="action.label"
+											type="button"
+											class="w-full text-left px-3 py-1.5 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+											@click="executeRowAction(action, row)"
+										>
+											{{ action.label }}
+										</button>
+									</div>
+								</div>
 							</td>
 						</tr>
 
@@ -346,38 +362,14 @@
 						class="px-2 py-1 text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
 						title="First page"
 					>
-						<svg
-							class="w-3.5 h-3.5"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
-							/>
-						</svg>
+						<DoubleChevronLeft class="w-3.5 h-3.5" />
 					</button>
 					<button
 						@click="prevPage"
 						:disabled="currentPage === 0"
 						class="px-2 py-1 text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
 					>
-						<svg
-							class="w-3.5 h-3.5"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M15 19l-7-7 7-7"
-							/>
-						</svg>
+						<ChevronLeft class="w-3.5 h-3.5" />
 					</button>
 
 					<!-- Page numbers -->
@@ -402,19 +394,7 @@
 						:disabled="!hasNextPage"
 						class="px-2 py-1 text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
 					>
-						<svg
-							class="w-3.5 h-3.5"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M9 5l7 7-7 7"
-							/>
-						</svg>
+						<ChevronRight class="w-3.5 h-3.5" />
 					</button>
 					<button
 						@click="goToPage(totalPages - 1)"
@@ -422,19 +402,7 @@
 						class="px-2 py-1 text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
 						title="Last page"
 					>
-						<svg
-							class="w-3.5 h-3.5"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M13 5l7 7-7 7M5 5l7 7-7 7"
-							/>
-						</svg>
+						<DoubleChevronRight class="w-3.5 h-3.5" />
 					</button>
 				</div>
 
@@ -459,12 +427,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
+import { ref, computed, watch, onMounted, nextTick } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import type { DocTypeMeta, Field, ListColumn, Document } from "../../types";
 import { frappeClient } from "../../api/resource";
 import { toast } from "../../stores/toast";
 import { dialog } from "../../stores/dialog";
+import { loadDoctypeScriptsFromMetadata } from "../../runtime/scriptLoader";
 
 // Sub-components
 import FilterArea from "./FilterArea.vue";
@@ -477,6 +446,46 @@ import DateCell from "./cells/DateCell.vue";
 import CurrencyCell from "./cells/CurrencyCell.vue";
 import CheckCell from "./cells/CheckCell.vue";
 import DefaultCell from "./cells/DefaultCell.vue";
+import ErrorCircle from "../../icons/ErrorCircle.vue";
+import SortAsc from "../../icons/SortAsc.vue";
+import SortDesc from "../../icons/SortDesc.vue";
+import SortDefault from "../../icons/SortDefault.vue";
+import Heart from "../../icons/Heart.vue";
+import ChevronLeft from "../../icons/ChevronLeft.vue";
+import ChevronRight from "../../icons/ChevronRight.vue";
+import DoubleChevronLeft from "../../icons/DoubleChevronLeft.vue";
+import DoubleChevronRight from "../../icons/DoubleChevronRight.vue";
+
+declare const desk: any;
+
+/**
+ * Listview settings interface - mirrors frappe.listview_settings
+ * Custom scripts register via: desk.listview_settings['DocType'] = { ... }
+ */
+interface ListviewSettings {
+	add_fields?: string[];
+	columns?: Array<{ fieldname: string; label?: string; width?: string }>;
+	hide_name_column?: boolean;
+	hide_serial_column?: boolean;
+	show_id_column?: boolean;
+	get_indicator?: (doc: Document) => [string, string] | null; // [label, color]
+	formatters?: Record<string, (value: any, field: Field, doc: Document) => string>;
+	onload?: (listview: any) => void;
+	refresh?: (listview: any) => void;
+	button?: {
+		show: (doc: Document) => boolean;
+		get_label?: () => string;
+		get_description?: (doc: Document) => string;
+		action?: (doc: Document) => void;
+	};
+	primary_action?: (listview: any) => void;
+	row_actions?: Array<{
+		label: string;
+		action: (doc: Document) => void;
+		show?: (doc: Document) => boolean;
+	}>;
+	[key: string]: any;
+}
 
 const props = defineProps<{
 	doctype: string;
@@ -517,6 +526,10 @@ const queryButtonRect = ref<DOMRect | null>(null);
 // Selection
 const selectedRows = ref<string[]>([]);
 const showBulkEdit = ref(false);
+
+// Custom list script settings
+const listSettings = ref<ListviewSettings>({});
+const fullMetaResponse = ref<any>(null);
 
 // Computed: total pages
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / pageLength.value)));
@@ -580,12 +593,35 @@ const allFilterableFields = computed<Field[]>(() => {
 		.sort((a, b) => (a.label || a.fieldname).localeCompare(b.label || b.fieldname));
 });
 
-// Computed: columns from metadata
+// Computed: columns from metadata (with custom script override)
 const columns = computed<ListColumn[]>(() => {
 	if (!meta.value) return [];
 
-	const cols: ListColumn[] = [];
 	const fields = meta.value.fields || [];
+	const settings = listSettings.value;
+
+	// If custom script defines explicit columns, use those
+	if (settings.columns?.length) {
+		return settings.columns.map((col) => {
+			const df = fields.find((f) => f.fieldname === col.fieldname);
+			return {
+				type: "Field" as const,
+				df: df || {
+					fieldname: col.fieldname,
+					label: col.label || col.fieldname,
+					fieldtype: "Data",
+					reqd: false,
+					read_only: false,
+					hidden: 0,
+				},
+				label: col.label || df?.label || col.fieldname,
+				fieldname: col.fieldname,
+				width: col.width,
+			};
+		});
+	}
+
+	const cols: ListColumn[] = [];
 
 	// 1. Subject column (title_field or name)
 	const titleField = meta.value.title_field;
@@ -644,6 +680,11 @@ const fetchFields = computed(() => {
 		if (col.df?.fieldname) fields.add(col.df.fieldname);
 	});
 
+	// Add extra fields from custom script settings
+	if (listSettings.value.add_fields) {
+		listSettings.value.add_fields.forEach((f) => fields.add(f));
+	}
+
 	return Array.from(fields);
 });
 
@@ -670,13 +711,73 @@ async function loadMeta() {
 	try {
 		const response = await frappeClient.getDocTypeMeta(props.doctype);
 		meta.value = response.docs?.[0] || null;
+		fullMetaResponse.value = response;
 
 		if (meta.value?.sort_field) sortField.value = meta.value.sort_field;
 		if (meta.value?.sort_order) sortOrder.value = meta.value.sort_order as "asc" | "desc";
+
+		// Inject list scripts from metadata (if any)
+		if (meta.value) {
+			loadDoctypeScriptsFromMetadata(meta.value, "list");
+		}
+
+		// Wait for scripts to execute, then read settings
+		await nextTick();
+		loadListSettings();
 	} catch (err: any) {
 		console.error("Failed to load doctype meta:", err);
 		error.value = err.message || "Failed to load doctype metadata";
 	}
+}
+
+/**
+ * Load listview settings from custom scripts.
+ * Scripts register via: desk.listview_settings['DocType'] = { ... }
+ */
+function loadListSettings() {
+	try {
+		const settings =
+			(window as any).desk?.listview_settings?.[props.doctype] ||
+			(window as any).frappe?.listview_settings?.[props.doctype] ||
+			{};
+		listSettings.value = settings;
+
+		// Call onload hook if defined
+		if (settings.onload) {
+			const listviewCtx = getListviewContext();
+			settings.onload(listviewCtx);
+		}
+	} catch (err) {
+		console.error("Failed to load listview settings:", err);
+		listSettings.value = {};
+	}
+}
+
+/**
+ * Build a context object for custom script hooks
+ */
+function getListviewContext() {
+	return {
+		doctype: props.doctype,
+		meta: meta.value,
+		rows: rows.value,
+		filters: queryFilters.value,
+		columns: columns.value,
+		refresh,
+		set_filter: (fieldname: string, value: any) => {
+			const existing = queryFilters.value.find((f) => f.fieldname === fieldname);
+			if (existing) {
+				existing.value = value;
+			} else {
+				queryFilters.value.push({
+					id: `auto_${Date.now()}`,
+					fieldname,
+					operator: "=",
+					value,
+				});
+			}
+		},
+	};
 }
 
 async function refresh() {
@@ -711,6 +812,15 @@ async function refresh() {
 		});
 
 		await fetchTotalCount(filters);
+
+		// Call refresh hook from custom script
+		if (listSettings.value.refresh) {
+			try {
+				listSettings.value.refresh(getListviewContext());
+			} catch (err) {
+				console.error("Listview refresh hook error:", err);
+			}
+		}
 	} catch (err: any) {
 		console.error("Failed to load list:", err);
 		error.value = err.message || "Failed to load list";
@@ -1057,6 +1167,31 @@ function getCellComponent(df: Field) {
 		Check: CheckCell,
 	};
 	return componentMap[df.fieldtype] || DefaultCell;
+}
+
+// Custom script: row actions
+const hasRowActions = computed(() => {
+	return !!listSettings.value.button || (listSettings.value.row_actions?.length ?? 0) > 0;
+});
+
+const activeRowActionMenu = ref<string | null>(null);
+
+function getVisibleRowActions(row: Document) {
+	return (listSettings.value.row_actions || []).filter(
+		(action) => !action.show || action.show(row),
+	);
+}
+
+function toggleRowActionMenu(name: string) {
+	activeRowActionMenu.value = activeRowActionMenu.value === name ? null : name;
+}
+
+function executeRowAction(
+	action: { label: string; action: (doc: Document) => void },
+	row: Document,
+) {
+	activeRowActionMenu.value = null;
+	action.action(row);
 }
 
 // Initialize

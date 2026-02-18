@@ -7,6 +7,7 @@
 		>
 			<button
 				v-for="(tab, idx) in tabs"
+				v-show="isTabVisible(tab)"
 				:key="tab.fieldname || idx"
 				class="px-5 py-3 border-0 bg-transparent text-sm font-medium cursor-pointer whitespace-nowrap relative transition-colors duration-200"
 				:class="[
@@ -26,7 +27,7 @@
 		<div class="py-6 mx-2">
 			<div
 				v-for="(tab, idx) in tabs"
-				v-show="activeTab === idx"
+				v-show="activeTab === idx && isTabVisible(tab)"
 				:key="tab.fieldname || idx"
 				class="animate-fadeIn"
 				role="tabpanel"
@@ -41,26 +42,36 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import type { Field } from "../types";
+import type { Field, FormContext } from "../types";
+import { evaluateDependsOn } from "../utils/dependsOn";
 
 export interface TabDefinition {
 	fieldname?: string;
 	label?: string;
 	fields: Field[];
 	hidden?: boolean;
+	depends_on?: string;
 }
 
 const props = withDefaults(
 	defineProps<{
 		tabs: TabDefinition[];
 		defaultTab?: number;
+		ctx?: FormContext | null;
 	}>(),
 	{
 		defaultTab: 0,
+		ctx: null,
 	},
 );
 
 const activeTab = ref(props.defaultTab);
+
+function isTabVisible(tab: TabDefinition): boolean {
+	if (tab.hidden) return false;
+	if (!tab.depends_on) return true;
+	return evaluateDependsOn(tab.depends_on, props.ctx?.doc ?? null);
+}
 </script>
 
 <style scoped>

@@ -12,21 +12,11 @@
 				class="flex items-center gap-2 font-bold text-base text-slate-800 dark:text-white"
 			>
 				<slot name="icon">
-					<svg
+					<ChevronRight
 						v-if="showIcon"
 						class="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0 transition-transform duration-200"
 						:class="{ 'rotate-90': isOpen }"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M9 5l7 7-7 7"
-						/>
-					</svg>
+					/>
 				</slot>
 				<div class="h-6 w-1 rounded bg-blue-500/70 mr-2"></div>
 				<span class="flex-1">{{ label }}</span>
@@ -43,8 +33,8 @@
 		<transition name="accordion-fade" mode="out-in">
 			<div
 				v-show="isOpen"
-				class="overflow-hidden transition-all duration-300"
-				:style="isOpen ? 'max-height: 2000px;' : 'max-height: 0;'"
+				class="transition-all duration-300"
+				:style="isOpen ? 'max-height: none;' : 'max-height: 0; overflow: hidden;'"
 			>
 				<div class="py-2 px-6">
 					<slot />
@@ -56,6 +46,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import ChevronRight from "../icons/ChevronRight.vue";
 
 const props = withDefaults(
 	defineProps<{

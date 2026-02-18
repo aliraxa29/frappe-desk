@@ -32,36 +32,59 @@ export interface Field {
   label: string;
   fieldtype: FieldType;
   options?: string;
-  reqd: boolean;
-  bold?: number;
-  hidden: number;
-  read_only: boolean;
-  depends_on?: string;
-  fetch_from?: string;
-  fetch_if_empty?: number;
-  default?: any;
-  description?: string;
-  columns?: number;
-  precision?: number;
-  in_list_view?: number;
-  in_filter?: number;
-  in_standard_filter?: number;
-  in_global_search?: number;
   search_index?: number;
-  allow_bulk_edit?: number;
+  show_dashboard?: number;
+  hidden?: number;
+  set_only_once?: number;
+  allow_in_quick_entry?: number;
+  print_hide?: number;
+  report_hide?: number;
+  reqd?: number;
+  bold?: number;
+  in_global_search?: number;
   collapsible?: number;
-  collapsed?: number;
+  unique?: number;
+  no_copy?: number;
+  allow_on_submit?: number;
+  show_preview_pop?: number;
+  trigger?: string;
   collapsible_depends_on?: string;
   mandatory_depends_on?: string;
   read_only_depends_on?: string;
-  print_hide?: number;
-  print_hide_if_no_value?: number;
-  no_copy?: number;
-  unique?: number;
-  parent?: string;
-  idx?: number;
-  width?: string;
+  depends_on?: string;
   permlevel?: number;
+  ignore_user_permissions?: number;
+  width?: string;
+  print_width?: string;
+  columns?: number;
+  default?: string;
+  description?: string;
+  in_list_view?: number;
+  fetch_if_empty?: number;
+  in_filter?: number;
+  remember_last_selected_value?: number;
+  ignore_xss_filter?: number;
+  print_hide_if_no_value?: number;
+  allow_bulk_edit?: number;
+  in_standard_filter?: number;
+  in_preview?: number;
+  read_only?: number;
+  precision?: string;
+  max_height?: string;
+  length?: number;
+  translatable?: number;
+  hide_border?: number;
+  hide_days?: number;
+  hide_seconds?: number;
+  non_negative?: number;
+  is_virtual?: number;
+  sort_options?: number;
+  link_filters?: string;
+  fetch_from?: string;
+  show_on_timeline?: number;
+  make_attachment_public?: number;
+  documentation_url?: string;
+  placeholder?: string;
 }
 
 // List View Column definition
@@ -84,9 +107,13 @@ export interface ListViewSettings {
 
 export type FieldType =
   | "Data"
+  | "Email"
+  | "Phone"
+  | "URL"
   | "Link"
   | "Select"
   | "Attach"
+  | "Attach Image"
   | "Currency"
   | "Date"
   | "DateTime"
@@ -231,4 +258,28 @@ export interface ListContext {
   doctype: string;
   data: Document[];
   filters: Record<string, any>;
+}
+// Parsed Form Layout Types
+export interface ParsedColumn {
+  fields: Field[];
+}
+
+export interface ParsedSection {
+  fieldname?: string;
+  label?: string;
+  description?: string;
+  collapsible?: boolean;
+  collapsed?: boolean;
+  depends_on?: string;
+  collapsible_depends_on?: string;
+  columns: ParsedColumn[];
+}
+
+export interface ParsedTab {
+  fieldname?: string;
+  label?: string;
+  fields: Field[];
+  sections: ParsedSection[];
+  hidden?: boolean;
+  depends_on?: string;
 }

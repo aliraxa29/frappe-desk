@@ -97,12 +97,34 @@ export function format(message: string, ...args: any[]): string {
 export function get_languages() {
   if (!window.desk.languages) {
     window.desk.languages = [];
-    window.desk.boot?.lang_dict?.array?.forEach((element: any) => {
-      window.desk.languages.push({
-        label: element.label,
-        value: element.value,
-      });
-    });
+    const langDict =
+      (window as any).dash?.boot?.lang_dict || window.desk.boot?.lang_dict;
+
+    if (langDict) {
+      if (Array.isArray(langDict)) {
+        // Array format: [{ label, value }, ...]
+        langDict.forEach((element: any) => {
+          window.desk.languages.push({
+            label: element.label,
+            value: element.value,
+          });
+        });
+      } else if (langDict.array && Array.isArray(langDict.array)) {
+        // Nested array format: { array: [{ label, value }, ...] }
+        langDict.array.forEach((element: any) => {
+          window.desk.languages.push({
+            label: element.label,
+            value: element.value,
+          });
+        });
+      } else if (typeof langDict === "object") {
+        // Flat object format: { "Afrikaans": "af", "Arabic": "ar", ... }
+        Object.entries(langDict).forEach(([label, value]) => {
+          window.desk.languages.push({ label, value });
+        });
+      }
+    }
+
     window.desk.languages = window.desk.languages.sort(function (
       a: any,
       b: any,

@@ -52,49 +52,19 @@ const fieldComponents = {
 		() => import("../components/fields/TextEditorField.vue"),
 	),
 	ReadOnlyField: defineAsyncComponent(() => import("../components/fields/ReadOnlyField.vue")),
+	EmailField: defineAsyncComponent(() => import("../components/fields/EmailField.vue")),
+	PhoneField: defineAsyncComponent(() => import("../components/fields/PhoneField.vue")),
+	UrlField: defineAsyncComponent(() => import("../components/fields/UrlField.vue")),
+	PasswordField: defineAsyncComponent(() => import("../components/fields/PasswordField.vue")),
+	RatingField: defineAsyncComponent(() => import("../components/fields/RatingField.vue")),
+	CodeField: defineAsyncComponent(() => import("../components/fields/CodeField.vue")),
+	DynamicLinkField: defineAsyncComponent(
+		() => import("../components/fields/DynamicLinkField.vue"),
+	),
 };
 
 function getFieldComponentName(fieldtype: FieldType): any {
 	const componentName = getFieldComponent(fieldtype);
-	switch (componentName) {
-		case "TextField":
-			return fieldComponents.TextField;
-		case "TextAreaField":
-			return fieldComponents.TextAreaField;
-		case "CheckField":
-			return fieldComponents.CheckField;
-		case "SelectField":
-			return fieldComponents.SelectField;
-		case "LinkField":
-			return fieldComponents.LinkField;
-		case "IntField":
-			return fieldComponents.IntField;
-		case "FloatField":
-			return fieldComponents.FloatField;
-		case "CurrencyField":
-			return fieldComponents.CurrencyField;
-		case "DateField":
-			return fieldComponents.DateField;
-		case "TimeField":
-			return fieldComponents.TimeField;
-		case "DateTimeField":
-			return fieldComponents.DateTimeField;
-		case "ColorField":
-			return fieldComponents.ColorField;
-		case "AttachField":
-			return fieldComponents.AttachField;
-		case "SectionBreakField":
-			return fieldComponents.SectionBreakField;
-		case "HeadingField":
-			return fieldComponents.HeadingField;
-		case "ChildTableField":
-			return fieldComponents.ChildTableField;
-		case "TextEditorField":
-			return fieldComponents.TextEditorField;
-		case "ReadOnlyField":
-			return fieldComponents.ReadOnlyField;
-		default:
-			break;
-	}
+	return (fieldComponents as any)[componentName] || fieldComponents.TextField;
 }
 </script>

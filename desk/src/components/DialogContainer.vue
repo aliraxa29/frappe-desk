@@ -4,107 +4,79 @@
 			<div
 				v-for="dialog in dialogs"
 				:key="dialog.id"
-				class="dialog-backdrop"
+				class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm"
 				@click.self="handleBackdropClick(dialog)"
 			>
 				<Transition name="dialog" appear>
-					<div class="dialog-container" :class="[`dialog-${dialog.size || 'md'}`]">
+					<div
+						:class="[
+							'bg-white dark:bg-slate-900 rounded-lg shadow-2xl max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col',
+							dialog.size === 'sm'
+								? 'w-full max-w-sm'
+								: dialog.size === 'lg'
+								  ? 'w-full max-w-2xl'
+								  : dialog.size === 'xl'
+								    ? 'w-full max-w-4xl'
+								    : 'w-full max-w-md',
+						]"
+					>
 						<!-- Header -->
-						<div class="dialog-header">
-							<div class="dialog-header-content">
+						<div
+							class="flex items-start justify-between p-5 border-b border-slate-200 dark:border-slate-700"
+						>
+							<div class="flex items-center gap-3">
 								<!-- Icon -->
 								<div
 									v-if="dialog.icon"
-									class="dialog-icon"
-									:class="[`icon-${dialog.icon}`]"
+									:class="[
+										'flex items-center justify-center w-10 h-10 rounded-full flex-shrink-0',
+										dialog.icon === 'success'
+											? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400'
+											: dialog.icon === 'error'
+											  ? 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400'
+											  : dialog.icon === 'warning'
+											    ? 'bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-400'
+											    : dialog.icon === 'question'
+											      ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400'
+											      : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400',
+									]"
 								>
-									<svg
+									<SuccessCircle
 										v-if="dialog.icon === 'success'"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M5 13l4 4L19 7"
-										/>
-									</svg>
-									<svg
+										class="w-12 h-12 text-green-500"
+									/>
+									<ErrorCircle
 										v-else-if="dialog.icon === 'error'"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M6 18L18 6M6 6l12 12"
-										/>
-									</svg>
-									<svg
+										class="w-12 h-12 text-red-500"
+									/>
+									<WarningTriangle
 										v-else-if="dialog.icon === 'warning'"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-										/>
-									</svg>
-									<svg
+										class="w-12 h-12 text-yellow-500"
+									/>
+									<QuestionCircle
 										v-else-if="dialog.icon === 'question'"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-										/>
-									</svg>
-									<svg
-										v-else
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-										/>
-									</svg>
+										class="w-12 h-12 text-blue-500"
+									/>
+									<InfoCircle v-else class="w-12 h-12 text-blue-400" />
 								</div>
-								<h2 class="dialog-title">{{ dialog.title }}</h2>
+								<h2
+									class="text-lg font-semibold text-slate-900 dark:text-slate-50"
+								>
+									{{ dialog.title }}
+								</h2>
 							</div>
 							<button
 								v-if="dialog.showClose !== false"
-								class="dialog-close"
+								class="flex items-center justify-center w-8 h-8 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 rounded transition-colors flex-shrink-0"
 								@click="handleCancel(dialog)"
 								aria-label="Close"
 							>
-								<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M6 18L18 6M6 6l12 12"
-									/>
-								</svg>
+								<Close class="w-5 h-5" />
 							</button>
 						</div>
 
 						<!-- Body -->
-						<div class="dialog-body scroll-area">
+						<div class="flex-1 overflow-y-auto p-6">
 							<!-- Custom component -->
 							<component
 								v-if="dialog.type === 'custom' && dialog.component"
@@ -117,11 +89,16 @@
 							<template v-else>
 								<p
 									v-if="dialog.message"
-									class="dialog-message"
-									:class="{ 'dialog-message-html': dialog.isHtml }"
+									:class="[
+										'text-sm text-slate-600 dark:text-slate-400 m-0 leading-relaxed',
+										{ 'p-0': dialog.isHtml },
+									]"
 								>
 									<template v-if="dialog.isHtml">
-										<div v-html="dialog.message" />
+										<div
+											v-html="dialog.message"
+											class="prose dark:prose-invert prose-sm max-w-none"
+										/>
 									</template>
 									<template v-else>
 										{{ dialog.message }}
@@ -129,8 +106,11 @@
 								</p>
 
 								<!-- Prompt input -->
-								<div v-if="dialog.type === 'prompt'" class="dialog-input-wrapper">
-									<label v-if="dialog.inputLabel" class="dialog-input-label">
+								<div v-if="dialog.type === 'prompt'" class="mt-4 space-y-3">
+									<label
+										v-if="dialog.inputLabel"
+										class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+									>
 										{{ dialog.inputLabel }}
 										<span v-if="dialog.inputRequired" class="text-red-500"
 											>*</span
@@ -139,7 +119,7 @@
 									<textarea
 										v-if="dialog.inputType === 'textarea'"
 										v-model="dialog.inputValue"
-										class="dialog-textarea"
+										class="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
 										:placeholder="dialog.inputPlaceholder"
 										rows="4"
 										@keydown.enter.ctrl="handlePrimaryAction(dialog)"
@@ -147,7 +127,7 @@
 									<input
 										v-else
 										v-model="dialog.inputValue"
-										class="dialog-input"
+										class="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
 										:type="dialog.inputType || 'text'"
 										:placeholder="dialog.inputPlaceholder"
 										@keydown.enter="handlePrimaryAction(dialog)"
@@ -157,19 +137,38 @@
 						</div>
 
 						<!-- Footer -->
-						<div v-if="dialog.type !== 'custom'" class="dialog-footer">
+						<div
+							v-if="dialog.type !== 'custom'"
+							class="flex items-center justify-end gap-3 p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800"
+						>
 							<button
 								v-if="dialog.secondaryButton"
-								class="dialog-btn"
-								:class="[`btn-${dialog.secondaryButton.variant || 'secondary'}`]"
+								:class="[
+									'px-4 py-2 text-sm font-medium rounded-md transition-colors',
+									dialog.secondaryButton.variant === 'primary'
+										? 'bg-blue-600 text-white hover:bg-blue-700'
+										: dialog.secondaryButton.variant === 'danger'
+										  ? 'bg-red-600 text-white hover:bg-red-700'
+										  : dialog.secondaryButton.variant === 'ghost'
+										    ? 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+										    : 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600',
+								]"
 								@click="handleSecondaryAction(dialog)"
 							>
 								{{ __(dialog.secondaryButton.label) }}
 							</button>
 							<button
 								v-if="dialog.primaryButton"
-								class="dialog-btn"
-								:class="[`btn-${dialog.primaryButton.variant || 'primary'}`]"
+								:class="[
+									'px-4 py-2 text-sm font-medium rounded-md transition-colors',
+									dialog.primaryButton.variant === 'secondary'
+										? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600'
+										: dialog.primaryButton.variant === 'danger'
+										  ? 'bg-red-600 text-white hover:bg-red-700'
+										  : dialog.primaryButton.variant === 'ghost'
+										    ? 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+										    : 'bg-blue-600 text-white hover:bg-blue-700',
+								]"
 								@click="handlePrimaryAction(dialog)"
 							>
 								{{ __(dialog.primaryButton.label) }}
@@ -186,6 +185,12 @@
 import { useDialogStore, type Dialog } from "../stores/dialog";
 import { storeToRefs } from "pinia";
 import { __ } from "../utils/translate";
+import SuccessCircle from "../icons/SuccessCircle.vue";
+import ErrorCircle from "../icons/ErrorCircle.vue";
+import WarningTriangle from "../icons/WarningTriangle.vue";
+import QuestionCircle from "../icons/QuestionCircle.vue";
+import InfoCircle from "../icons/InfoCircle.vue";
+import Close from "../icons/Close.vue";
 
 const dialogStore = useDialogStore();
 const { dialogs } = storeToRefs(dialogStore);
@@ -239,267 +244,21 @@ async function handleSecondaryAction(dialog: Dialog) {
 </script>
 
 <style scoped>
-.dialog-backdrop {
-	position: fixed;
-	inset: 0;
-	z-index: 9998;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 1rem;
-	background: rgba(2, 6, 23, 0.6);
-	backdrop-filter: blur(2px);
-}
-
-.dialog-container {
-	background: var(--bg-primary, #fff);
-	color: var(--text-primary, #0f172a);
-	border-radius: 0.75rem;
-	box-shadow: 0 25px 50px -12px rgba(2, 6, 23, 0.45);
-	max-height: calc(100vh - 2rem);
-	overflow: hidden;
-	display: flex;
-	flex-direction: column;
-}
-
-.dialog-sm {
-	width: 100%;
-	max-width: 24rem;
-}
-.dialog-md {
-	width: 100%;
-	max-width: 32rem;
-}
-.dialog-lg {
-	width: 100%;
-	max-width: 42rem;
-}
-.dialog-xl {
-	width: 100%;
-	max-width: 56rem;
-}
-
-.dialog-header {
-	display: flex;
-	align-items: flex-start;
-	justify-content: space-between;
-	padding: 1.25rem 1.5rem;
-	border-bottom: 1px solid var(--border, #e2e8f0);
-}
-.dialog-header-content {
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-}
-.dialog-icon {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 2.5rem;
-	height: 2.5rem;
-	border-radius: 9999px;
-	flex-shrink: 0;
-}
-.dialog-icon svg {
-	width: 1.5rem;
-	height: 1.5rem;
-}
-
-.icon-success {
-	background: #dcfce7;
-	color: #22c55e;
-}
-.icon-error {
-	background: #fee2e2;
-	color: #ef4444;
-}
-.icon-warning {
-	background: #fef3c7;
-	color: #f59e0b;
-}
-.icon-question {
-	background: #dbeafe;
-	color: #3b82f6;
-}
-.icon-info {
-	background: #e0e7ff;
-	color: #6366f1;
-}
-
-.dialog-title {
-	font-size: 1.125rem;
-	font-weight: 600;
-	margin: 0;
-	line-height: 1.4;
-	color: var(--text-primary, #0f172a);
-}
-
-.dialog-close {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 2rem;
-	height: 2rem;
-	padding: 0;
-	background: none;
-	border: none;
-	color: var(--text-tertiary, #94a3b8);
-	cursor: pointer;
-	border-radius: 0.375rem;
-	flex-shrink: 0;
-	transition: all 0.15s;
-}
-.dialog-close:hover {
-	color: var(--text-secondary, #64748b);
-	background: var(--bg-tertiary, #f1f5f9);
-}
-.dialog-close svg {
-	width: 1.25rem;
-	height: 1.25rem;
-}
-
-.dialog-body {
-	padding: 1.5rem;
-	overflow-y: auto;
-}
-.dialog-message {
-	font-size: 0.9375rem;
-	color: var(--text-secondary, #475569);
-	margin: 0;
-	line-height: 1.6;
-}
-
-.dialog-message-html {
-	padding: 0;
-}
-
-.dialog-message-html div {
-	font-size: 0.9375rem;
-	color: var(--text-secondary, #475569);
-	line-height: 1.6;
-}
-
-.dialog-message-html a {
-	color: #0ea5e9;
-	text-decoration: underline;
-}
-
-.dialog-message-html a:hover {
-	color: #0284c7;
-}
-
-.dialog-message-html strong {
-	font-weight: 600;
-	color: var(--text-primary, #1e293b);
-}
-
-.dialog-message-html code {
-	background: var(--bg-secondary, #f1f5f9);
-	padding: 0.25rem 0.5rem;
-	border-radius: 0.25rem;
-	font-family: "Monaco", "Menlo", monospace;
-	font-size: 0.875rem;
-}
-
-.dialog-input-wrapper {
-	margin-top: 1rem;
-}
-.dialog-input-label {
-	display: block;
-	font-size: 0.875rem;
-	font-weight: 500;
-	color: var(--text-secondary, #374151);
-	margin-bottom: 0.5rem;
-}
-
-.dialog-input,
-.dialog-textarea {
-	width: 100%;
-	padding: 0.625rem 0.875rem;
-	font-size: 0.9375rem;
-	color: var(--input-text, #0f172a);
-	background: var(--input-bg, #fff);
-	border: 1px solid var(--input-border, #d1d5db);
-	border-radius: 0.5rem;
-	transition: all 0.15s;
-}
-.dialog-input:focus,
-.dialog-textarea:focus {
-	outline: none;
-	border-color: var(--button-primary, #3b82f6);
-	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
-}
-.dialog-textarea {
-	resize: vertical;
-	min-height: 5rem;
-}
-
-.dialog-footer {
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-	gap: 0.75rem;
-	padding: 1rem 1.5rem;
-	border-top: 1px solid var(--border, #e2e8f0);
-	background: var(--bg-secondary, #f8fafc);
-}
-
-.dialog-btn {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0.5rem 1rem;
-	font-size: 0.875rem;
-	font-weight: 500;
-	border-radius: 0.5rem;
-	cursor: pointer;
-	transition: all 0.15s;
-	border: 1px solid transparent;
-}
-.btn-primary {
-	background: var(--button-primary, #3b82f6);
-	color: #fff;
-}
-.btn-primary:hover {
-	background: var(--button-primary-hover, #2563eb);
-}
-.btn-secondary {
-	background: var(--button-secondary, #fff);
-	color: var(--button-secondary-text, #374151);
-	border-color: var(--input-border, #d1d5db);
-}
-.btn-secondary:hover {
-	background: var(--bg-tertiary, #f9fafb);
-	border-color: var(--border, #9ca3af);
-}
-.btn-danger {
-	background: #ef4444;
-	color: #fff;
-}
-.btn-danger:hover {
-	background: #dc2626;
-}
-.btn-ghost {
-	background: transparent;
-	color: var(--text-tertiary, #64748b);
-}
-.btn-ghost:hover {
-	background: var(--bg-tertiary, #f1f5f9);
-	color: var(--text-primary, #334155);
-}
-
-/* Transitions */
+/* Dialog animations */
 .dialog-backdrop-enter-active,
 .dialog-backdrop-leave-active {
 	transition: opacity 0.2s ease;
 }
+
 .dialog-backdrop-enter-from,
 .dialog-backdrop-leave-to {
 	opacity: 0;
 }
+
 .dialog-enter-active {
 	animation: dialogIn 0.25s ease-out;
 }
+
 .dialog-leave-active {
 	animation: dialogOut 0.15s ease-in;
 }
@@ -514,6 +273,7 @@ async function handleSecondaryAction(dialog: Dialog) {
 		transform: scale(1) translateY(0);
 	}
 }
+
 @keyframes dialogOut {
 	from {
 		opacity: 1;

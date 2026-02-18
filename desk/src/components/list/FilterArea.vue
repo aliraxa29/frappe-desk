@@ -20,14 +20,7 @@
 						class="ml-0.5 -mr-1 p-0.5 rounded hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
 						@click.stop="removeFilter(pill.id)"
 					>
-						<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M6 18L18 6M6 6l12 12"
-							/>
-						</svg>
+						<Close class="w-3 h-3" />
 					</button>
 				</div>
 			</TransitionGroup>
@@ -39,14 +32,7 @@
 					class="inline-flex items-center gap-1 px-2 py-1 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors"
 					@click="showFilterPicker = !showFilterPicker"
 				>
-					<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-						/>
-					</svg>
+					<Filter class="w-3.5 h-3.5" />
 					<span>Add Filter</span>
 				</button>
 			</div>
@@ -67,14 +53,7 @@
 					class="inline-flex items-center gap-1 px-2 py-1 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors"
 					@click="$emit('toggle-query-builder')"
 				>
-					<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-						/>
-					</svg>
+					<Settings class="w-3.5 h-3.5" />
 					<span>Edit Filters</span>
 				</button>
 			</div>
@@ -135,6 +114,9 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from "vue";
 import type { Field } from "../../types";
+import Close from "../../icons/Close.vue";
+import Filter from "../../icons/Filter.vue";
+import Settings from "../../icons/Settings.vue";
 
 export interface FilterRow {
 	id: string;

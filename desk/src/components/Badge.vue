@@ -11,22 +11,14 @@
 			class="ml-1 rounded-full p-0.5 transition hover:bg-black/10"
 			@click.stop="$emit('close')"
 		>
-			<svg viewBox="0 0 20 20" class="h-3.5 w-3.5" fill="currentColor">
-				<path
-					fill-rule="evenodd"
-					d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414
-             1.414L11.414 10l4.293 4.293a1 1 0 01-1.414
-             1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414
-             -1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-					clip-rule="evenodd"
-				/>
-			</svg>
+			<Close class="h-3.5 w-3.5" />
 		</button>
 	</span>
 </template>
 
 <script setup lang="ts">
 import { computed } from "vue";
+import Close from "../icons/Close.vue";
 
 type PillVariant = "primary" | "success" | "warning" | "danger" | "neutral" | "orange";
 type PillSize = "sm" | "md";

@@ -13,7 +13,27 @@ export interface UserInfo {
 }
 
 export const useUserStore = defineStore("user", () => {
-  const currentUser = ref<UserInfo | null>(null);
+  // Initialize from boot data — no API call needed on page load
+  const boot = (window as any).dash?.boot;
+  const bootUser = boot?.user;
+  const bootUserInfo = boot?.user_info;
+
+  const initialUser: UserInfo | null = bootUser
+    ? {
+        name: bootUser.name || "",
+        email: bootUser.email || "",
+        full_name:
+          bootUserInfo?.[bootUser.name]?.fullname ||
+          [bootUser.first_name, bootUser.last_name].filter(Boolean).join(" ") ||
+          bootUser.name ||
+          "",
+        user_image:
+          bootUserInfo?.[bootUser.name]?.image || bootUser.user_image || "",
+        roles: bootUser.roles || [],
+      }
+    : null;
+
+  const currentUser = ref<UserInfo | null>(initialUser);
   const loading = ref(false);
   const error = ref<string | null>(null);
 
@@ -22,12 +42,18 @@ export const useUserStore = defineStore("user", () => {
   );
   const userEmail = computed(() => currentUser.value?.email || "");
   const userImage = computed(() => currentUser.value?.user_image || "");
-  const userRoles = computed(() => currentUser.value?.roles || []);
+  const userRoles = computed(() => (window as any).dash?.user?.roles || []);
 
   /**
-   * Fetch current user information
+   * Fetch current user information from server.
+   * Only needed for explicit refresh — boot data covers initial load.
    */
   const fetchUserInfo = async () => {
+    // If already populated from boot, skip unless forced
+    if (currentUser.value && !error.value) {
+      return true;
+    }
+
     loading.value = true;
     error.value = null;
     try {
@@ -35,7 +61,7 @@ export const useUserStore = defineStore("user", () => {
         method: "frappe.client.get",
         args: {
           doctype: "User",
-          name: "frappe.session.user",
+          name: bootUser?.name || "frappe.session.user",
         },
       });
 

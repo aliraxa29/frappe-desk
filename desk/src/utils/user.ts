@@ -11,8 +11,13 @@ export const user: User = {
   },
 
   get_user_full_name(): string {
-    const bootUser = (window as any).desk?.boot?.user;
+    const boot = (window as any).dash?.boot;
+    const bootUser = boot?.user;
     if (!bootUser) return "";
+
+    // Try user_info first (has precomputed fullname), then fall back to user fields
+    const userInfo = boot?.user_info?.[bootUser.name];
+    if (userInfo?.fullname) return String(userInfo.fullname).trim();
 
     const fullName = String(bootUser.full_name || "").trim();
     if (fullName) return fullName;
@@ -23,12 +28,15 @@ export const user: User = {
   },
 
   get_user_image(): string {
-    const bootUser = (window as any).desk?.boot?.user;
-    return String(bootUser?.user_image || "").trim();
+    const boot = (window as any).dash?.boot;
+    const bootUser = boot?.user;
+    // Try user_info first (has image), then fall back
+    const userInfo = boot?.user_info?.[bootUser?.name];
+    return String(userInfo?.image || bootUser?.user_image || "").trim();
   },
 
   get_email(): string {
-    const bootUser = (window as any).desk?.boot?.user;
+    const bootUser = (window as any).dash?.boot?.user;
     return String(bootUser?.email || "").trim();
   },
 };
