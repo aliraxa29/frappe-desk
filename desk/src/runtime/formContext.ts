@@ -31,6 +31,20 @@ export function createFormContext(
       });
     },
 
+    add_child(field: string, childDoc: Document) {
+      if (!this.doc[field]) {
+        this.doc[field] = [];
+      }
+      this.doc[field].push(childDoc);
+      this.dirty = true;
+
+      triggerFormEvent(this.doctype, `add_child_${field}`, {
+        ...this,
+        field,
+        child_doc: childDoc,
+      });
+    },
+
     get_value(field: string) {
       return this.doc[field];
     },
