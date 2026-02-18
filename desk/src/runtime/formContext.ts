@@ -19,14 +19,15 @@ export function createFormContext(
     customButtons,
 
     set_value(field: string, value: any) {
+      const oldValue = this.doc[field];
       this.doc[field] = value;
       this.dirty = true;
-      // Trigger form event
-      triggerFormEvent(this.doctype, "field_changed", {
+
+      triggerFormEvent(this.doctype, field, {
         ...this,
         field,
         value,
-        previous_value: undefined,
+        old_value: oldValue,
       });
     },
 
