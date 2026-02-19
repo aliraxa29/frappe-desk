@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import type { Field } from "../../types";
-debugger;
+
 defineProps<{
 	field: Field;
 	modelValue: any;

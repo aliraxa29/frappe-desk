@@ -13,8 +13,9 @@
 			:value="modelValue"
 			:readonly="field.read_only"
 			:required="field.reqd"
+			:maxlength="field.length === 0 ? 140 : field.length"
 			type="text"
-			class="w-full px-3 py-2.5 border border-[#ddd] dark:border-none dark:bg-gray-800 rounded focus:outline-none focus:border-[#0066cc] dark:focus:border-gray-500 focus:shadow-[0_0_0_3px_rgba(0,102,204,0.1)] read-only:bg-gray-100 dark:read-only:bg-gray-800 read-only:cursor-not-allowed text-[0.95rem] transition-colors duration-200 dark:text-white"
+			class="w-full px-3 py-2.5 border border-slate-300 dark:border-slate-600 rounded text-[0.95rem] transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-600 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-600/10 dark:focus:ring-blue-500/20 read-only:bg-slate-50 dark:read-only:bg-slate-900/50 read-only:cursor-not-allowed disabled:opacity-50"
 			@input="onInput"
 			@blur="$emit('blur')"
 		/>

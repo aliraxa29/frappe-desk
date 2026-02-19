@@ -195,8 +195,9 @@ export interface FormContext {
   refresh_field(field?: string): void;
   throw(msg: string): void;
   notify(msg: string, type?: "info" | "success" | "error" | "warning"): void;
-  validate(): boolean;
+  validate(): Promise<boolean>;
   save(): Promise<void>;
+  getDoctypeMeta(doctype: string): Promise<DocTypeMeta>;
   submit(): Promise<void>;
   amend(): Promise<void>;
   duplicate(): Promise<void>;
@@ -283,4 +284,22 @@ export interface ParsedTab {
   sections: ParsedSection[];
   hidden?: boolean;
   depends_on?: string;
+}
+
+export interface DeskCallOptions {
+  method: string;
+  args?: Record<string, any>;
+  type?: string;
+  callback?: (response: any) => void;
+  error_callback?: (error: any) => void;
+  freeze?: boolean;
+  freeze_message?: string;
+  async?: boolean;
+}
+
+export interface DeskCallResponse {
+  message?: any;
+  exc?: string;
+  status?: number;
+  _server_messages?: string[];
 }

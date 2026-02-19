@@ -170,7 +170,6 @@ async function submitForm() {
 
 	isLoading.value = true;
 	try {
-		debugger;
 		const data: Record<string, any> = {
 			doctype: props.doctype,
 		};

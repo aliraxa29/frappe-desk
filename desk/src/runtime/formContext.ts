@@ -2,6 +2,7 @@ import { reactive } from "vue";
 import type { FormContext, Document, DocTypeMeta } from "../types";
 import { toast } from "../stores/toast";
 import { dialog } from "../stores/dialog";
+import { model } from "../data/model";
 
 export function createFormContext(
   doctype: string,
@@ -61,13 +62,42 @@ export function createFormContext(
     notify(
       msg: string,
       type: "success" | "error" | "warning" | "info" = "info",
+      duration?: number,
     ) {
-      toast[type](msg);
+      const defaultDurations = {
+        success: 4000,
+        info: 4000,
+        warning: 5000,
+        error: 6000,
+      };
+      const finalDuration = duration ?? defaultDurations[type];
+      toast.show({ type, title: msg, duration: finalDuration });
     },
 
-    validate(): boolean {
+    async validate(): Promise<boolean> {
       let isValid = true;
       for (const field of this.meta.fields) {
+        if (field.fieldtype === "Table" && this.doc[field.fieldname]) {
+          if (this.doc[field.fieldname].length === 0 && field.reqd) {
+            toast.error(`${field.label} must have at least one row`);
+            isValid = false;
+            break;
+          }
+          const childMeta = await this.getDoctypeMeta(field.options || "");
+          for (const row of this.doc[field.fieldname]) {
+            for (const childField of childMeta.fields) {
+              if (childField.reqd && !row[childField.fieldname]) {
+                toast.error(
+                  `${childField.label} is required at row ${
+                    this.doc[field.fieldname].indexOf(row) + 1
+                  }`,
+                );
+                isValid = false;
+                break;
+              }
+            }
+          }
+        }
         if (field.reqd && !this.doc[field.fieldname]) {
           toast.error(`${field.label} is required`);
           isValid = false;
@@ -75,6 +105,19 @@ export function createFormContext(
         }
       }
       return isValid;
+    },
+
+    async getDoctypeMeta(doctype: string): Promise<DocTypeMeta> {
+      if (window.locals.DocType[doctype]) {
+        return window.locals.DocType[doctype] as DocTypeMeta;
+      } else {
+        return new Promise((resolve) => {
+          model.with_doctype(doctype, (result: any) => {
+            const metaDoc = result.message as DocTypeMeta;
+            resolve(metaDoc);
+          });
+        });
+      }
     },
 
     async save() {
@@ -101,7 +144,12 @@ export function createFormContext(
         group?: string;
         icon?: string;
         className?: string;
-        variant?: "primary" | "secondary" | "danger";
+        variant?:
+          | "primary"
+          | "secondary"
+          | "tertiary"
+          | "destructive"
+          | "plain";
         show_on?: "new" | "edit" | "always";
       } = {},
     ) {

@@ -275,7 +275,7 @@ function onFieldChange(_field: Field) {
 
 async function handleSave() {
 	if (!ctx.value) return;
-	if (!ctx.value.validate()) return;
+	if (!(await ctx.value.validate())) return;
 
 	emit("loading", true);
 
@@ -300,7 +300,7 @@ async function handleSave() {
 			const docName = ctx.value.doc.name || "";
 			savedDoc = await frappeClient.updateDocument(props.doctype, docName, ctx.value.doc);
 
-			ctx.value.notify("Document updated successfully", "success");
+			ctx.value.notify("Saved", "success");
 			ctx.value.doc = savedDoc;
 			ctx.value.dirty = false;
 		}

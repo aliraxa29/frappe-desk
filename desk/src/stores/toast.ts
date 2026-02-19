@@ -89,19 +89,19 @@ function getToastStore() {
 
 export const toast = {
   success(title: string, message?: string) {
-    getToastStore().success(title, message);
+    return getToastStore().success(title, message);
   },
   error(title: string, message?: string) {
-    getToastStore().error(title, message);
+    return getToastStore().error(title, message);
   },
   warning(title: string, message?: string) {
-    getToastStore().warning(title, message);
+    return getToastStore().warning(title, message);
   },
   info(title: string, message?: string) {
-    getToastStore().info(title, message);
+    return getToastStore().info(title, message);
   },
   show(options: Omit<Toast, "id">) {
-    getToastStore().show(options);
+    return getToastStore().show(options);
   },
   clear() {
     getToastStore().clear();

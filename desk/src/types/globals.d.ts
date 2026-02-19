@@ -6,7 +6,7 @@ declare global {
   interface Window {
     desk?: any;
     dash?: any;
-    locals: LocalsStore;
+    locals: any;
     get_languages: () => { label: string; value: string }[];
 
     /**

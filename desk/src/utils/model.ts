@@ -7,7 +7,7 @@
 
 import { useLocalsStore } from "./locals/locals";
 import { getDoc, getList, hasDoc, addToLocals, clearDoc } from "./locals/sync";
-import type { DeskDocument, DocTypeMetadata, DocField } from "../types/locals";
+import type { DeskDocument } from "../types/locals";
 
 /**
  * Get or fetch a document with callback

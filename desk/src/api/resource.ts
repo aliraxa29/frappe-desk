@@ -3,13 +3,6 @@ import { desk } from "../utils/desk";
 import { toast } from "../stores/toast";
 
 class FrappeClient {
-  private getCookie(name: string): string {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(";").shift() || "";
-    return "";
-  }
-
   private handleError(message: string, error: any): void {
     console.error(message, error);
     const errorMsg = error?.message || error?.exc || String(error);
@@ -32,13 +25,9 @@ class FrappeClient {
     }
   }
 
-  // Get document
   async getDocument(doctype: string, name: string): Promise<Document> {
     try {
       const response = await desk.get(`/api/resource/${doctype}/${name}`);
-
-      // Frappe REST API returns: { data: {...document...} }
-      // Handle different response formats
       const doc = response.data || response.message || response;
 
       if (!doc || typeof doc !== "object") {
@@ -53,7 +42,6 @@ class FrappeClient {
     }
   }
 
-  // Create document
   async createDocument(
     doctype: string,
     data: Record<string, any>,
@@ -65,7 +53,6 @@ class FrappeClient {
           doc: { ...data, doctype },
         },
       });
-      toast.success(`${doctype} created successfully`);
       return response.message;
     } catch (error) {
       this.handleError(`Failed to create ${doctype}`, error);
@@ -73,7 +60,6 @@ class FrappeClient {
     }
   }
 
-  // Update document
   async updateDocument(
     doctype: string,
     name: string,
@@ -88,7 +74,6 @@ class FrappeClient {
           fieldname: data,
         },
       });
-      toast.success(`${doctype} saved successfully`);
       return response.message;
     } catch (error) {
       this.handleError(`Failed to update ${doctype} "${name}"`, error);
@@ -96,7 +81,6 @@ class FrappeClient {
     }
   }
 
-  // Delete document
   async deleteDocument(doctype: string, name: string): Promise<void> {
     try {
       await desk.call({
@@ -113,7 +97,6 @@ class FrappeClient {
     }
   }
 
-  // Get list of documents
   async getList(
     doctype: string,
     options?: {
@@ -145,7 +128,6 @@ class FrappeClient {
     }
   }
 
-  // Call server method
   async callMethod(method: string, args?: Record<string, any>): Promise<any> {
     try {
       const response = await desk.call({
@@ -159,7 +141,6 @@ class FrappeClient {
     }
   }
 
-  // Get installed apps
   async getInstalledApps(): Promise<string[]> {
     try {
       const response = await desk.call({
@@ -176,7 +157,6 @@ class FrappeClient {
     }
   }
 
-  // Get all doctypes for an app
   async getAppDoctypes(app: string): Promise<string[]> {
     try {
       const response = await desk.call({
@@ -194,7 +174,6 @@ class FrappeClient {
     }
   }
 
-  // Check if user has permission
   async hasPermission(
     doctype: string,
     action: string = "read",
@@ -214,7 +193,6 @@ class FrappeClient {
     }
   }
 
-  // Get value from server
   async getValue(doctype: string, name: string, field: string): Promise<any> {
     try {
       const response = await desk.call({
