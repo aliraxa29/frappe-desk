@@ -132,7 +132,7 @@
 						<td
 							v-for="col in displayColumns"
 							:key="`${index}-${col.fieldname}`"
-							class="px-2.5 py-1.5 cursor-pointer"
+							class="px-2.5 py-1.5 cursor-pointer dark:text-gray-300"
 							:class="{ 'text-right': isNumericFieldtype(col.fieldtype) }"
 							@dblclick="startInlineEdit(index, col.fieldname)"
 							@click="selectCellRow(index)"

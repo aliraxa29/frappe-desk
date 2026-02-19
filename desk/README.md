@@ -14,28 +14,6 @@ A modern Vue 3 + TypeScript + Vite desktop application with Socket.IO realtime i
 - 🔌 **API Proxy** - Seamless Frappe backend integration
 - 🎨 **Reactive UI** - Automatic updates when data changes
 
-## 📂 Project Structure
-
-```
-desk/
-├── src/
-│   ├── stores/           # Pinia stores (locals, user, session)
-│   ├── types/            # TypeScript type definitions
-│   ├── utils/
-│   │   ├── socketio/     # Socket.IO client & composables ⭐ NEW
-│   │   ├── sync/         # Server sync utilities
-│   │   └── ...
-│   ├── components/       # Vue components
-│   ├── views/            # Page components
-│   ├── router/           # Vue Router configuration
-│   ├── App.vue           # Root component
-│   └── main.ts           # Entry point
-├── public/               # Static assets
-├── vite.config.ts        # Vite configuration (with proxies) ⭐
-├── index.html            # Entry HTML with boot data
-└── package.json          # Dependencies (socket.io-client added)
-```
-
 ## 🚀 Quick Start
 
 ### 1. Install Dependencies
@@ -51,7 +29,7 @@ yarn install
 
 ```bash
 cd /home/erp/bench15
-bench serve                    # :8000
+bench start                    # :8000
 ```
 
 **Terminal 2: Frontend Dev**
@@ -59,12 +37,6 @@ bench serve                    # :8000
 ```bash
 cd /home/erp/bench15/apps/desktop/desk
 yarn dev                       # :5173
-```
-
-**Terminal 3: Redis (for realtime)**
-
-```bash
-redis-server config/redis_cache.conf
 ```
 
 ### 3. Open Application

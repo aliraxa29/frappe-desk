@@ -427,14 +427,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, nextTick } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import type { DocTypeMeta, Field, ListColumn, Document } from "../../types";
+import type { DocTypeMeta, Field, ListColumn, Document, ListviewSettings } from "../../types";
 import { frappeClient } from "../../api/resource";
 import { toast } from "../../stores/toast";
 import { dialog } from "../../stores/dialog";
-import { loadDoctypeScriptsFromMetadata } from "../../runtime/scriptLoader";
-
+import { ListView as ListViewController } from "../../metadata/listview";
 // Sub-components
 import FilterArea from "./FilterArea.vue";
 import QueryBuilder from "./QueryBuilder.vue";
@@ -458,34 +457,7 @@ import DoubleChevronRight from "../../icons/DoubleChevronRight.vue";
 
 declare const desk: any;
 
-/**
- * Listview settings interface - mirrors frappe.listview_settings
- * Custom scripts register via: desk.listview_settings['DocType'] = { ... }
- */
-interface ListviewSettings {
-	add_fields?: string[];
-	columns?: Array<{ fieldname: string; label?: string; width?: string }>;
-	hide_name_column?: boolean;
-	hide_serial_column?: boolean;
-	show_id_column?: boolean;
-	get_indicator?: (doc: Document) => [string, string] | null; // [label, color]
-	formatters?: Record<string, (value: any, field: Field, doc: Document) => string>;
-	onload?: (listview: any) => void;
-	refresh?: (listview: any) => void;
-	button?: {
-		show: (doc: Document) => boolean;
-		get_label?: () => string;
-		get_description?: (doc: Document) => string;
-		action?: (doc: Document) => void;
-	};
-	primary_action?: (listview: any) => void;
-	row_actions?: Array<{
-		label: string;
-		action: (doc: Document) => void;
-		show?: (doc: Document) => boolean;
-	}>;
-	[key: string]: any;
-}
+// The ListviewSettings type is now imported from ../../metadata/listview
 
 const props = defineProps<{
 	doctype: string;
@@ -499,6 +471,9 @@ const emit = defineEmits<{
 
 const router = useRouter();
 const route = useRoute();
+
+// ListView controller instance (class-based)
+const listController = ref<ListViewController | null>(null);
 
 // State
 const loading = ref(true);
@@ -606,14 +581,16 @@ const columns = computed<ListColumn[]>(() => {
 			const df = fields.find((f) => f.fieldname === col.fieldname);
 			return {
 				type: "Field" as const,
-				df: df || {
-					fieldname: col.fieldname,
-					label: col.label || col.fieldname,
-					fieldtype: "Data",
-					reqd: false,
-					read_only: false,
-					hidden: 0,
-				},
+				df:
+					df ||
+					({
+						fieldname: col.fieldname,
+						label: col.label || col.fieldname,
+						fieldtype: "Data",
+						reqd: 0,
+						read_only: 0,
+						hidden: 0,
+					} as Field),
 				label: col.label || df?.label || col.fieldname,
 				fieldname: col.fieldname,
 				width: col.width,
@@ -629,14 +606,16 @@ const columns = computed<ListColumn[]>(() => {
 		const df = fields.find((f) => f.fieldname === titleField);
 		cols.push({
 			type: "Subject",
-			df: df || {
-				fieldname: titleField,
-				label: titleField,
-				fieldtype: "Data",
-				reqd: false,
-				read_only: false,
-				hidden: 0,
-			},
+			df:
+				df ||
+				({
+					fieldname: titleField,
+					label: titleField,
+					fieldtype: "Data",
+					reqd: 0,
+					read_only: 0,
+					hidden: 0,
+				} as Field),
 			label: df?.label || "ID",
 			fieldname: titleField,
 		});
@@ -662,7 +641,7 @@ const columns = computed<ListColumn[]>(() => {
 					f.fieldtype,
 				),
 		)
-		.sort((a, b) => (a.idx || 0) - (b.idx || 0));
+		.sort((a, b) => ((a as any).idx || 0) - ((b as any).idx || 0));
 
 	listViewFields.forEach((df) => {
 		cols.push({ type: "Field", df, label: df.label, fieldname: df.fieldname });
@@ -716,14 +695,17 @@ async function loadMeta() {
 		if (meta.value?.sort_field) sortField.value = meta.value.sort_field;
 		if (meta.value?.sort_order) sortOrder.value = meta.value.sort_order as "asc" | "desc";
 
-		// Inject list scripts from metadata (if any)
-		if (meta.value) {
-			loadDoctypeScriptsFromMetadata(meta.value, "list");
-		}
+		// Create ListView controller
+		const ctrl = new ListViewController(props.doctype, meta.value);
+		ctrl.setOpenDocumentHandler((name: string) => openDocument(name));
 
-		// Wait for scripts to execute, then read settings
-		await nextTick();
-		loadListSettings();
+		// Initialize: injects scripts, loads settings, binds handlers, fires onload
+		await ctrl.init();
+
+		listController.value = ctrl;
+
+		// Sync settings from controller
+		listSettings.value = ctrl.settings;
 	} catch (err: any) {
 		console.error("Failed to load doctype meta:", err);
 		error.value = err.message || "Failed to load doctype metadata";
@@ -731,38 +713,25 @@ async function loadMeta() {
 }
 
 /**
- * Load listview settings from custom scripts.
- * Scripts register via: desk.listview_settings['DocType'] = { ... }
- */
-function loadListSettings() {
-	try {
-		const settings =
-			(window as any).desk?.listview_settings?.[props.doctype] ||
-			(window as any).frappe?.listview_settings?.[props.doctype] ||
-			{};
-		listSettings.value = settings;
-
-		// Call onload hook if defined
-		if (settings.onload) {
-			const listviewCtx = getListviewContext();
-			settings.onload(listviewCtx);
-		}
-	} catch (err) {
-		console.error("Failed to load listview settings:", err);
-		listSettings.value = {};
-	}
-}
-
-/**
  * Build a context object for custom script hooks
  */
 function getListviewContext() {
+	if (listController.value) {
+		return listController.value.toListContext();
+	}
+
 	return {
 		doctype: props.doctype,
 		meta: meta.value,
-		rows: rows.value,
+		data: rows.value,
 		filters: queryFilters.value,
 		columns: columns.value,
+		selected: selectedRows.value,
+		page_length: pageLength.value,
+		current_page: currentPage.value,
+		total_count: totalCount.value,
+		sort_field: sortField.value,
+		sort_order: sortOrder.value,
 		refresh,
 		set_filter: (fieldname: string, value: any) => {
 			const existing = queryFilters.value.find((f) => f.fieldname === fieldname);
@@ -777,6 +746,17 @@ function getListviewContext() {
 				});
 			}
 		},
+		remove_filter: (fieldname: string) => {
+			queryFilters.value = queryFilters.value.filter((f) => f.fieldname !== fieldname);
+		},
+		clear_filters: () => clearFilters(),
+		get_checked_items: () => rows.value.filter((r) => selectedRows.value.includes(r.name!)),
+		set_page_length: (length: number) => {
+			pageLength.value = length;
+			currentPage.value = 0;
+		},
+		toggle_sort: (fieldname: string) => toggleSort({ fieldname } as any),
+		open_document: (name: string) => openDocument(name),
 	};
 }
 
@@ -813,10 +793,19 @@ async function refresh() {
 
 		await fetchTotalCount(filters);
 
+		// Sync data back to controller so toListContext() returns current rows
+		if (listController.value) {
+			listController.value.data.splice(0, listController.value.data.length, ...rows.value);
+			listController.value.totalCount = totalCount.value;
+			listController.value.currentPage = currentPage.value;
+			listController.value.sortField = sortField.value;
+			listController.value.sortOrder = sortOrder.value;
+		}
+
 		// Call refresh hook from custom script
 		if (listSettings.value.refresh) {
 			try {
-				listSettings.value.refresh(getListviewContext());
+				listSettings.value.refresh(listController.value || (getListviewContext() as any));
 			} catch (err) {
 				console.error("Listview refresh hook error:", err);
 			}
@@ -875,7 +864,7 @@ function buildFilters(): any[] {
 	return filters;
 }
 
-defineExpose({ refresh, loadMeta });
+defineExpose({ refresh, loadMeta, listController });
 
 async function fetchTotalCount(filters: any[]) {
 	try {
@@ -1193,6 +1182,14 @@ function executeRowAction(
 	activeRowActionMenu.value = null;
 	action.action(row);
 }
+
+// Cleanup
+onUnmounted(() => {
+	if (listController.value) {
+		listController.value.destroy();
+		listController.value = null;
+	}
+});
 
 // Initialize
 onMounted(async () => {

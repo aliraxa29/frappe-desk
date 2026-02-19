@@ -34,13 +34,13 @@ import { ref, computed, onMounted, watch, onUnmounted, nextTick } from "vue";
 import type {
 	DocTypeMeta,
 	Document,
-	FormContext,
 	Field,
 	ParsedTab,
 	ParsedSection,
 	ParsedColumn,
 } from "../types";
-import { createFormContext, formRegistry } from "../runtime/formContext";
+import { Form, createForm } from "../metadata/form";
+import { registry } from "../runtime/registry";
 import { loadDoctypeScriptsFromMetadata } from "../runtime/scriptLoader";
 import FormLayout from "../components/FormLayout.vue";
 import FormTabs from "../components/FormTabs.vue";
@@ -67,7 +67,7 @@ const emit = defineEmits<{
 const loading = ref(true);
 const error = ref("");
 const meta = ref<DocTypeMeta | null>(null);
-const ctx = ref<FormContext>();
+const ctx = ref<Form>();
 const originalDoc = ref<Document | null>(null);
 const route = useRoute();
 const viewers = ref<Array<{ user: string; full_name: string }>>([]);
@@ -209,18 +209,7 @@ function createNewDocument(doctype: string, meta: DocTypeMeta): Document {
 	return doc;
 }
 
-function triggerFormEvent(doctype: string, event: string, context: any) {
-	const handlers = formRegistry.forms[doctype] || [];
-	for (const handler of handlers) {
-		if (typeof handler[event] === "function") {
-			try {
-				handler[event](context);
-			} catch (e) {
-				console.error(`Error in ${doctype}.${event}:`, e);
-			}
-		}
-	}
-}
+// triggerFormEvent is now handled by Form.trigger() internally
 
 function setupRealtimeSubscriptions() {
 	if (!ctx.value || !ctx.value.doc.name || ctx.value.doc.__islocal) {
@@ -270,45 +259,46 @@ function cleanupRealtimeSubscriptions() {
 }
 
 function onFieldChange(_field: Field) {
-	// Field change is handled by formContext
+	// Field changes are handled by Form.set_value() which triggers
+	// registered field-change handlers automatically via the event system.
 }
 
 async function handleSave() {
 	if (!ctx.value) return;
-	if (!(await ctx.value.validate())) return;
 
 	emit("loading", true);
 
 	try {
-		let savedDoc: Document;
-		const isNewDoc =
-			ctx.value.doc.__islocal ||
-			!ctx.value.doc.name ||
-			ctx.value.doc.name.startsWith("new-");
+		const savedDoc = await ctx.value.save();
 
-		if (isNewDoc) {
-			savedDoc = await frappeClient.createDocument(props.doctype, ctx.value.doc);
-			router.push({
-				name: "EditForm",
-				params: {
-					app: route.params.app,
-					doctype: props.doctype,
-					name: savedDoc.name,
-				},
-			});
-		} else {
-			const docName = ctx.value.doc.name || "";
-			savedDoc = await frappeClient.updateDocument(props.doctype, docName, ctx.value.doc);
+		if (savedDoc && ctx.value.is_new_doc === false) {
+			// navigate to the saved document URL if it was a new doc
+			const wasNew =
+				!originalDoc.value?.name || String(originalDoc.value.name).startsWith("new-");
+			if (wasNew && savedDoc.name) {
+				router.push({
+					name: "EditForm",
+					params: {
+						app: route.params.app,
+						doctype: props.doctype,
+						name: savedDoc.name,
+					},
+				});
+			}
 
-			ctx.value.notify("Saved", "success");
-			ctx.value.doc = savedDoc;
-			ctx.value.dirty = false;
+			// Update original snapshot
+			try {
+				originalDoc.value = JSON.parse(JSON.stringify(ctx.value.doc));
+			} catch {
+				originalDoc.value = { ...ctx.value.doc };
+			}
 		}
 
-		emit("save", savedDoc);
+		if (savedDoc) {
+			emit("save", savedDoc);
+		}
 	} catch (err: any) {
 		console.error("Save failed:", err);
-		ctx.value.throw(`Failed to save: ${err.message || err}`);
 	} finally {
 		emit("loading", false);
 	}
@@ -372,10 +362,11 @@ function applyAutonameFields(docMeta: DocTypeMeta | null, isNew: boolean): Field
 	if (autonameField.fieldname === "naming_series") {
 		const existingIdx = fields.findIndex((f) => f.fieldname === "naming_series");
 		if (existingIdx !== -1) {
+			const existing = fields[existingIdx]!;
 			fields[existingIdx] = {
-				...fields[existingIdx],
+				...existing,
 				...autonameField,
-				label: fields[existingIdx].label || autonameField.label,
+				label: existing.label || autonameField.label,
 			} as Field;
 		} else {
 			fields.unshift(autonameField);
@@ -395,10 +386,10 @@ async function onLoad() {
 	cleanupRealtimeSubscriptions();
 
 	try {
-		if (!locals.DocType[props.doctype]) {
+		if (!(window as any).locals?.DocType?.[props.doctype]) {
 			meta.value = await loadMeta(props.doctype);
 		} else {
-			meta.value = locals.DocType[props.doctype];
+			meta.value = (window as any).locals.DocType[props.doctype];
 		}
 		if (meta.value) {
 			meta.value.fields = applyAutonameFields(meta.value, isNewDocument);
@@ -444,12 +435,21 @@ async function onLoad() {
 		}
 
 		if (meta.value) {
-			ctx.value = createFormContext(props.doctype, doc, meta.value);
+			const frm = createForm(props.doctype, doc, meta.value);
 
-			triggerFormEvent(props.doctype, "setup", ctx.value);
-			triggerFormEvent(props.doctype, "load", ctx.value);
+			// Bind all registered script handlers
+			const handlers = registry.forms[props.doctype] || [];
+			for (const h of handlers) {
+				frm.bindHandlers(h);
+			}
 
-			if (!isNewDocument && ctx.value.doc.name) {
+			ctx.value = frm;
+
+			// Fire lifecycle events
+			await frm.trigger("setup");
+			await frm.trigger("onload");
+
+			if (!isNewDocument && frm.doc.name) {
 				setupRealtimeSubscriptions();
 			}
 		}
@@ -511,10 +511,8 @@ const isDirty = computed(() => {
 });
 
 function handleDiscard() {
-	if (!ctx.value || !originalDoc.value) return;
-
-	ctx.value.doc = JSON.parse(JSON.stringify(originalDoc.value));
-	ctx.value.dirty = false;
+	if (!ctx.value) return;
+	ctx.value.discard();
 }
 
 async function reload() {
@@ -538,6 +536,9 @@ function focusFirstField() {
 // Cleanup on component unmount
 onUnmounted(() => {
 	cleanupRealtimeSubscriptions();
+	if (ctx.value) {
+		ctx.value.destroy();
+	}
 });
 
 defineExpose({
@@ -548,6 +549,7 @@ defineExpose({
 	formStatus,
 	isDirty,
 	ctx,
+	frm: ctx, // Form class instance (preferred access)
 	customButtons: computed(() => ctx.value?.customButtons || []),
 });
 </script>

@@ -4,8 +4,8 @@ const loadedScripts = new Set<string>();
  * Script Loader - Injects doctype scripts into the page
  *
  * Scripts are provided by the backend in the metadata response:
- * - __ts_scripts: Form view scripts (string content)
- * - __ts_list_scripts: List view scripts (string content)
+ * - __form_js: Form view scripts (string content)
+ * - __list_js: List view scripts (string content)
  *
  * Similar to Frappe's approach where __js is injected into the page
  */

@@ -1,5 +1,5 @@
 <template>
-	<div data-form-content class="flex flex-col gap-6">
+	<div data-form-content class="flex flex-col gap-6 p-4">
 		<div v-if="imageField && ctx" class="mb-4">
 			<div
 				class="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800/50 dark:border-slate-600 shadow-sm p-6"

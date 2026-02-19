@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 import frappe
 
@@ -26,7 +25,13 @@ def _load_script_content(script_path):
 
 
 def _discover_script_files(dt_name, context="form"):
-	"""Discover script file paths from app doctype folders"""
+	"""Discover script file paths from app doctype folders.
+
+	In Frappe, doctypes are organized under modules:
+	  app_path/module_name/doctype/doctype_name/
+
+	So we must traverse all module subdirectories within each app.
+	"""
 	scripts = []
 
 	try:
@@ -34,32 +39,38 @@ def _discover_script_files(dt_name, context="form"):
 	except Exception:
 		installed_apps = []
 
+	bench_path = frappe.get_bench_path()
+
 	for app in installed_apps:
 		try:
 			app_module = frappe.get_app_module(app)
 			app_path = os.path.dirname(app_module.__file__)
 
-			# Look for doctype folder
-			doctype_path = os.path.join(app_path, "doctype", dt_name)
+			# Iterate module subdirectories within the app
+			for entry in os.listdir(app_path):
+				module_path = os.path.join(app_path, entry)
+				if not os.path.isdir(module_path):
+					continue
 
-			if not os.path.exists(doctype_path):
-				continue
+				# Look for doctype folder inside this module
+				doctype_path = os.path.join(module_path, "doctype", dt_name)
 
-			# Check for available script files (try context-specific first, then generic)
-			script_names = [
-				f"{dt_name}.{context}.ts",  # e.g., invoice.form.ts
-				f"{dt_name}.{context}.js",  # Also support .js
-				f"{dt_name}.ts",  # fallback: generic .ts
-				f"{dt_name}.js",  # fallback: generic .js
-			]
+				if not os.path.exists(doctype_path):
+					continue
 
-			for script in script_names:
-				script_file = os.path.join(doctype_path, script)
-				if os.path.exists(script_file):
-					# Store relative path from bench root
-					module_name = app_module.__name__.split(".")[0]
-					relative_path = f"apps/{app}/{module_name}/doctype/{dt_name}/{script}"
-					scripts.append(relative_path)
+				# Only load context-specific scripts (not generic .js/.ts which are
+				# Frappe's standard old-style client scripts using frappe.ui.form.on)
+				script_names = [
+					f"{dt_name}.{context}.ts",  # e.g., invoice.form.ts
+					f"{dt_name}.{context}.js",  # e.g., invoice.form.js
+				]
+
+				for script in script_names:
+					script_file = os.path.join(doctype_path, script)
+					if os.path.exists(script_file):
+						# Store relative path from bench root
+						relative_path = script_file.replace(bench_path + "/", "")
+						scripts.append(relative_path)
 		except Exception as e:
 			frappe.log_error(f"Error finding scripts for {dt_name} in {app}: {e!s}")
 			continue
@@ -176,12 +187,18 @@ def get_doctype_with_scripts(doctype, with_parent=False, cached_timestamp=None):
 
 	frappe_getdoctype(doctype, with_parent, cached_timestamp)
 	if frappe.response.get("docs"):
-		meta_doc = frappe.response["docs"][0]
-
-		# Get form scripts content
-		form_content = get_scripts_content(doctype, "form")
-		list_content = get_scripts_content(doctype, "list")
-		setattr(meta_doc, "__ts_scripts", form_content if form_content else None)
-		setattr(meta_doc, "__ts_list_scripts", list_content if list_content else None)
+		# Convert Document objects to dicts so we can inject custom keys
+		docs_list = frappe.response["docs"]
+		converted = []
+		for i, doc in enumerate(docs_list):
+			d = doc.as_dict() if hasattr(doc, "as_dict") else doc
+			if i == 0:
+				# Only inject scripts on the primary doctype
+				form_content = get_scripts_content(doctype, "form")
+				list_content = get_scripts_content(doctype, "list")
+				d["__form_js"] = form_content if form_content else None
+				d["__list_js"] = list_content if list_content else None
+			converted.append(d)
+		frappe.response["docs"] = converted
 
 	return frappe.response

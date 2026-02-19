@@ -409,11 +409,11 @@ export const model: Model = {
       }
     }
 
-    if (meta.__form_ts) {
+    if (meta.__form_js) {
       loadDoctypeScriptsFromMetadata(meta, "form");
     }
 
-    if (meta.__list_ts) {
+    if (meta.__list_js) {
       loadDoctypeScriptsFromMetadata(meta, "list");
     }
 

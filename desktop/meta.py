@@ -18,13 +18,20 @@ class DesktopMeta(FormMeta):
 		def _get_path(fname):
 			return os.path.join(path, scrub(fname))
 
+		# Load context-specific scripts (.ts first, then .js fallback)
+		self._add_code(_get_path(self.name + ".form.ts"), "__form_js")
 		self._add_code(_get_path(self.name + ".form.js"), "__form_js")
+		self._add_code(_get_path(self.name + ".list.ts"), "__list_js")
 		self._add_code(_get_path(self.name + ".list.js"), "__list_js")
+
+		# Load scripts registered via hooks from other apps
+		self.add_code_via_hook("desk_doctype_form_scripts", "__form_js")
+		self.add_code_via_hook("desk_doctype_list_scripts", "__list_js")
 
 	def as_dict(self, no_nulls=False):
 		d = super().as_dict(no_nulls=no_nulls)
 		d["__form_js"] = self.get("__form_js")
-		d["__list_js"] = self.get("__list_ts")
+		d["__list_js"] = self.get("__list_js")
 		return d
 
 
