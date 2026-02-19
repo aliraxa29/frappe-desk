@@ -1,5 +1,5 @@
 <template>
-	<div class="mb-4 flex flex-col relative">
+	<div class="flex flex-col relative">
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
@@ -17,7 +17,7 @@
 			:disabled="field.read_only"
 			type="text"
 			readonly
-			class="w-full px-3 py-2 border border-[#ddd] dark:border-slate-700 rounded focus:outline-none focus:border-[#0066cc] focus:shadow-[0_0_0_3px_rgba(0,102,204,0.1)] disabled:bg-gray-100 disabled:dark:bg-slate-700 disabled:cursor-not-allowed text-[0.95rem] transition-colors duration-200 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+			class="w-full px-3 py-2.5 border border-[#ddd] dark:border-slate-700 rounded focus:outline-none focus:border-[#0066cc] focus:shadow-[0_0_0_3px_rgba(0,102,204,0.1)] disabled:bg-gray-100 disabled:dark:bg-slate-700 disabled:cursor-not-allowed text-sm transition-colors duration-200 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
 			@focus="showPicker = true"
 		/>
 
@@ -30,7 +30,9 @@
 			>
 				<div class="space-y-3">
 					<div>
-						<label class="text-xs text-slate-500 dark:text-slate-400">Hour</label>
+						<label class="text-xs text-slate-500 dark:text-slate-400">{{
+							__("Hour")
+						}}</label>
 						<input
 							type="range"
 							min="0"
@@ -41,7 +43,9 @@
 						<div class="text-center text-sm font-mono">{{ pad(hour) }}</div>
 					</div>
 					<div>
-						<label class="text-xs text-slate-500 dark:text-slate-400">Minute</label>
+						<label class="text-xs text-slate-500 dark:text-slate-400">{{
+							__("Minute")
+						}}</label>
 						<input
 							type="range"
 							min="0"
@@ -52,7 +56,9 @@
 						<div class="text-center text-sm font-mono">{{ pad(minute) }}</div>
 					</div>
 					<div>
-						<label class="text-xs text-slate-500 dark:text-slate-400">Second</label>
+						<label class="text-xs text-slate-500 dark:text-slate-400">{{
+							__("Second")
+						}}</label>
 						<input
 							type="range"
 							min="0"
@@ -68,19 +74,19 @@
 						@click="setNow"
 						class="flex-1 px-3 py-1.5 bg-blue-600 text-white rounded font-medium text-xs hover:bg-blue-700"
 					>
-						Now
+						{{ __("Now") }}
 					</button>
 					<button
 						@click="applyTime"
 						class="flex-1 px-3 py-1.5 bg-green-600 text-white rounded font-medium text-xs hover:bg-green-700"
 					>
-						Apply
+						{{ __("Apply") }}
 					</button>
 					<button
 						@click="clearTime"
 						class="flex-1 px-3 py-1.5 bg-gray-400 text-white rounded font-medium text-xs hover:bg-gray-500"
 					>
-						Clear
+						{{ __("Clear") }}
 					</button>
 				</div>
 			</div>

@@ -3,7 +3,7 @@
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
-			class="font-medium text-[0.95rem] text-slate-700 dark:text-slate-300"
+			class="font-medium text-sm text-slate-700 dark:text-slate-300"
 		>
 			{{ field.label }}
 			<span v-if="field.reqd" class="text-red-600 dark:text-red-500 ml-1">*</span>

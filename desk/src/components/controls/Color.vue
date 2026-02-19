@@ -1,6 +1,6 @@
 <template>
-	<div class="mb-4 flex flex-col relative">
-		<label v-if="field.label" class="font-medium mb-1 text-sm text-slate-700 dark:text-white">
+	<div class="flex flex-col relative">
+		<label v-if="field.label" class="font-medium mb-2 text-sm text-slate-700 dark:text-white">
 			{{ field.label }}
 			<span v-if="field.reqd" class="text-red-500 ml-1">*</span>
 		</label>
@@ -10,7 +10,7 @@
 				ref="inputRef"
 				v-model="hexInput"
 				type="text"
-				:placeholder="field.description || 'Choose a color'"
+				:placeholder="field.description || __('Choose a color')"
 				:disabled="field.read_only"
 				:required="field.reqd && !field.read_only"
 				class="w-full pl-8 pr-3 py-2.5 border border-[#ddd] dark:border-slate-700 rounded focus:outline-none focus:border-[#0066cc] focus:shadow-[0_0_0_3px_rgba(0,102,204,0.1)] disabled:bg-gray-100 disabled:dark:bg-slate-700 disabled:cursor-not-allowed text-[0.95rem] transition-colors duration-200 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
@@ -35,10 +35,9 @@
 				ref="pickerRef"
 				class="absolute top-full left-0 mt-2 w-52.5 bg-white dark:bg-slate-800 dark:text-white border border-gray-300 dark:border-slate-700 rounded-lg shadow-lg p-3 z-200"
 			>
-				<!-- Swatches -->
 				<div>
 					<div class="text-xs text-gray-500 font-medium mb-2 uppercase tracking-wide">
-						Swatches
+						{{ __("Swatches") }}
 					</div>
 					<div class="flex flex-wrap gap-2 mt-2 mb-2">
 						<div
@@ -55,10 +54,9 @@
 
 				<!-- Color Picker -->
 				<div class="text-xs text-gray-500 font-medium mb-2 mt-2 uppercase tracking-wide">
-					Color Picker
+					{{ __("Color Picker") }}
 				</div>
 
-				<!-- 2D Saturation/Brightness -->
 				<div
 					ref="colorMapRef"
 					class="relative w-full h-35 rounded-md mb-2 cursor-crosshair color-map-gradient"
@@ -73,7 +71,6 @@
 					/>
 				</div>
 
-				<!-- Hue Slider -->
 				<div
 					ref="hueSliderRef"
 					class="relative w-full h-3.5 rounded-full cursor-pointer border border-gray-200 hue-gradient"

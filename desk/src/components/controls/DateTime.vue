@@ -1,9 +1,9 @@
 <template>
-	<div class="mb-4 flex flex-col relative">
+	<div class="flex flex-col relative">
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
-			class="font-medium mb-1 text-sm text-slate-700 dark:text-slate-200"
+			class="font-medium mb-2 text-sm text-slate-700 dark:text-slate-200"
 		>
 			{{ field.label }}
 			<span v-if="field.reqd" class="text-red-500 ml-1">*</span>

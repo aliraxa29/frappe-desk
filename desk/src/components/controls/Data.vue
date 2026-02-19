@@ -21,9 +21,9 @@
 		/>
 		<small
 			v-if="field.description"
-			class="block text-gray-600 text-[0.85rem] leading-relaxed"
-			>{{ field.description }}</small
-		>
+			class="block text-gray-600 dark:text-slate-300 text-[0.85rem] leading-relaxed"
+			>{{ __(field.description) }}
+		</small>
 		<small v-if="error" class="text-red-500 block text-[0.85rem]">{{ error }}</small>
 	</div>
 </template>

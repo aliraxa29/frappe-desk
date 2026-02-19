@@ -2,7 +2,6 @@
 	<AppLayout :custom-sidebar="!isNewDocument">
 		<template #header>
 			<div class="flex flex-wrap items-center justify-between gap-4 w-full py-2">
-				<!-- Title Section -->
 				<div class="flex flex-col gap-1 flex-1">
 					<h2 class="text-lg font-semibold text-slate-800 dark:text-white">
 						{{ doctype }}
@@ -15,7 +14,6 @@
 					</p>
 				</div>
 
-				<!-- Action Bar -->
 				<div class="flex items-center gap-2">
 					<FormButtons :buttons="customButtons" @execute="handleButtonExecute" />
 					<FormActionsMenu :actions="menuActions" @select="handleMenuAction" />
@@ -75,7 +73,6 @@
 					@loading="loading = $event"
 				/>
 
-				<!-- Bottom Action Bar -->
 				<BottomActionBar
 					:show="isDirty"
 					:loading="loading"

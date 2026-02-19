@@ -1,8 +1,7 @@
 <template>
 	<div class="flex flex-col">
-		<!-- Tabs Header -->
 		<div
-			class="sticky top-0 z-20 flex gap-1 border-b border-slate-200 dark:border-slate-700 px-2 bg-slate-50 dark:bg-slate-800 overflow-x-auto scroll-area scrollbar-hide"
+			class="sticky top-0 z-25 flex gap-1 border-b border-slate-200 dark:border-slate-700 px-2 bg-slate-50 dark:bg-slate-800 overflow-x-auto scroll-area scrollbar-hide"
 			role="tablist"
 		>
 			<button
@@ -23,7 +22,6 @@
 			</button>
 		</div>
 
-		<!-- Tabs Content -->
 		<div class="py-6 mx-2">
 			<div
 				v-for="(tab, idx) in tabs"
@@ -32,9 +30,7 @@
 				class="animate-fadeIn"
 				role="tabpanel"
 			>
-				<slot :name="`tab-${idx}`" :tab="tab" :fields="tab.fields">
-					<!-- Default tab content -->
-				</slot>
+				<slot :name="`tab-${idx}`" :tab="tab" :fields="tab.fields"> </slot>
 			</div>
 		</div>
 	</div>

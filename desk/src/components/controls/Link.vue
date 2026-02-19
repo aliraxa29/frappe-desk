@@ -1,5 +1,5 @@
 <template>
-	<div class="mb-4 flex flex-col relative">
+	<div class="flex flex-col relative">
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
@@ -21,7 +21,7 @@
 					:required="field.reqd"
 					:placeholder="`Select a ${field.options || 'record'}...`"
 					type="text"
-					class="flex-1 px-3 py-2 outline-none text-[0.95rem] bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-200 read-only:bg-gray-100 read-only:dark:bg-slate-700 read-only:cursor-not-allowed"
+					class="flex-1 px-3 py-2.5 outline-none text-[0.95rem] bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-200 read-only:bg-gray-100 read-only:dark:bg-slate-700 read-only:cursor-not-allowed"
 					@input="handleInput"
 					@focus="handleFocus"
 					@keydown="handleKeydown"
@@ -52,12 +52,10 @@
 				</div>
 			</div>
 
-			<!-- Dropdown Options -->
 			<div
 				v-if="showDropdown"
 				class="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-[#ddd] dark:border-slate-700 rounded shadow-lg z-180 max-h-87.5 overflow-y-auto scroll-area"
 			>
-				<!-- Loading State -->
 				<div v-if="loading" class="p-3 text-center text-sm text-slate-500">
 					<div class="flex items-center justify-center gap-2">
 						<div
@@ -67,9 +65,7 @@
 					</div>
 				</div>
 
-				<!-- Options List -->
 				<div v-else-if="allItems.length > 0">
-					<!-- Search Results -->
 					<button
 						v-for="(item, idx) in filteredResults"
 						:key="`result-${item.value}`"
@@ -114,7 +110,6 @@
 					</div>
 				</div>
 
-				<!-- No Results -->
 				<div
 					v-else-if="!loading && searchText"
 					class="p-3 text-center text-sm text-slate-500"
@@ -122,16 +117,18 @@
 					{{ __(`No results for ${searchText}`) }}
 				</div>
 
-				<!-- Empty State Hint -->
 				<div v-else class="p-3 text-center text-sm text-slate-500">
 					{{ __("Start typing to search...") }}
 				</div>
 			</div>
 		</div>
 
-		<small v-if="field.description" class="block text-gray-600 mt-1 text-[0.85rem]">{{
-			field.description
-		}}</small>
+		<small
+			v-if="field.description"
+			class="block text-gray-600 dark:text-slate-300 mt-1 text-[0.85rem]"
+		>
+			{{ __(field.description) }}
+		</small>
 	</div>
 </template>
 

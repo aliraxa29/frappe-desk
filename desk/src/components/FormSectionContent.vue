@@ -1,42 +1,52 @@
 <template>
 	<div
 		v-if="ctx"
-		:class="[
-			'flex flex-col md:flex-row gap-6',
-			section.columns.length === 1 ? 'md:gap-8' : 'md:gap-6',
-		]"
+		:class="['flex flex-col gap-6', section.columns.length > 1 ? 'md:flex-row' : '']"
 	>
-		<div
-			v-for="(column, colIdx) in section.columns"
-			:key="colIdx"
-			:class="[
-				'flex-1 flex flex-col gap-4 min-w-0',
-				shouldUse2ColumnLayout && section.columns.length === 1
-					? 'md:flex-none md:w-1/2'
-					: '',
-			]"
-		>
-			<div
-				v-for="field in column.fields"
-				:key="field.fieldname"
-				v-show="isFieldVisible(field)"
-				:class="[
-					'field-wrapper',
-					isFullWidthField(field) ? 'col-span-full md:col-span-2' : 'col-span-1',
-				]"
-			>
-				<FieldRenderer
-					:field="getEffectiveField(field)"
-					:ctx="ctx"
-					@field-change="$emit('fieldChange', $event)"
-				/>
-			</div>
-		</div>
+		<template v-for="(column, colIdx) in section.columns" :key="colIdx">
+			<template v-if="section.columns.length > 1">
+				<div class="flex-1 flex flex-col gap-4 min-w-0">
+					<div
+						v-for="field in column.fields"
+						:key="field.fieldname"
+						v-show="isFieldVisible(field)"
+						:class="['field-wrapper', isFullWidthField(field) ? 'md:col-span-2' : '']"
+					>
+						<FieldRenderer
+							:field="getEffectiveField(field)"
+							:ctx="ctx"
+							@field-change="$emit('fieldChange', $event)"
+						/>
+					</div>
+				</div>
+			</template>
+
+			<template v-else>
+				<div class="w-full">
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div
+							v-for="field in column.fields"
+							:key="field.fieldname"
+							v-show="isFieldVisible(field)"
+							:class="[
+								'field-wrapper',
+								isFullWidthField(field) ? 'md:col-span-2' : '',
+							]"
+						>
+							<FieldRenderer
+								:field="getEffectiveField(field)"
+								:ctx="ctx"
+								@field-change="$emit('fieldChange', $event)"
+							/>
+						</div>
+					</div>
+				</div>
+			</template>
+		</template>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import type { Field, FormContext, ParsedSection } from "../types";
 import FieldRenderer from "../fields/FieldRenderer.vue";
 import { evaluateDependsOn } from "../utils/dependsOn";
@@ -52,30 +62,25 @@ const emit = defineEmits<{
 	fieldChange: [field: Field];
 }>();
 
-// Check if field is full-width (text editor, textarea, etc)
 function isFullWidthField(field: Field): boolean {
-	const fullWidthTypes = ["Text Editor", "Text", "Code", "Table", "HTML", "Description"];
+	const fullWidthTypes = [
+		"Text Editor",
+		"Text",
+		"Small Text",
+		"Code",
+		"Table",
+		"HTML",
+		"Description",
+		"Long Text",
+	];
 	return fullWidthTypes.includes(field.fieldtype);
 }
 
-// Determine if we should use 2-column layout (when section has no explicit column breaks)
-const shouldUse2ColumnLayout = computed(() => {
-	return props.section.columns.length === 1;
-});
-
-/**
- * Evaluate depends_on expression to determine field visibility.
- * Returns true if the field should be visible.
- */
 function isFieldVisible(field: Field): boolean {
 	if (!field.depends_on) return true;
 	return evaluateDependsOn(field.depends_on, props.ctx?.doc ?? null);
 }
 
-/**
- * Build an effective field with read_only_depends_on and mandatory_depends_on applied.
- * Returns a shallow copy with overridden read_only / reqd when relevant.
- */
 function getEffectiveField(field: Field): Field {
 	const hasReadOnlyDep = !!field.read_only_depends_on;
 	const hasMandatoryDep = !!field.mandatory_depends_on;

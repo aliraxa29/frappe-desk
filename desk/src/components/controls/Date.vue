@@ -1,9 +1,9 @@
 <template>
-	<div class="mb-4 flex flex-col relative">
+	<div class="flex flex-col relative">
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
-			class="font-medium mb-1 text-sm text-slate-700 dark:text-slate-200"
+			class="font-medium mb-2 text-sm text-slate-700 dark:text-slate-200"
 		>
 			{{ field.label }}
 			<span v-if="field.reqd" class="text-red-500 ml-1">*</span>
@@ -17,7 +17,7 @@
 			:disabled="field.read_only"
 			:required="field.reqd && !field.read_only"
 			type="text"
-			class="w-full px-3 py-2 border border-[#ddd] dark:border-slate-700 rounded focus:outline-none focus:border-[#0066cc] focus:shadow-[0_0_0_3px_rgba(0,102,204,0.1)] disabled:bg-gray-100 disabled:dark:bg-slate-700 disabled:cursor-not-allowed text-[0.95rem] transition-colors duration-200 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+			class="w-full px-3 py-2.5 border border-[#ddd] dark:border-slate-700 rounded focus:outline-none focus:border-[#0066cc] focus:shadow-[0_0_0_3px_rgba(0,102,204,0.1)] disabled:bg-gray-100 disabled:dark:bg-slate-700 disabled:cursor-not-allowed text-[0.95rem] transition-colors duration-200 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
 			readonly
 			@focus="showPicker = true"
 		/>
@@ -31,7 +31,7 @@
 			<div
 				v-if="showPicker"
 				ref="pickerRef"
-				class="absolute top-full left-0 mt-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg shadow-lg p-3 z-200"
+				class="absolute top-full left-0 mt-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg shadow-lg p-3 z-20"
 				style="width: 320px"
 			>
 				<div class="text-center mb-3 pb-2 border-b border-gray-200 dark:border-slate-700">

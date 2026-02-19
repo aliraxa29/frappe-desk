@@ -191,6 +191,7 @@ export interface FormContext {
   dirty: boolean;
   customButtons?: any[];
   set_value(field: string, value: any): void;
+  add_child(field: string, childDoc: Document): void;
   get_value(field: string): any;
   refresh_field(field?: string): void;
   throw(msg: string): void;

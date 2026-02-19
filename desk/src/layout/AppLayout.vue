@@ -1,16 +1,12 @@
 <template>
 	<div class="h-screen flex flex-col overflow-hidden">
-		<!-- Top Navbar - Fixed height, no scroll -->
 		<Navbar class="shrink-0 z-50" />
 
-		<!-- Main Layout Container -->
 		<div class="flex flex-1 overflow-hidden">
-			<!-- Left Sidebar: custom slot overrides AppSidebar when customSidebar=true -->
 			<template v-if="customSidebar">
 				<slot name="sidebar" />
 			</template>
 			<template v-else-if="!hideSidebar">
-				<!-- Expand trigger when collapsed -->
 				<button
 					v-if="sidebarStore.collapsed"
 					@click="sidebarStore.toggleCollapsed()"
@@ -34,9 +30,7 @@
 				<AppSidebar v-else />
 			</template>
 
-			<!-- Main Content Area -->
 			<div class="flex flex-1 flex-col overflow-hidden">
-				<!-- Page Header -->
 				<div
 					class="shrink-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 z-17"
 				>
@@ -45,9 +39,8 @@
 					</div>
 				</div>
 
-				<!-- Page Content - Only scrollable area -->
 				<div
-					class="flex-1 overflow-y-auto scroll-area bg-transparent text-slate-900 dark:bg-gray-950 p-3"
+					class="flex-1 overflow-y-auto scroll-area bg-transparent text-slate-900 dark:bg-gray-950"
 				>
 					<slot name="content" />
 				</div>
