@@ -37,5 +37,4 @@ export function triggerFormEvent(doctype: string, event: string, ctx: any) {
   }
 }
 
-// Re-export Form class for script convenience
 export { Form, createForm, FORM_SCRIPT_EVENTS } from "../metadata/form";

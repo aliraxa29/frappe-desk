@@ -41,7 +41,7 @@ import type {
 } from "../types";
 import { Form, createForm } from "../metadata/form";
 import { registry } from "../runtime/registry";
-import { loadDoctypeScriptsFromMetadata } from "../runtime/scriptLoader";
+import { loadScript } from "../runtime/scriptLoader";
 import FormLayout from "../components/FormLayout.vue";
 import FormTabs from "../components/FormTabs.vue";
 import { frappeClient } from "../api/resource";
@@ -393,7 +393,7 @@ async function onLoad() {
 		}
 		if (meta.value) {
 			meta.value.fields = applyAutonameFields(meta.value, isNewDocument);
-			loadDoctypeScriptsFromMetadata(meta.value, "form");
+			loadScript(meta.value, "form");
 		}
 
 		if (meta.value?.issingle && props.docname !== props.doctype) {

@@ -43,31 +43,6 @@ desk_doctype_form_scripts = {
 }
 ```
 
-### For Frontend Developers
-
-**Before:**
-
-```typescript
-const metadata = await frappe.call({
-  method: "frappe.desk.form.load.getdoctype",
-  args: { doctype: "Invoice" },
-});
-const { scripts } = await frappe.call({
-  method: "desktop.doctype_scripts.get_scripts",
-  args: { doctype: "Invoice" },
-});
-```
-
-**After:**
-
-```typescript
-const metadata = await frappe.call({
-  method: "desktop.doctype_scripts.get_doctype_with_scripts",
-  args: { doctype: "Invoice" },
-});
-const scripts = metadata.docs[0].__ts_scripts;
-```
-
 ## Documentation
 
 Start with the guide that matches your role:
@@ -91,45 +66,11 @@ Start with the guide that matches your role:
 
 ```
 /apps/desktop/desktop/
-├── doctype_scripts.py                    # Core discovery module
 ├── SCRIPT_REGISTRATION_GUIDE.md          # How to register scripts
 ├── FRONTEND_INTEGRATION_GUIDE.md         # How to integrate frontend
 ├── API_REFERENCE.md                      # Complete API docs
 ├── IMPLEMENTATION_SUMMARY.md             # Architecture & design
 ├── VERIFICATION_CHECKLIST.md             # Deployment verification
-└── tests/
-    └── test_doctype_scripts.py           # Unit tests
-```
-
-## Key APIs
-
-### Primary Endpoint: `get_doctype_with_scripts()`
-
-Returns metadata with `__ts_scripts` and `__ts_list_scripts` arrays.
-
-```python
-frappe.call({
-    method: 'desktop.doctype_scripts.get_doctype_with_scripts',
-    args: {
-        doctype: 'Invoice',
-        with_parent: False,
-        cached_timestamp: '2024-01-01 00:00:00'
-    }
-})
-```
-
-### Secondary Endpoint: `get_scripts()`
-
-Returns discovery results as structured dict.
-
-```python
-frappe.call({
-    method: 'desktop.doctype_scripts.get_scripts',
-    args: {
-        doctype: 'Invoice',
-        context: 'form'
-    }
-})
 ```
 
 ## Script Registration Examples
@@ -265,20 +206,6 @@ cd /home/erp/bench15
 bench --site site.local run-tests --app desktop --verbose
 ```
 
-### Manual Verification
-
-```python
-import frappe
-from desktop.doctype_scripts import get_doctype_with_scripts
-
-result = frappe.call({
-    method: 'desktop.doctype_scripts.get_doctype_with_scripts',
-    args: { doctype: 'Invoice' }
-})
-
-print(result.message.docs[0].__ts_scripts)
-```
-
 ## Migration Path
 
 ### For Existing Implementations
@@ -385,12 +312,6 @@ register(); // Must be called
 
 - API Reference: [API_REFERENCE.md](./API_REFERENCE.md)
 - Frontend Integration: [FRONTEND_INTEGRATION_GUIDE.md](./FRONTEND_INTEGRATION_GUIDE.md)
-- Script Registration: [SCRIPT_REGISTRATION_GUIDE.md](./SCRIPT_REGISTRATION_GUIDE.md)
-
-### Code
-
-- Implementation: `desktop/doctype_scripts.py`
-- Tests: `desktop/tests/test_doctype_scripts.py`
 
 ### Issues
 

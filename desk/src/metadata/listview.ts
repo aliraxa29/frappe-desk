@@ -14,7 +14,7 @@ import { toast } from "../stores/toast";
 import { dialog } from "../stores/dialog";
 import { model } from "../data/model";
 import { __ } from "../utils/translate";
-import { loadDoctypeScriptsFromMetadata } from "../runtime/scriptLoader";
+import { loadScript } from "../runtime/scriptLoader";
 import { registry } from "../runtime/registry";
 
 /**
@@ -81,7 +81,7 @@ export class ListView {
         if (this.meta.sort_order)
           this.sortOrder = this.meta.sort_order as "asc" | "desc";
 
-        loadDoctypeScriptsFromMetadata(this.meta, "list");
+        loadScript(this.meta, "list");
       }
       await nextTick();
 

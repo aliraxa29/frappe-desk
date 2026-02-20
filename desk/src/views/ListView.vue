@@ -51,6 +51,7 @@ import ListView from "../components/list/ListView.vue";
 import Button from "../components/Button.vue";
 import { realtime } from "../utils/socketio/client";
 import { openQuickEntry } from "../composables/useQuickEntry";
+import { getMeta } from "../metadata";
 
 const route = useRoute();
 const router = useRouter();
@@ -134,8 +135,8 @@ function cleanupRealtimeSubscriptions() {
 
 onMounted(async () => {
 	try {
-		const response = await frappeClient.getDocTypeMeta(doctype.value);
-		meta.value = response.docs?.[0] || null;
+		const response = await getMeta(doctype.value);
+		meta.value = response.message.docs?.[0] || null;
 
 		// If issingle, redirect to form view for the single doc
 		if (meta.value?.issingle) {

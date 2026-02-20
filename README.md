@@ -112,7 +112,6 @@ apps/desktop/
 ├── desktop/                   # Python backend
 │   ├── api/                   # Custom RPC endpoints
 │   ├── doctype/               # DocType definitions & controllers
-│   ├── doctype_scripts.py     # Runtime script discovery
 │   └── hooks.py               # Frappe hooks
 ├── pyproject.toml
 └── package.json

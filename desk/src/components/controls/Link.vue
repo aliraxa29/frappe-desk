@@ -21,7 +21,7 @@
 					:required="field.reqd"
 					:placeholder="`Select a ${field.options || 'record'}...`"
 					type="text"
-					class="flex-1 px-3 py-2.5 outline-none text-[0.95rem] bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-200 read-only:bg-gray-100 read-only:dark:bg-slate-700 read-only:cursor-not-allowed"
+					class="flex-1 px-3 py-2.5 outline-none text-[0.95rem] bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-200 read-only:bg-gray-100 read-only:dark:bg-slate-700 read-only:cursor-not-allowed focus:outline-none focus:border-blue-600 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-600/10 dark:focus:ring-blue-500/20"
 					@input="handleInput"
 					@focus="handleFocus"
 					@keydown="handleKeydown"

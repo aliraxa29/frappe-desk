@@ -454,6 +454,7 @@ import ChevronLeft from "../../icons/ChevronLeft.vue";
 import ChevronRight from "../../icons/ChevronRight.vue";
 import DoubleChevronLeft from "../../icons/DoubleChevronLeft.vue";
 import DoubleChevronRight from "../../icons/DoubleChevronRight.vue";
+import { getMeta } from "../../metadata";
 
 declare const desk: any;
 
@@ -504,7 +505,6 @@ const showBulkEdit = ref(false);
 
 // Custom list script settings
 const listSettings = ref<ListviewSettings>({});
-const fullMetaResponse = ref<any>(null);
 
 // Computed: total pages
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / pageLength.value)));
@@ -685,26 +685,21 @@ watch(
 	{ immediate: false },
 );
 
-// Methods
 async function loadMeta() {
 	try {
-		const response = await frappeClient.getDocTypeMeta(props.doctype);
-		meta.value = response.docs?.[0] || null;
-		fullMetaResponse.value = response;
+		const response = await getMeta(props.doctype);
+		meta.value = response;
 
 		if (meta.value?.sort_field) sortField.value = meta.value.sort_field;
 		if (meta.value?.sort_order) sortOrder.value = meta.value.sort_order as "asc" | "desc";
 
-		// Create ListView controller
 		const ctrl = new ListViewController(props.doctype, meta.value);
 		ctrl.setOpenDocumentHandler((name: string) => openDocument(name));
 
-		// Initialize: injects scripts, loads settings, binds handlers, fires onload
 		await ctrl.init();
 
 		listController.value = ctrl;
 
-		// Sync settings from controller
 		listSettings.value = ctrl.settings;
 	} catch (err: any) {
 		console.error("Failed to load doctype meta:", err);

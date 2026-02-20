@@ -1,6 +1,6 @@
 import { call } from "../utils/desk";
 import { __ } from "../utils/translate";
-import { loadDoctypeScriptsFromMetadata } from "../runtime/scriptLoader";
+import { loadScript } from "../runtime/scriptLoader";
 
 export interface Model {
   all_fieldtypes: string[];
@@ -398,7 +398,7 @@ export const model: Model = {
   init_doctype: function (doctype) {
     var meta = locals.DocType[doctype];
     for (const asset_key of [
-      "__list_js",
+      "__list__js",
       "__custom_list_js",
       "__calendar_js",
       "__map_js",
@@ -410,11 +410,11 @@ export const model: Model = {
     }
 
     if (meta.__form_js) {
-      loadDoctypeScriptsFromMetadata(meta, "form");
+      loadScript(meta, "form");
     }
 
-    if (meta.__list_js) {
-      loadDoctypeScriptsFromMetadata(meta, "list");
+    if (meta.__list__js) {
+      loadScript(meta, "list");
     }
 
     if (meta.__templates) {

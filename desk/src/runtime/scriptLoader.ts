@@ -5,15 +5,13 @@ const loadedScripts = new Set<string>();
  *
  * Scripts are provided by the backend in the metadata response:
  * - __form_js: Form view scripts (string content)
- * - __list_js: List view scripts (string content)
- *
- * Similar to Frappe's approach where __js is injected into the page
+ * - __list__js: List view scripts (string content)
  */
 
 /**
  * Inject script content into the page
  * @param scriptId Unique identifier for the script (used for tracking)
- * @param content Script content (JavaScript/TypeScript)
+ * @param content Script content (JavaScript)
  * @param attributes Additional script attributes (e.g., type, defer, async)
  */
 export function injectScript(
@@ -23,9 +21,7 @@ export function injectScript(
 ): void {
   if (!content) return;
 
-  // Avoid injecting the same script twice
   if (loadedScripts.has(scriptId)) {
-    console.debug(`Script already loaded: ${scriptId}`);
     return;
   }
 
@@ -35,7 +31,6 @@ export function injectScript(
     script.type = attributes?.type || "text/javascript";
     script.textContent = wrappedContent;
 
-    // Add any additional attributes
     if (attributes) {
       Object.entries(attributes).forEach(([key, value]) => {
         if (key !== "type") {
@@ -44,41 +39,35 @@ export function injectScript(
       });
     }
 
-    // Add data attribute for tracking
     script.setAttribute("data-script-id", scriptId);
 
-    // Inject into document head or body
     const target = document.head || document.body;
     target.appendChild(script);
 
     loadedScripts.add(scriptId);
-    console.debug(`✓ Injected script: ${scriptId}`);
   } catch (e) {
-    console.error(`Failed to inject script ${scriptId}:`, e);
+    console.error(`Failed to load script ${scriptId}:`, e);
   }
 }
 
 /**
  * Load doctype scripts from metadata response
  *
- * This is called with the metadata returned from get_doctype_with_scripts()
  * The scripts are already loaded as content in __ts_scripts and __ts_list_scripts
  *
- * @param metadata DocType metadata from getdoctype() response
+ * @param metadata DocType metadata
  * @param context 'form' or 'list'
  */
-export function loadDoctypeScriptsFromMetadata(
+export function loadScript(
   metadata: any,
   context: "form" | "list" = "form",
 ): void {
   if (!metadata) {
-    console.warn("No metadata provided to loadDoctypeScriptsFromMetadata");
     return;
   }
 
   const doctype = metadata.name || "Unknown";
 
-  // Get the appropriate scripts from metadata
   let scriptContent: string | null = null;
   let scriptId: string;
 
@@ -86,7 +75,7 @@ export function loadDoctypeScriptsFromMetadata(
     scriptContent = metadata.__form_js;
     scriptId = `doctype-form-scripts-${doctype}`;
   } else if (context === "list") {
-    scriptContent = metadata.__list_js;
+    scriptContent = metadata.__list__js;
     scriptId = `doctype-list-scripts-${doctype}`;
   } else {
     console.warn(`Unknown context: ${context}`);
@@ -94,11 +83,8 @@ export function loadDoctypeScriptsFromMetadata(
   }
 
   if (!scriptContent) {
-    console.debug(`No scripts found in metadata for ${doctype} (${context})`);
     return;
   }
-
-  console.log(`Loading scripts for ${doctype} (${context} context)`);
   injectScript(scriptId, scriptContent);
 }
 
