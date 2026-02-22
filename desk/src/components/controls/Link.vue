@@ -135,11 +135,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import type { Field } from "../../types";
-import { desk } from "../../utils/resource";
+import { resource } from "../../utils/resource";
 import { __ } from "../../utils/translate";
 import ArrowRight from "../../icons/ArrowRight.vue";
 import Close from "../../icons/Close.vue";
-import { useLocalsStore } from "../../utils/locals/locals";
 
 interface Props {
 	modelValue: string;
@@ -166,7 +165,6 @@ const showDropdown = ref(false);
 const resultItems = ref<LinkItem[]>([]);
 const loading = ref(false);
 const selectedIdx = ref(0);
-const locals = useLocalsStore();
 let searchTimeout: NodeJS.Timeout | null = null;
 
 const currentValue = computed(() => props.modelValue);
@@ -209,7 +207,7 @@ async function fetchOptions(search: string = "") {
 	try {
 		const linkedDoctype = props.field.options;
 
-		const response = await desk.call({
+		const response = await resource.call({
 			method: "frappe.desk.search.search_link",
 			args: {
 				doctype: linkedDoctype,

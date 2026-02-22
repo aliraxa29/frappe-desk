@@ -9,7 +9,6 @@ import { realtime } from "./utils/socketio/client";
 import { initializeRealtimeNotifications } from "./utils/socketio/notifications";
 import { useThemeStore } from "./stores/theme";
 import { useTranslationStore } from "./stores/translation";
-import "./utils/translate";
 import dayjs from "./plugins/dayjs";
 
 initializeGlobals();

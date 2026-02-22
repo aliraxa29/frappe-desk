@@ -189,12 +189,8 @@ onMounted(async () => {
 });
 
 function createNewDocument(doctype: string, meta: DocTypeMeta): Document {
-	const doc: Document = {
-		doctype: doctype,
-		name: "new-" + doctype + "-" + Date.now(),
-		__islocal: 1,
-		docstatus: 0,
-	};
+	debugger;
+	const doc: Document = model.get_new_doc(doctype);
 
 	for (const field of meta.fields) {
 		if (field.default) {
@@ -238,8 +234,6 @@ function createNewDocument(doctype: string, meta: DocTypeMeta): Document {
 
 	return doc;
 }
-
-// triggerFormEvent is now handled by Form.trigger() internally
 
 function setupRealtimeSubscriptions() {
 	if (!ctx.value || !ctx.value.doc.name || ctx.value.doc.__islocal) {
@@ -580,7 +574,7 @@ defineExpose({
 	isDirty,
 	ctx,
 	frm: ctx, // Form class instance (preferred access)
-	customButtons: computed(() => ctx.value?.customButtons || []),
+	custom_buttons: computed(() => ctx.value?.custom_buttons || []),
 });
 </script>
 

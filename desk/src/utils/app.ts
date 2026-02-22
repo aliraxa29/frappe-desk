@@ -1,63 +1,43 @@
+import { provide } from "./provide";
 import { __, get_languages } from "./translate";
 
 export function initializeGlobals() {
-  if (!window.desk) window.desk = {};
-  window.get_languages = get_languages;
-  (globalThis as any).__ = __;
+  if (!window.desk) {
+    window.desk = {} as Desk;
+  }
+  desk.provide = provide;
+  desk.get_languages = get_languages;
+  window.__ = __;
 
-  window.desk.provide = function (namespace: string) {
-    // docs: create a namespace //
-    var nsl = namespace.split(".");
-    var parent = window;
-    for (var i = 0; i < nsl.length; i++) {
-      var n = nsl[i];
-      if (!parent[n]) {
-        parent[n] = {};
-      }
-      parent = parent[n];
-    }
-    return parent;
-  };
+  desk.provide("desk.settings");
+  desk.provide("desk.utils");
+  desk.provide("desk.ui.form");
+  desk.provide("desk.modules");
+  desk.provide("desk.templates");
+  desk.provide("desk.test_data");
+  desk.provide("desk.utils");
+  desk.provide("desk.model");
+  desk.provide("desk.user");
+  desk.provide("desk.session");
+  desk.provide("locals.DocType");
 
-  window.desk.provide("locals");
-  window.desk.provide("desk.flags");
-  window.desk.provide("desk.settings");
-  window.desk.provide("desk.utils");
-  window.desk.provide("desk.ui.form");
-  window.desk.provide("desk.modules");
-  window.desk.provide("desk.templates");
-  window.desk.provide("desk.test_data");
-  window.desk.provide("desk.utils");
-  window.desk.provide("desk.model");
-  window.desk.provide("desk.user");
-  window.desk.provide("desk.session");
-  // Don't provide these - they come from HTML boot data
-  // window.desk.provide("desk._messages");
-  window.desk.provide("locals.DocType");
+  desk.provide("desk.listview_settings");
+  desk.provide("desk.tour");
+  desk.provide("desk.listview_parent_route");
 
-  // for listviews
-  window.desk.provide("desk.listview_settings");
-  window.desk.provide("desk.tour");
-  window.desk.provide("desk.listview_parent_route");
-
-  // Bridge boot data: window.dash.boot → window.desk.boot
-  // This makes boot data available to model.ts, formatters.ts, etc.
-  // which reference desk.boot.user, desk.boot.sysdefaults, etc.
-  const boot = (window as any).dash?.boot;
+  const boot = dash?.boot;
   if (boot) {
-    window.desk.boot = boot;
-    window.desk._messages =
-      (window as any).dash?._messages || boot.__messages || {};
+    dash.boot = boot;
+    dash._messages = (window as any).dash?._messages || boot.__messages || {};
 
     // Set up commonly accessed boot properties as top-level desk properties
     // so model.ts references like desk.session.user, desk.user_roles work
-    window.desk.session = {
-      user: boot.user?.name || "Guest",
-      user_email: boot.user?.email || "",
-      user_fullname: boot.user?.first_name || "",
-    };
-    window.desk.user_roles = boot.user?.roles || [];
-    window.desk.sys_defaults = boot.sysdefaults || {};
-    window.desk.user_info = boot.user_info || {};
+    desk.session.user = dash.boot.user.name;
+    desk.session.logged_in_user = dash.boot.user.name;
+    desk.session.user_email = dash.boot.user.email;
+    desk.session.user_fullname = desk.user.get_user_full_name();
+    desk.user_defaults = dash.boot.user.defaults;
+    desk.user_roles = dash.boot.user.roles;
+    desk.sys_defaults = dash.boot.sysdefaults;
   }
 }

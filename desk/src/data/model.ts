@@ -3,10 +3,12 @@ import { __ } from "../utils/translate";
 import { loadScript } from "../runtime/scriptLoader";
 import { getMeta } from "@/metadata";
 import { Form } from "@/runtime/formContext";
-import { dialog } from "@/stores/dialog";
+import { dialog, dialog } from "@/stores/dialog";
+import { Document } from "@/types";
+import { meta } from "@/utils/meta";
 
 export interface Model {
-  docinfo: any;
+  docinfo: Record<string, any>;
   all_fieldtypes: string[];
   no_value_type: string[];
   layout_fields: string[];
@@ -19,75 +21,66 @@ export interface Model {
   numeric_fieldtypes: string[];
   std_fields_table: any[];
   table_fields: string[];
-  new_names: { [key: string]: string };
-  events: { [doctype: string]: { [fieldname: string]: Function[] } };
-  user_settings: { [doctype: string]: any };
-  init(): void;
-  is_value_type(fieldtype: string | { fieldtype: string }): boolean;
-  is_non_std_field(fieldname: string): boolean;
-  get_std_field(fieldname: string, ignore?: boolean): any;
-  get_from_localstorage(doctype: string): any;
-  set_in_localstorage(doctype: string, docs: any): void;
-  clear_local_storage(): void;
-  with_doctype(
-    doctype: string,
-    callback?: (result: any) => any,
-    async?: boolean,
-  ): Promise<void>;
-  init_doctype(doctype: string): void;
-  with_doc(doctype: string, name: string, callback: Function): Promise<any>;
-  get_docinfo(doctype: string, name: string): any;
-  set_docinfo(doctype: string, name: string, key: string, value: any): void;
-  get_shared(doctype: string, name: string): any;
-  get_server_module_name(doctype: string): string;
-  scrub(txt: string): string;
-  unscrub(txt: string): string;
-  can_create(doctype: string): boolean;
-  can_select(doctype: string): boolean;
-  can_read(doctype: string): boolean;
-  can_write(doctype: string): boolean;
-  can_get_report(doctype: string): boolean;
-  can_delete(doctype: string): boolean;
-  can_submit(doctype: string): boolean;
-  can_cancel(doctype: string): boolean;
-  has_workflow(doctype: string): boolean;
-  is_submittable(doctype: string): boolean;
-  is_table(doctype: string): boolean;
-  is_single(doctype: string): boolean;
-  is_tree(doctype: string): boolean;
-  is_fresh(doc: any): boolean;
-  can_import(doctype: string, frm?: any, meta?: any): boolean;
-  can_export(doctype: string, frm?: any): boolean;
-  can_print(doctype: string, frm?: any): boolean;
-  can_email(doctype: string, frm?: any): boolean;
-  can_share(doctype: string, frm?: any): boolean;
-  has_value(dt: string, dn: string, fn: string): boolean;
-  get_list(doctype: string, filters?: { [key: string]: any }): any[];
-  get_value(doctype: string, name: string, fieldname: string): any;
-  set_value(doctype: string, name: string, fieldname: string, value: any): any;
-  on(doctype: string, fieldname: string, fn: Function): void;
-  trigger(
-    fieldname: string,
-    value: any,
-    doc: any,
-    skip_dirty_trigger?: boolean,
-  ): Promise<void>;
+  new_names: Record<string, string>;
+  events: Record<string, any>;
+  user_settings: Record<string, any>;
+  is_value_type: (fieldtype: string | Record<string, any>) => boolean;
+  is_non_std_field: (fieldname: string) => boolean;
+  get_std_field: (fieldname: string, ignore?: boolean) => any;
+  get_from_localstorage: (doctype: string) => any;
+  set_in_localstorage: (doctype: string, docs: any) => void;
+  clear_local_storage: () => void;
   sync: (r: any) => any;
-  add_to_locals: (doc: any) => void;
   rename_after_save: (d: any, i: number) => void;
   sync_docinfo: (r: any) => any;
+  add_to_locals: (doc: any) => void;
   update_in_locals: (doc: any) => void;
+  set_default_values: (doc: any, parent_doc: any) => string[];
   get_new_doc: (
     doctype: string,
-    parent_doc?: any,
-    parentfield?: string,
+    parent_doc?: Document | null,
+    parentfield?: string | null,
     with_mandatory_children?: boolean,
-  ) => any;
+  ) => Document;
   make_new_doc_and_get_name: (
     doctype: string,
-    with_mandatory_children?: boolean,
+    with_mandatory_children: boolean,
   ) => string;
   get_new_name: (doctype: string) => string;
+  with_doctype: (
+    doctype: string,
+    callback?: ((doc: any) => void) | undefined,
+    async?: boolean,
+  ) => Promise<void>;
+  init_doctype: (doctype: string) => void;
+  with_doc: (doctype: string, name: string, callback: any) => Promise<any>;
+  get_docinfo: (doctype: string, name: string) => any;
+  set_docinfo: (doctype: string, name: string, key: string, value: any) => void;
+  get_shared: (doctype: string, name: string) => any;
+  get_server_module_name: (doctype: string) => string;
+  scrub: (txt: string) => string;
+  unscrub: (txt: string) => string;
+  can_create: (doctype: string) => boolean;
+  can_select: (doctype: string) => boolean;
+  can_read: (doctype: string) => boolean;
+  can_write: (doctype: string) => boolean;
+  can_get_report: (doctype: string) => boolean;
+  can_delete: (doctype: string) => boolean;
+  can_submit: (doctype: string) => boolean;
+  can_cancel: (doctype: string) => boolean;
+  has_workflow: (doctype: string) => boolean;
+  is_submittable: (doctype: string) => boolean;
+  is_table: (doctype: string) => boolean;
+  is_single: (doctype: string) => boolean;
+  is_tree: (doctype: string) => boolean;
+  is_fresh: (doc: Document) => boolean;
+  can_import: (doctype: string, frm?: Form, meta?: any) => boolean;
+  can_export: (doctype: string, frm?: Form) => boolean;
+  can_print: (doctype: string, frm?: Form) => boolean;
+  can_email: (doctype: string, frm?: Form) => boolean;
+  can_share: (doctype: string, frm?: Form) => boolean;
+  has_value: (dt: string, dn: string, fn: string) => boolean;
+  get_list: (doctype: string, filters: Record<string, any>) => any[];
 }
 
 export const model: Model = {
@@ -364,8 +357,8 @@ export const model: Model = {
       }
       model.docinfo[doctype][name] = r.docinfo;
 
-      // copy values to frappe.boot.user_info
-      Object.assign(frappe.boot.user_info, r.docinfo.user_info);
+      // copy values to dash.boot.user_info
+      Object.assign(dash.boot.user_info, r.docinfo.user_info);
     }
 
     return r.docs;
@@ -381,19 +374,19 @@ export const model: Model = {
       doc.name = model.get_new_name(doc.doctype);
 
       if (!doc.parentfield)
-        model.provide("model.docinfo." + doc.doctype + "." + doc.name);
+        desk.provide("model.docinfo." + doc.doctype + "." + doc.name);
     }
 
     locals[doc.doctype][doc.name] = doc;
 
-    let meta = frappe.get_meta(doc.doctype);
+    let meta = desk.meta.get_meta(doc.doctype);
     let is_table = meta ? meta.istable : doc.parentfield;
     // add child docs to locals
     if (!is_table) {
       for (var i in doc) {
         var value = doc[i];
 
-        if ($.isArray(value)) {
+        if (Array.isArray(value)) {
           for (var x = 0, y = value.length; x < y; x++) {
             var d = value[x];
 
@@ -406,18 +399,20 @@ export const model: Model = {
     }
   },
 
-  update_in_locals: function (doc) {
-    // update values in the existing local doc instead of replacing
-    let local_doc = locals[doc.doctype][doc.name];
-    let clear_keys = function (source, target) {
+  update_in_locals: function (doc: Document) {
+    let local_doc = locals[doc.doctype ?? ""][doc.name ?? ""];
+    let clear_keys = function (
+      source: Record<string, any>,
+      target: Record<string, any>,
+    ) {
       Object.keys(target).map((key) => {
         if (source[key] == undefined) delete target[key];
       });
     };
 
     for (let fieldname in doc) {
-      let df = frappe.meta.get_field(doc.doctype, fieldname);
-      if (df && frappe.model.table_fields.includes(df.fieldtype)) {
+      let df = desk.meta.get_field(doc.doctype, fieldname);
+      if (df && desk.model.table_fields.includes(df.fieldtype)) {
         // table
         if (!(doc[fieldname] instanceof Array)) {
           doc[fieldname] = [];
@@ -488,40 +483,79 @@ export const model: Model = {
     clear_keys(doc, local_doc);
   },
 
+  set_default_values: function (doc: Document, parent_doc: Document | null) {
+    let doctype = doc.doctype;
+    let docfields = desk.meta.get_docfields(doctype);
+    let updated: string[] = [];
+
+    // Table types should be initialized
+    let fieldtypes_without_default = desk.model.no_value_type.filter(
+      (fieldtype) => !desk.model.table_fields.includes(fieldtype),
+    );
+    docfields.forEach((f) => {
+      if (
+        fieldtypes_without_default.includes(f.fieldtype) ||
+        doc[f.fieldname] != null ||
+        f.no_default
+      ) {
+        return;
+      }
+
+      let v = desk.model.get_default_value(f, doc, parent_doc);
+      if (v) {
+        if (["Int", "Check"].includes(f.fieldtype)) v = cint(v);
+        else if (["Currency", "Float"].includes(f.fieldtype)) v = flt(v);
+
+        doc[f.fieldname] = v;
+        updated.push(f.fieldname);
+      } else if (
+        f.fieldtype == "Select" &&
+        f.options &&
+        typeof f.options === "string" &&
+        !["[Select]", "Loading..."].includes(f.options)
+      ) {
+        doc[f.fieldname] = f.options.split("\n")[0];
+      }
+    });
+    return updated;
+  },
+
   get_new_doc: function (
-    doctype,
-    parent_doc,
-    parentfield,
-    with_mandatory_children,
+    doctype: string,
+    parent_doc: Document | null = null,
+    parentfield: string | null = null,
+    with_mandatory_children: boolean = false,
   ) {
-    frappe.provide("locals." + doctype);
-    var doc = {
+    desk.provide("locals." + doctype);
+    var doc: Document = {
       docstatus: 0,
       doctype: doctype,
-      name: frappe.model.get_new_name(doctype),
+      name: desk.model.get_new_name(doctype),
       __islocal: 1,
       __unsaved: 1,
-      owner: frappe.session.user,
+      owner: desk.session.user,
     };
-    frappe.model.set_default_values(doc, parent_doc);
+    desk.model.set_default_values(doc, parent_doc);
 
     if (parent_doc) {
-      $.extend(doc, {
+      Object.assign(doc, {
         parent: parent_doc.name,
         parentfield: parentfield,
         parenttype: parent_doc.doctype,
       });
-      if (!parent_doc[parentfield]) parent_doc[parentfield] = [];
-      doc.idx = parent_doc[parentfield].length + 1;
-      parent_doc[parentfield].push(doc);
+      if (parentfield) {
+        if (!parent_doc[parentfield]) parent_doc[parentfield] = [];
+        doc.idx = parent_doc[parentfield].length + 1;
+        parent_doc[parentfield].push(doc);
+      }
     } else {
-      frappe.provide("frappe.model.docinfo." + doctype + "." + doc.name);
+      desk.provide("desk.model.docinfo." + doctype + "." + doc.name);
     }
 
-    frappe.model.add_to_locals(doc);
+    desk.model.add_to_locals(doc);
 
     if (with_mandatory_children) {
-      frappe.model.create_mandatory_children(doc);
+      desk.model.create_mandatory_children(doc);
     }
 
     if (!parent_doc) {
@@ -529,48 +563,51 @@ export const model: Model = {
     }
 
     // set the name if called from a link field
-    if (frappe.route_options && frappe.route_options.name_field) {
-      var meta = frappe.get_meta(doctype);
+    if (desk.route_options && desk.route_options.name_field) {
+      var meta = desk.get_meta(doctype);
       // set title field / name as name
       if (meta.autoname && meta.autoname.indexOf("field:") !== -1) {
-        doc[meta.autoname.substr(6)] = frappe.route_options.name_field;
+        doc[meta.autoname.substr(6)] = desk.route_options.name_field;
       } else if (meta.autoname && meta.autoname === "prompt") {
-        doc.__newname = frappe.route_options.name_field;
+        doc.__newname = desk.route_options.name_field;
       } else if (meta.title_field) {
-        doc[meta.title_field] = frappe.route_options.name_field;
+        doc[meta.title_field] = desk.route_options.name_field;
       }
 
-      delete frappe.route_options.name_field;
+      delete desk.route_options.name_field;
     }
 
     // set route options
-    if (frappe.route_options && !doc.parent) {
-      $.each(frappe.route_options, function (fieldname, value) {
-        var df = frappe.meta.has_field(doctype, fieldname);
+    if (desk.route_options && !doc.parent) {
+      $.each(desk.route_options, function (fieldname, value) {
+        var df = desk.meta.has_field(doctype, fieldname);
         if (df && !df.no_copy) {
           doc[fieldname] = value;
         }
       });
-      frappe.route_options = null;
+      desk.route_options = null;
     }
 
     return doc;
   },
 
-  make_new_doc_and_get_name: function (doctype, with_mandatory_children) {
+  make_new_doc_and_get_name: function (
+    doctype: string,
+    with_mandatory_children: boolean,
+  ) {
     return desk.model.get_new_doc(doctype, null, null, with_mandatory_children)
       .name;
   },
 
-  get_new_name: function (doctype) {
+  get_new_name: function (doctype: string) {
     // random hash is added to idenity mislinked files when doc is not saved and file is uploaded.
-    return frappe.router.slug(`new-${doctype}-${frappe.utils.get_random(10)}`);
+    return desk.utils.slug(`new-${doctype}-${desk.utils.get_random(10)}`);
   },
 
   with_doctype: function (
     doctype: string,
-    callback = undefined,
-    async = false,
+    callback: ((doc: any) => void) | undefined = undefined,
+    async: boolean = false,
   ) {
     if (locals.DocType[doctype]) {
       callback && callback(locals.DocType[doctype]);
@@ -790,7 +827,7 @@ export const model: Model = {
 
   is_single: function (doctype) {
     if (!doctype) return false;
-    return desk.boot.single_types.indexOf(doctype) != -1;
+    return dash.boot.single_types.indexOf(doctype) != -1;
   },
 
   is_tree: function (doctype) {
@@ -803,35 +840,35 @@ export const model: Model = {
     return doc && doc.__last_sync_on && new Date() - doc.__last_sync_on < 5000;
   },
 
-  can_import: function (doctype, frm, meta = null) {
+  can_import: (doctype: string, frm?: Form, meta: any = null) => {
     if (meta && !meta.allow_import) return false;
 
     // system manager can always import
     if (desk.user_roles.includes("System Manager")) return true;
 
     if (frm) return frm.perm[0].import === 1;
-    return desk.boot.user.can_import.indexOf(doctype) !== -1;
+    return dash.boot.user.can_import.indexOf(doctype) !== -1;
   },
 
-  can_export: function (doctype, frm) {
+  can_export: (doctype: string, frm?: Form) => {
     // system manager can always export
     if (desk.user_roles.includes("System Manager")) return true;
 
     if (frm) return frm.perm[0].export === 1;
-    return desk.boot.user.can_export.indexOf(doctype) !== -1;
+    return dash.boot.user.can_export.indexOf(doctype) !== -1;
   },
 
-  can_print: function (doctype, frm) {
+  can_print: (doctype: string, frm?: Form) => {
     if (frm) return frm.perm[0].print === 1;
-    return desk.boot.user.can_print.indexOf(doctype) !== -1;
+    return dash.boot.user.can_print.indexOf(doctype) !== -1;
   },
 
-  can_email: function (doctype, frm) {
+  can_email: (doctype: string, frm?: Form) => {
     if (frm) return frm.perm[0].email === 1;
-    return desk.boot.user.can_email.indexOf(doctype) !== -1;
+    return dash.boot.user.can_email.indexOf(doctype) !== -1;
   },
 
-  can_share: function (doctype, frm) {
+  can_share: (doctype: string, frm?: Form) => {
     let disable_sharing = cint(desk.sys_defaults.disable_document_sharing);
 
     if (disable_sharing && desk.session.user !== "Administrator") {
@@ -841,43 +878,24 @@ export const model: Model = {
     if (frm) {
       return frm.perm[0].share === 1;
     }
-    return desk.boot.user.can_share.indexOf(doctype) !== -1;
-  },
-
-  has_value: function (dt, dn, fn) {
-    // return true if property has value
-    var val = locals[dt] && locals[dt][dn] && locals[dt][dn][fn];
-    var df = desk.meta.get_docfield(dt, fn, dn);
-
-    let ret;
-    if (desk.model.table_fields.includes(df.fieldtype)) {
-      ret = false;
-      $.each(locals[df.options] || {}, function (k, d) {
-        if (
-          d.parent == dn &&
-          d.parenttype == dt &&
-          d.parentfield == df.fieldname
-        ) {
-          ret = true;
-          return false;
-        }
-      });
-    } else {
-      ret = !is_null(val);
-    }
-    return ret ? true : false;
+    return dash.boot.user.can_share.indexOf(doctype) !== -1;
   },
 
   get_list: function (doctype, filters) {
     var docsdict = locals[doctype] || locals[":" + doctype] || {};
-    if ($.isEmptyObject(docsdict)) return [];
+    if (Object.keys(docsdict).length === 0) return [];
     return desk.utils.filter_dict(docsdict, filters);
   },
 
-  get_value: function (doctype, filters, fieldname, callback) {
+  get_value: (
+    doctype: string,
+    filters: Record<string, any>,
+    fieldname: string,
+    callback?: (value: any) => void,
+  ) => {
     if (callback) {
-      desk.call({
-        method: "desk.client.get_value",
+      resource.call({
+        method: "frappe.client.get_value",
         args: {
           doctype: doctype,
           fieldname: fieldname,
@@ -897,18 +915,18 @@ export const model: Model = {
       ) {
         return locals[doctype][filters][fieldname];
       } else {
-        var l = desk.get_list(doctype, filters);
+        var l = model.get_list(doctype, filters);
         return l.length && l[0] ? l[0][fieldname] : null;
       }
     }
   },
 
   set_value: function (
-    doctype,
-    docname,
-    fieldname,
-    value,
-    fieldtype,
+    doctype: string,
+    docname: string,
+    fieldname: string,
+    value: any,
+    fieldtype: string,
     skip_dirty_trigger = false,
   ) {
     /* help: Set a value locally (if changed) and execute triggers */
@@ -971,7 +989,12 @@ export const model: Model = {
     desk.model.events[doctype][fieldname].push(fn);
   },
 
-  trigger: function (fieldname, value, doc, skip_dirty_trigger = false) {
+  trigger: function (
+    fieldname: string,
+    value: any,
+    doc: any,
+    skip_dirty_trigger = false,
+  ) {
     const tasks: any[] = [];
 
     function enqueue_events(events) {
@@ -1002,23 +1025,28 @@ export const model: Model = {
     return desk.run_serially(tasks);
   },
 
-  get_doc: function (doctype, name) {
+  get_doc: function (doctype: string, name: string) {
     if (!name) name = doctype;
     if ($.isPlainObject(name)) {
-      var doc = desk.get_list(doctype, name);
+      var doc = model.get_list(doctype, name);
       return doc && doc.length ? doc[0] : null;
     }
     return locals[doctype] ? locals[doctype][name] : null;
   },
 
-  get_children: function (doctype, parent, parentfield, filters) {
+  get_children: function (
+    doctype: string,
+    parent: string,
+    parentfield: string,
+    filters?: any,
+  ) {
     let doc;
     if ($.isPlainObject(doctype)) {
       doc = doctype;
       filters = parentfield;
       parentfield = parent;
     } else {
-      doc = desk.get_doc(doctype, parent);
+      doc = model.get_doc(doctype, parent);
     }
 
     var children = doc[parentfield] || [];
@@ -1029,21 +1057,21 @@ export const model: Model = {
     }
   },
 
-  clear_table: function (doc, parentfield) {
+  clear_table: function (doc: any, parentfield: string) {
     for (const d of doc[parentfield] || []) {
       delete locals[d.doctype][d.name];
     }
     doc[parentfield] = [];
   },
 
-  remove_from_locals: function (doctype, name) {
+  remove_from_locals: function (doctype: string, name: string) {
     this.clear_doc(doctype, name);
     if (desk.views.formview[doctype]) {
       delete desk.views.formview[doctype].frm.opendocs[name];
     }
   },
 
-  clear_doc: function (doctype, name) {
+  clear_doc: function (doctype: string, name: string) {
     var doc = locals[doctype] && locals[doctype][name];
     if (!doc) return;
 
@@ -1069,7 +1097,7 @@ export const model: Model = {
     }
   },
 
-  get_no_copy_list: function (doctype) {
+  get_no_copy_list: (doctype: string) => {
     var no_copy_list = [
       "name",
       "amended_from",
@@ -1077,7 +1105,7 @@ export const model: Model = {
       "cancel_reason",
     ];
 
-    var docfields = desk.get_doc("DocType", doctype).fields || [];
+    var docfields = model.get_doc("DocType", doctype).fields || [];
     for (var i = 0, j = docfields.length; i < j; i++) {
       var df = docfields[i];
       if (cint(df.no_copy)) no_copy_list.push(df.fieldname);
@@ -1095,116 +1123,7 @@ export const model: Model = {
         title = `${value} (${docname})`;
       }
     }
-    desk.confirm(__("Permanently delete {0}?", [title.bold()]), function () {
-      return desk.call({
-        method: "desk.client.delete",
-        args: {
-          doctype: doctype,
-          name: docname,
-        },
-        freeze: true,
-        freeze_message: __("Deleting {0}...", [title]),
-        callback: function (r, rt) {
-          if (!r.exc) {
-            desk.utils.play_sound("delete");
-            desk.model.clear_doc(doctype, docname);
-            if (callback) callback(r, rt);
-          }
-        },
-      });
-    });
-  },
-
-  rename_doc: (doctype: string, docname: string, callback: Function) => {
-    let message = __("Merge with existing");
-    let warning = __("This cannot be undone");
-    let merge_label = message + " <b>(" + warning + ")</b>";
-
-    var d = new desk.ui.Dialog({
-      title: __("Rename {0}", [__(docname)]),
-      fields: [
-        {
-          label: __("New Name"),
-          fieldname: "new_name",
-          fieldtype: "Data",
-          reqd: 1,
-          default: docname,
-        },
-        { label: merge_label, fieldtype: "Check", fieldname: "merge" },
-      ],
-    });
-
-    d.set_primary_action(__("Rename"), function () {
-      d.hide();
-      var args = d.get_values();
-      if (!args) return;
-      return desk.call({
-        method: "desk.rename_doc",
-        freeze: true,
-        freeze_message: "Updating related fields...",
-        args: {
-          doctype: doctype,
-          old: docname,
-          new: args.new_name,
-          merge: args.merge,
-        },
-        btn: d.get_primary_btn(),
-        callback: function (r, rt) {
-          if (!r.exc) {
-            $(document).trigger("rename", [
-              doctype,
-              docname,
-              r.message || args.new_name,
-            ]);
-            if (locals[doctype] && locals[doctype][docname])
-              delete locals[doctype][docname];
-            d.hide();
-            if (callback) callback(r.message);
-          }
-        },
-      });
-    });
-    d.show();
-  },
-
-  round_floats_in: (doc: any, fieldnames: string[] = []) => {
-    if (!doc) {
-      return;
-    }
-    if (!fieldnames) {
-      fieldnames = desk.meta.get_fieldnames(doc.doctype, doc.parent, {
-        fieldtype: ["in", ["Currency", "Float"]],
-      });
-    }
-    for (var i = 0; i < fieldnames.length; i++) {
-      var fieldname = fieldnames[i];
-      doc[fieldname] = flt(doc[fieldname], precision(fieldname, doc));
-    }
-  },
-
-  validate_missing: (doc: any, fieldname: string) => {
-    if (!doc[fieldname]) {
-      desk.throw(
-        __("Please specify") +
-          ": " +
-          __(
-            desk.meta.get_label(doc.doctype, fieldname, doc.parent || doc.name),
-          ),
-      );
-    }
-  },
-
-  get_all_docs: (doc: any) => {
-    var all = [doc];
-    for (var key in doc) {
-      if (Array.isArray(doc[key]) && !key.startsWith("_")) {
-        var children = doc[key];
-        for (var i = 0, l = children.length; i < l; i++) {
-          all.push(children[i]);
-        }
-      }
-    }
-    return all;
+    dialog.confirm(__("Permanently delete {0}?", [title.bold()]));
   },
 
   get_full_column_name: (fieldname: string, doctype: string) => {
@@ -1218,42 +1137,5 @@ export const model: Model = {
       fieldtype = fieldtype.fieldtype;
     }
     return desk.model.numeric_fieldtypes.includes(fieldtype);
-  },
-
-  set_default_views_for_doctype(doctype: string, frm: Form) {
-    desk.model.with_doctype(doctype, async () => {
-      let meta = await getMeta(doctype);
-      let default_views = ["List", "Report", "Dashboard", "Kanban"];
-
-      if (meta.is_calendar_and_gantt) {
-        let views = ["Calendar", "Gantt"];
-        default_views.push(...views);
-      }
-
-      if (meta.is_tree) {
-        default_views.push("Tree");
-      }
-
-      if (frm.doc.image_field) {
-        default_views.push("Image");
-      }
-
-      if (doctype === "Communication" && desk.boot.email_accounts.length) {
-        default_views.push("Inbox");
-      }
-
-      if (
-        (frm.doc.fields?.find((i: any) => i.fieldname === "latitude") &&
-          frm.doc.fields?.find((i: any) => i.fieldname === "longitude")) ||
-        frm.doc.fields?.find(
-          (i: any) =>
-            i.fieldname === "location" && i.fieldtype == "Geolocation",
-        )
-      ) {
-        default_views.push("Map");
-      }
-
-      frm.set_df_property("default_view", "options", default_views);
-    });
   },
 };

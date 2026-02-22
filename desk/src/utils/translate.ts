@@ -1,4 +1,7 @@
 import { useTranslationStore } from "../stores/translation";
+import { provide } from "./provide";
+
+provide("dash");
 
 export function __(
   txt: string,
@@ -10,7 +13,7 @@ export function __(
 
   let translated_text = "";
 
-  // Try to get from store first, fallback to window.desk._messages
+  // Try to get from store first, fallback to dash._messages
   try {
     const translationStore = useTranslationStore();
     translated_text = translationStore.getTranslation(
@@ -21,10 +24,14 @@ export function __(
     // Store not initialized, use window fallback
     let key = txt;
     if (context) {
-      translated_text = window.desk?._messages?.[`${key}:${context}`] || "";
+      translated_text = dash?._messages?.[`${key}:${context}`] || "";
     }
     if (!translated_text) {
-      translated_text = window.desk?._messages?.[key] || txt;
+      if (dash?._messages?.[key]) {
+        translated_text = dash._messages[key];
+      } else {
+        translated_text = txt;
+      }
     }
   }
 
@@ -95,16 +102,16 @@ export function format(message: string, ...args: any[]): string {
 }
 
 export function get_languages() {
-  if (!window.desk.languages) {
-    window.desk.languages = [];
+  if (!dash.languages) {
+    dash.languages = [];
     const langDict =
-      (window as any).dash?.boot?.lang_dict || window.desk.boot?.lang_dict;
+      (window as any).dash?.boot?.lang_dict || dash.boot?.lang_dict;
 
     if (langDict) {
       if (Array.isArray(langDict)) {
         // Array format: [{ label, value }, ...]
         langDict.forEach((element: any) => {
-          window.desk.languages.push({
+          dash.languages.push({
             label: element.label,
             value: element.value,
           });
@@ -112,7 +119,7 @@ export function get_languages() {
       } else if (langDict.array && Array.isArray(langDict.array)) {
         // Nested array format: { array: [{ label, value }, ...] }
         langDict.array.forEach((element: any) => {
-          window.desk.languages.push({
+          dash.languages.push({
             label: element.label,
             value: element.value,
           });
@@ -120,28 +127,14 @@ export function get_languages() {
       } else if (typeof langDict === "object") {
         // Flat object format: { "Afrikaans": "af", "Arabic": "ar", ... }
         Object.entries(langDict).forEach(([label, value]) => {
-          window.desk.languages.push({ label, value });
+          dash.languages.push({ label, value });
         });
       }
     }
 
-    window.desk.languages = window.desk.languages.sort(function (
-      a: any,
-      b: any,
-    ) {
+    dash.languages = dash.languages.sort(function (a: any, b: any) {
       return a.value < b.value ? -1 : 1;
     });
   }
-  return window.desk.languages;
-}
-
-// Make translation functions available globally
-if (typeof window !== "undefined" && window) {
-  try {
-    (window as any).__ = __;
-    (window as any).__n = __n;
-    (window as any).format = format;
-  } catch (e) {
-    console.warn("Could not set global translation functions:", e);
-  }
+  return dash.languages;
 }

@@ -1303,7 +1303,7 @@ async function fetchModules(forceRefresh = false) {
 
 		// If source is 'modules', use items as modules list
 		if (sb.source === "modules") {
-			modules.value = sb.items.map((item) => ({
+			modules.value = sb.items.map((item: any) => ({
 				name: item.name,
 				label: item.label,
 				icon: item.icon,

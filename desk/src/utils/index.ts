@@ -3,12 +3,14 @@ import { user } from "./user";
 import { model } from "../data/model";
 import { defineForm } from "../runtime/formContext";
 import { defineList } from "../runtime/listRuntime";
-import { resource } from "./resource";
 import { defaults } from "./defaults";
 import { datetime } from "./datetime";
 import { datatype } from "./datatype";
 import { utils } from "./utils";
 import { db } from "./db";
+import { __ } from "./translate";
+import { session } from "./session";
+import { meta } from "./meta";
 
 const number_format_info: Record<
   string,
@@ -30,8 +32,12 @@ window.desk = {
   defaultDateFormat: "YYYY-MM-DD",
   defaultTimeFormat: "HH:mm:ss",
   defaultDatetimeFormat: "YYYY-MM-DD HH:mm:ss",
+  user_defaults: {},
+  user_info: {},
+  user_roles: [],
   number_format_info,
   sys_defaults: {},
+  session: session,
   utils,
   datetime,
   defaults,
@@ -39,8 +45,10 @@ window.desk = {
   user,
   model,
   db,
+  meta,
 };
 
 (window as any).defineForm = defineForm;
 (window as any).defineList = defineList;
 Object.assign(window, datatype);
+window.__ = __;

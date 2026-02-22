@@ -229,7 +229,6 @@ import { useAppInfoStore } from "../stores/appInfo";
 import { useDialogStore } from "../stores/dialog";
 import { useUserStore } from "../stores/user";
 import { __ } from "../utils/translate";
-import { getErrorMessage, formatErrorMessage } from "../utils/errorHandler";
 import Navbar from "../layout/Navbar.vue";
 import AppCard from "../components/AppCard.vue";
 
@@ -390,11 +389,10 @@ async function confirmInstall(app_name: string) {
 		// Hard refresh to reload all metadata and boot data from server
 		window.location.href = window.location.href;
 	} catch (error: any) {
-		// Extract error from response data if available (Frappe API error response)
-		const frappeError = error?.response?.data || error;
-		const rawErrorMessage = getErrorMessage(frappeError);
-		const errorMessage = formatErrorMessage(rawErrorMessage);
-		await dialogStore.error(__("Installation Failed"), errorMessage);
+		await dialogStore.error(
+			__("Installation Failed"),
+			error.message || __("An error occurred while installing the app."),
+		);
 	}
 }
 
@@ -426,11 +424,10 @@ async function confirmUninstall(app_name: string) {
 		// Hard refresh to reload all metadata and boot data from server
 		window.location.href = window.location.href;
 	} catch (error: any) {
-		// Extract error from response data if available (Frappe API error response)
-		const frappeError = error?.response?.data || error;
-		const rawErrorMessage = getErrorMessage(frappeError);
-		const errorMessage = formatErrorMessage(rawErrorMessage);
-		await dialogStore.error(__("Uninstallation Failed"), errorMessage);
+		await dialogStore.error(
+			__("Uninstallation Failed"),
+			error.message || __("An error occurred while uninstalling the app."),
+		);
 	}
 }
 
@@ -479,11 +476,10 @@ async function installFreeMarketplaceApp(app_name: string) {
 	} catch (error: any) {
 		installingApps.value.delete(app_name);
 
-		// Extract error from response data if available (Frappe API error response)
-		const frappeError = error?.response?.data || error;
-		const rawErrorMessage = getErrorMessage(frappeError);
-		const errorMessage = formatErrorMessage(rawErrorMessage);
-		await dialogStore.error(__("Installation Failed"), errorMessage);
+		await dialogStore.error(
+			__("Installation Failed"),
+			error.message || __("An error occurred while installing the app."),
+		);
 	}
 }
 

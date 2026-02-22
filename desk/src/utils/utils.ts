@@ -1,6 +1,7 @@
 import { toast } from "@/stores/toast";
 import { __ } from "./translate";
 import numbers_system from "./numbers_system";
+import { model } from "@/data/model";
 
 export interface BaseUtils {
   get_random: (len: number) => string;
@@ -111,6 +112,8 @@ export interface BaseUtils {
   get_filter_from_json: (filter_json: string, doctype: string) => any;
   is_current_user: (user: string) => boolean;
   mask_passwords: (obj: Record<string, any>) => void;
+  get_abbr: (txt: string, max_length?: number) => string;
+  slug: (name: string) => string;
 }
 
 export const utils: BaseUtils = {
@@ -517,7 +520,7 @@ export const utils: BaseUtils = {
         filters: { name: state },
         fields: ["name", "style"],
       })
-      .then((res) => {
+      .then((res: any) => {
         const state = res[0];
         if (!state.style) {
           return utils.guess_colour(state.name);
@@ -824,7 +827,7 @@ export const utils: BaseUtils = {
         return values.reduce((a, b) => flt(a) + flt(b)) / values.length;
       } else if (column.column.fieldtype == "Int") {
         return values.reduce((a, b) => cint(a) + cint(b));
-      } else if (desk.model.is_numeric_field(column.column.fieldtype)) {
+      } else if (model.is_numeric_field(column.column.fieldtype)) {
         return values.reduce((a, b) => flt(a) + flt(b));
       } else {
         return null;
@@ -1215,5 +1218,26 @@ export const utils: BaseUtils = {
         obj[key] = "*****";
       }
     }
+  },
+
+  get_abbr: (txt: string, max_length?: number) => {
+    if (!txt) return "";
+    var abbr = "";
+    txt.split(" ").forEach((w, i) => {
+      if (abbr.length >= (max_length || 2)) {
+        // break
+        return false;
+      } else if (!w.trim().length) {
+        // continue
+        return true;
+      }
+      abbr += w.trim()[0];
+    });
+
+    return abbr || "?";
+  },
+
+  slug: (name: string) => {
+    return name.toLowerCase().replace(/ /g, "-");
   },
 };

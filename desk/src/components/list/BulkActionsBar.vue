@@ -95,6 +95,7 @@ import UserAssign from "../../icons/UserAssign.vue";
 import Tag from "../../icons/Tag.vue";
 import Printer from "../../icons/Printer.vue";
 import Trash from "../../icons/Trash.vue";
+import { __ } from "@/utils/translate";
 
 defineProps<{
 	selectedCount: number;

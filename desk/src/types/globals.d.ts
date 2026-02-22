@@ -8,6 +8,9 @@ import { DB } from "@/utils/db";
 import { BaseUtils } from "@/utils/utils";
 import { RealTimeClient } from "@/utils/socketio/client";
 import { Model } from "@/data/model";
+import { Session } from "@/utils/session";
+import { Locals } from "@/utils/locals";
+import { Meta } from "@/utils/meta";
 
 export {};
 
@@ -20,6 +23,7 @@ declare global {
       string,
       { decimal_str: string; group_sep: string; precision?: number }
     >;
+    session: Session;
     datetime: DateTimeUtils;
     defaults: Defaults;
     sys_defaults: any;
@@ -28,13 +32,18 @@ declare global {
     dom: DOM;
     user: User;
     model: Model;
-    meta: any;
+    meta: Meta;
     realtime: RealTimeClient;
+    user_defaults: any;
+    user_roles: string[];
+    user_info: any;
+    provide: (namespace: string) => any;
+    get_languages: () => { [key: string]: string };
   }
 
   var desk: Desk;
   var dash: any;
-  var locals: any;
+  var locals: Locals;
   var cstr: Datatype["cstr"];
   var strip_number_groups: Datatype["strip_number_groups"];
   var get_number_format_info: Datatype["get_number_format_info"];
@@ -76,5 +85,6 @@ declare global {
   interface Window extends Datatype {
     desk: Desk;
     dash: any;
+    __: (text: string, ...args: any[]) => string;
   }
 }

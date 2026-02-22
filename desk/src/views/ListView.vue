@@ -14,11 +14,9 @@
 					</span>
 				</div>
 				<div class="flex items-center gap-2">
-					<!-- Export -->
 					<Button @click="handleExport" variant="secondary" size="sm">
 						{{ __("Export") }}
 					</Button>
-					<!-- Refresh -->
 					<Button @click="handleRefresh" variant="secondary" size="sm">
 						{{ __("Refresh") }}
 					</Button>
@@ -30,7 +28,6 @@
 		</template>
 
 		<template #content>
-			<!-- List Component -->
 			<div
 				class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-gray-950 overflow-hidden m-2"
 			>
@@ -44,7 +41,6 @@
 import { ref, computed, onMounted, watch, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { DocTypeMeta } from "../types";
-import { frappeClient } from "../api/resource";
 import { useBreadcrumbStore } from "../stores/breadcrumbs";
 import AppLayout from "../layout/AppLayout.vue";
 import ListView from "../components/list/ListView.vue";
@@ -136,8 +132,7 @@ function cleanupRealtimeSubscriptions() {
 
 onMounted(async () => {
 	try {
-		const response = await getMeta(doctype.value);
-		meta.value = response.message.docs?.[0] || null;
+		meta.value = await getMeta(doctype.value);
 
 		// If issingle, redirect to form view for the single doc
 		if (meta.value?.issingle) {
@@ -152,17 +147,13 @@ onMounted(async () => {
 			return;
 		}
 
-		// Update breadcrumbs with proper label
 		breadcrumbStore.setForList(app.value, doctype.value, meta.value?.label || doctype.value);
-
-		// Setup realtime subscriptions
 		setupRealtimeSubscriptions();
 	} catch (err) {
 		console.error("Failed to load doctype meta:", err);
 	}
 });
 
-// Cleanup on route change
 watch(doctype, (newDoctype, oldDoctype) => {
 	if (oldDoctype) {
 		cleanupRealtimeSubscriptions();
@@ -172,7 +163,6 @@ watch(doctype, (newDoctype, oldDoctype) => {
 	}
 });
 
-// Cleanup on component unmount
 onUnmounted(() => {
 	cleanupRealtimeSubscriptions();
 });
@@ -219,7 +209,6 @@ function handleRefresh() {
 }
 
 function handleExport() {
-	// Open Frappe report builder / export in a new tab
 	window.open(
 		`/api/method/frappe.client.get_list?doctype=${doctype.value}&fields=["*"]&limit_page_length=0&as_dict=1`,
 		"_blank",
