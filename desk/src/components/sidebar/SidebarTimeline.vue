@@ -152,7 +152,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import type { Document } from "../../types";
-import { desk } from "../../utils/desk";
+import { resource } from "../../utils/resource";
 import { useRouter } from "vue-router";
 import { __ } from "../../utils/translate";
 
@@ -185,7 +185,7 @@ const fieldLabelMap = ref<Record<string, string>>({});
 /** Build a map of fieldname → label from DocType meta */
 async function buildFieldLabelMap() {
 	try {
-		const res = await desk.call({
+		const res = await resource.call({
 			method: "frappe.client.get",
 			args: { doctype: "DocType", name: props.doctype },
 		});
@@ -220,7 +220,7 @@ async function loadTimeline() {
 		await buildFieldLabelMap();
 
 		const [versionsRes, commentsRes] = await Promise.all([
-			desk.call({
+			resource.call({
 				method: "frappe.client.get_list",
 				args: {
 					doctype: "Version",
@@ -233,7 +233,7 @@ async function loadTimeline() {
 					limit_page_length: 100,
 				},
 			}),
-			desk.call({
+			resource.call({
 				method: "frappe.client.get_list",
 				args: {
 					doctype: "Comment",

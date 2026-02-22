@@ -12,7 +12,7 @@ export const fieldComponentMap: Record<FieldType, string> = {
   "Attach Image": "AttachField",
   Currency: "CurrencyField",
   Date: "DateField",
-  DateTime: "DateTimeField",
+  Datetime: "DateTimeField",
   Time: "TimeField",
   Float: "FloatField",
   Int: "IntField",

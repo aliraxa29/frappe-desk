@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import type { Document } from "../../types";
-import { desk } from "../../utils/desk";
+import { resource } from "../../utils/resource";
 import { useToastStore } from "../../stores/toast";
 import X from "../../icons/X.vue";
 import { __ } from "../../utils/translate";
@@ -70,7 +70,7 @@ async function loadTags() {
 	if (!props.doc?.name) return;
 	try {
 		// _user_tags is a comma-separated string stored on the document
-		const response = await desk.call({
+		const response = await resource.call({
 			method: "frappe.client.get_value",
 			args: {
 				doctype: props.doctype,
@@ -96,7 +96,7 @@ async function addTag() {
 		return;
 	}
 	try {
-		await desk.call({
+		await resource.call({
 			method: "frappe.desk.doctype.tag.tag.add_tag",
 			args: { tag: tagName, dt: props.doctype, dn: props.doc.name },
 		});
@@ -110,7 +110,7 @@ async function addTag() {
 async function removeTag(tag: string) {
 	if (!props.doc?.name) return;
 	try {
-		await desk.call({
+		await resource.call({
 			method: "frappe.desk.doctype.tag.tag.remove_tag",
 			args: { tag, dt: props.doctype, dn: props.doc.name },
 		});

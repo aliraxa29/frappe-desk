@@ -3,7 +3,7 @@
  * Loads all search data once at startup and searches locally (no API calls per search)
  */
 
-import { desk } from "./desk";
+import { resource } from "./resource";
 import { fuzzyMatch, getMarkedString } from "./fuzzyMatch";
 import { router } from "../router";
 
@@ -199,7 +199,7 @@ class SearchManager {
         dashboardRes,
         appsRes,
       ] = await Promise.all([
-        desk.call({
+        resource.call({
           method: "frappe.client.get_list",
           args: {
             doctype: "DocType",
@@ -208,7 +208,7 @@ class SearchManager {
             limit_page_length: 0,
           },
         }),
-        desk.call({
+        resource.call({
           method: "frappe.client.get_list",
           args: {
             doctype: "Report",
@@ -217,7 +217,7 @@ class SearchManager {
             limit_page_length: 0,
           },
         }),
-        desk.call({
+        resource.call({
           method: "frappe.client.get_list",
           args: {
             doctype: "Page",
@@ -225,7 +225,7 @@ class SearchManager {
             limit_page_length: 0,
           },
         }),
-        desk.call({
+        resource.call({
           method: "frappe.client.get_list",
           args: {
             doctype: "Workspace",
@@ -233,7 +233,7 @@ class SearchManager {
             limit_page_length: 0,
           },
         }),
-        desk.call({
+        resource.call({
           method: "frappe.client.get_list",
           args: {
             doctype: "Dashboard",
@@ -241,7 +241,7 @@ class SearchManager {
             limit_page_length: 0,
           },
         }),
-        desk.call({
+        resource.call({
           method: "desktop.api.apps.get_installed_apps",
         }),
       ]);
@@ -702,7 +702,7 @@ class SearchManager {
     if (query.length < 3) return [];
 
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "frappe.utils.global_search.search",
         args: { text: query, start: 0, limit: 10 },
       });

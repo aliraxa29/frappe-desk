@@ -7,6 +7,7 @@ import Button from "../components/Button.vue";
 import Spinner from "../icons/Spinner.vue";
 import Eye from "../icons/Eye.vue";
 import EyeOff from "../icons/EyeOff.vue";
+import { __ } from "@/utils/translate";
 
 const router = useRouter();
 const route = useRoute();

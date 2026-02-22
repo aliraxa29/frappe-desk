@@ -1,6 +1,6 @@
 type CSSStyles = Partial<CSSStyleDeclaration>;
 
-export interface DeskDom {
+export interface DOM {
   id_count: number;
   freeze_count: number;
   by_id(id: string): HTMLElement | null;
@@ -41,7 +41,7 @@ export interface DeskDom {
   is_online(): boolean;
 }
 
-export const dom: DeskDom = {
+export const dom: DOM = {
   id_count: 0,
   freeze_count: 0,
 
@@ -248,8 +248,12 @@ export const dom: DeskDom = {
     return text.length > max ? `${text.slice(0, max)}...` : text;
   },
 
-  run_serially(tasks: Array<() => Promise<unknown> | void>) {
-    return tasks.reduce((p, task) => p.then(() => task?.()), Promise.resolve());
+  async run_serially(tasks: Array<() => Promise<unknown> | void>) {
+    for (const task of tasks) {
+      if (task) {
+        await task();
+      }
+    }
   },
 
   load_image(

@@ -108,7 +108,7 @@
 <script setup lang="ts">
 import { ref, nextTick, watch } from "vue";
 import type { Document } from "../../types";
-import { desk } from "../../utils/desk";
+import { resource } from "../../utils/resource";
 import { useToastStore } from "../../stores/toast";
 import X from "../../icons/X.vue";
 import Plus from "../../icons/Plus.vue";
@@ -151,7 +151,7 @@ async function loadAssignments() {
 	}
 	loading.value = true;
 	try {
-		const res = await desk.call({
+		const res = await resource.call({
 			method: "frappe.desk.form.assign_to.get",
 			args: { doctype: props.doctype, name: props.doc.name },
 		});
@@ -161,7 +161,7 @@ async function loadAssignments() {
 		const enriched = await Promise.all(
 			items.map(async (item: any) => {
 				try {
-					const userRes = await desk.call({
+					const userRes = await resource.call({
 						method: "frappe.client.get_value",
 						args: {
 							doctype: "User",
@@ -196,7 +196,7 @@ async function openAdd() {
 async function searchUsers() {
 	loadingUsers.value = true;
 	try {
-		const res = await desk.call({
+		const res = await resource.call({
 			method: "frappe.client.get_list",
 			args: {
 				doctype: "User",
@@ -224,7 +224,7 @@ async function searchUsers() {
 async function addAssignment(user: string) {
 	if (!props.doc?.name) return;
 	try {
-		await desk.call({
+		await resource.call({
 			method: "frappe.desk.form.assign_to.add",
 			args: {
 				doctype: props.doctype,
@@ -247,7 +247,7 @@ async function addAssignment(user: string) {
 async function removeAssignment(user: string) {
 	if (!props.doc?.name) return;
 	try {
-		await desk.call({
+		await resource.call({
 			method: "frappe.desk.form.assign_to.remove",
 			args: { doctype: props.doctype, name: props.doc.name, assign_to: user },
 		});

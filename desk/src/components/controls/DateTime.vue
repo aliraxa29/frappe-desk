@@ -33,37 +33,25 @@
 				class="absolute top-full left-0 mt-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg shadow-lg p-3 z-200"
 				style="width: 320px"
 			>
-				<!-- DateTime Display -->
 				<div class="text-center mb-3 pb-2 border-b border-gray-200">
-					<div
-						class="text-sm font-semibold text-slate-900 dark:text-slate-100 font-mono"
-					>
+					<div class="text-sm font-semibold text-slate-900 dark:text-slate-100">
 						{{ formatDate(year, month, day) }} {{ padTime(hour) }}:{{
 							padTime(minute)
 						}}:{{ padTime(second) }}
 					</div>
 				</div>
 
-				<!-- Calendar Section -->
 				<div class="mb-3">
 					<div class="flex justify-between items-center mb-3">
-						<button
-							type="button"
-							@click="prevMonth"
-							class="px-3 py-1.5 bg-blue-600 text-white rounded font-medium text-xs hover:bg-blue-700 transition-colors duration-200"
-						>
+						<Button variant="primary" size="sm" @click="prevMonth" class="px-3 py-1.5">
 							← Prev
-						</button>
+						</Button>
 						<span class="text-xs font-semibold text-slate-700 dark:text-slate-200"
 							>{{ getMonthName(month) }} {{ year }}</span
 						>
-						<button
-							type="button"
-							@click="nextMonth"
-							class="px-3 py-1.5 bg-blue-600 text-white rounded font-medium text-xs hover:bg-blue-700 transition-colors duration-200"
-						>
+						<Button variant="primary" size="sm" @click="nextMonth" class="px-3 py-1.5">
 							Next →
-						</button>
+						</Button>
 					</div>
 
 					<div class="grid grid-cols-7 gap-1 mb-2">
@@ -91,25 +79,23 @@
 					</div>
 				</div>
 
-				<!-- Time Section -->
 				<div class="border-t border-gray-200 pt-3">
 					<div class="mb-2">
 						<div class="flex justify-between items-center mb-1">
 							<label
 								class="text-xs font-medium text-slate-600 dark:text-slate-300 uppercase tracking-wide text-[11px]"
-								>Hour</label
+								>{{ __("Hour") }}</label
 							>
-							<span
-								class="text-xs font-semibold text-slate-700 dark:text-slate-200"
-								>{{ padTime(hour) }}</span
-							>
+							<span class="text-xs font-semibold text-slate-700 dark:text-slate-200">
+								{{ padTime(hour) }}
+							</span>
 						</div>
 						<input
 							v-model.number="hour"
 							type="range"
 							min="0"
 							max="23"
-							class="w-full h-1.5 bg-gray-200 rounded appearance-none cursor-pointer slider"
+							class="w-full h-1.5 bg-gray-200 rounded appearance-none cursor-pointer slider dark-slider-bg"
 							@input="emitValue"
 						/>
 					</div>
@@ -117,7 +103,8 @@
 						<div class="flex justify-between items-center mb-1">
 							<label
 								class="text-xs font-medium text-slate-600 dark:text-slate-300 uppercase tracking-wide text-[11px]"
-								>Minute</label
+							>
+								{{ __("Minute") }}</label
 							>
 							<span
 								class="text-xs font-semibold text-slate-700 dark:text-slate-200"
@@ -137,12 +124,12 @@
 						<div class="flex justify-between items-center mb-1">
 							<label
 								class="text-xs font-medium text-slate-600 dark:text-slate-300 uppercase tracking-wide text-[11px]"
-								>Second</label
 							>
-							<span
-								class="text-xs font-semibold text-slate-700 dark:text-slate-200"
-								>{{ padTime(second) }}</span
-							>
+								{{ __("Second") }}
+							</label>
+							<span class="text-xs font-semibold text-slate-700 dark:text-slate-200">
+								{{ padTime(second) }}
+							</span>
 						</div>
 						<input
 							v-model.number="second"
@@ -154,13 +141,9 @@
 						/>
 					</div>
 
-					<button
-						type="button"
-						@click="setNow"
-						class="w-full px-3 py-1.5 bg-blue-600 text-white rounded font-medium text-xs hover:bg-blue-700 transition-colors duration-200"
-					>
-						Now
-					</button>
+					<Button variant="primary" @click="setNow" class="w-full px-3 py-1.5">
+						{{ __("Now") }}
+					</Button>
 				</div>
 			</div>
 		</Transition>
@@ -170,6 +153,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import type { Field } from "../../types";
+import Button from "../Button.vue";
 
 const props = defineProps<{
 	field: Field;
@@ -179,7 +163,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
 	"update:modelValue": [value: any];
-	blur: [];
 }>();
 
 const year = ref(new Date().getFullYear());
@@ -274,7 +257,12 @@ function formatDateTime(): string {
 }
 
 function parseDateTime(dateTimeStr: string) {
-	if (!dateTimeStr || typeof dateTimeStr !== "string" || dateTimeStr === "0000-00-00 00:00:00") {
+	if (
+		!dateTimeStr ||
+		typeof dateTimeStr !== "string" ||
+		dateTimeStr === "0000-00-00 00:00:00" ||
+		dateTimeStr.toLowerCase() === "now"
+	) {
 		const now = new Date();
 		year.value = now.getFullYear();
 		month.value = now.getMonth();
@@ -282,6 +270,7 @@ function parseDateTime(dateTimeStr: string) {
 		hour.value = now.getHours();
 		minute.value = now.getMinutes();
 		second.value = now.getSeconds();
+		setNow();
 		return;
 	}
 	const [datePart, timePart] = dateTimeStr.split(" ");
@@ -316,7 +305,7 @@ function setNow() {
 watch(
 	() => props.modelValue,
 	(newVal) => {
-		if (newVal) parseDateTime(newVal as string);
+		if (newVal !== undefined && newVal !== null) parseDateTime(newVal as string);
 	},
 );
 
@@ -347,35 +336,46 @@ onBeforeUnmount(() => {
 	-webkit-appearance: none;
 	appearance: none;
 }
+
 .slider::-webkit-slider-thumb {
 	-webkit-appearance: none;
 	appearance: none;
 	width: 16px;
 	height: 16px;
 	border-radius: 9999px;
-	background: #2563eb;
+	background: var(--color-gray-900);
 	cursor: pointer;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-	margin-top: -6.25px;
+	margin-top: -2.25px;
 }
+
 .slider::-webkit-slider-thumb:hover {
-	background: #1d4ed8;
+	background: var(--color-gray-900);
 	transform: scale(1.15);
 }
+
 .slider::-moz-range-thumb {
 	width: 16px;
 	height: 16px;
 	border-radius: 9999px;
-	background: #2563eb;
+	background: var(--color-gray-900);
 	cursor: pointer;
 	border: none;
 }
+
+.dark-slider-bg {
+	&:where(.dark, .dark *) {
+		background: var(--color-gray-500);
+	}
+}
+
 .picker-enter-active,
 .picker-leave-active {
 	transition:
 		opacity 0.2s,
 		transform 0.2s;
 }
+
 .picker-enter-from,
 .picker-leave-to {
 	opacity: 0;

@@ -198,7 +198,37 @@ function createNewDocument(doctype: string, meta: DocTypeMeta): Document {
 
 	for (const field of meta.fields) {
 		if (field.default) {
-			doc[field.fieldname] = field.default;
+			const defaultVal = String(field.default).toLowerCase();
+
+			if (field.fieldtype === "Datetime" && defaultVal === "now") {
+				const now = new Date();
+				const year = now.getFullYear();
+				const month = String(now.getMonth() + 1).padStart(2, "0");
+				const day = String(now.getDate()).padStart(2, "0");
+				const hours = String(now.getHours()).padStart(2, "0");
+				const minutes = String(now.getMinutes()).padStart(2, "0");
+				const seconds = String(now.getSeconds()).padStart(2, "0");
+				doc[field.fieldname] = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+			} else if (field.fieldtype === "Date" && defaultVal === "now") {
+				const today = new Date();
+				const year = today.getFullYear();
+				const month = String(today.getMonth() + 1).padStart(2, "0");
+				const day = String(today.getDate()).padStart(2, "0");
+				doc[field.fieldname] = `${year}-${month}-${day}`;
+			} else if (field.fieldtype === "Time" && defaultVal === "now") {
+				const now = new Date();
+				const hours = String(now.getHours()).padStart(2, "0");
+				const minutes = String(now.getMinutes()).padStart(2, "0");
+				const seconds = String(now.getSeconds()).padStart(2, "0");
+				doc[field.fieldname] = `${hours}:${minutes}:${seconds}`;
+			} else if (
+				["Int", "Float", "Currency"].includes(field.fieldtype) &&
+				!isNaN(Number(field.default))
+			) {
+				doc[field.fieldname] = Number(field.default);
+			} else {
+				doc[field.fieldname] = field.default;
+			}
 		} else if (field.fieldtype === "Table") {
 			doc[field.fieldname] = [];
 		} else if (field.fieldtype === "Check") {
@@ -386,10 +416,10 @@ async function onLoad() {
 	cleanupRealtimeSubscriptions();
 
 	try {
-		if (!(window as any).locals?.DocType?.[props.doctype]) {
+		if (!locals?.DocType?.[props.doctype]) {
 			meta.value = await loadMeta(props.doctype);
 		} else {
-			meta.value = (window as any).locals.DocType[props.doctype];
+			meta.value = locals.DocType[props.doctype];
 		}
 		if (meta.value) {
 			meta.value.fields = applyAutonameFields(meta.value, isNewDocument);
@@ -411,7 +441,7 @@ async function onLoad() {
 		let doc: Document;
 
 		if (!isNewDocument && props.docname) {
-			doc = await frappeClient.getDocument(props.doctype, props.docname);
+			doc = await desk.db.get_doc(props.doctype, props.docname);
 
 			if (!doc || typeof doc !== "object") {
 				throw new Error("Failed to load document: Invalid response");

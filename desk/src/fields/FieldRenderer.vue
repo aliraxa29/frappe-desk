@@ -8,9 +8,10 @@
 </template>
 
 <script setup lang="ts">
-import type { Field, FormContext, FieldType } from "../types";
+import type { Field, FieldType } from "../types";
 import { getFieldComponent } from "../fields/registry";
 import { defineAsyncComponent } from "vue";
+import type { Form } from "../metadata/form";
 
 const props = defineProps({
 	field: {
@@ -18,7 +19,7 @@ const props = defineProps({
 		required: true,
 	},
 	ctx: {
-		type: Object as () => FormContext,
+		type: Object as () => Form,
 		required: true,
 	},
 });

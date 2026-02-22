@@ -12,6 +12,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
     "apexcharts": "^5.3.6",
+    "dayjs": "^1.11.19",
     "pinia": "^3.0.4",
     "quill": "^2.0.3",
     "socket.io": "^4.7.1",

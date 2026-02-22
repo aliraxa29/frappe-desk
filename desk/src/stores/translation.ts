@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { desk } from "../utils/desk";
+import { resource } from "../utils/resource";
 
 export interface TranslationData {
   [key: string]: string;
@@ -65,16 +65,13 @@ export const useTranslationStore = defineStore("translation", () => {
    */
   async function loadTranslationsFromAPI(lang: string) {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "desktop.api.translations.get_translations",
         args: { lang },
       });
-
+      debugger;
       if (response.message) {
-        loadTranslations(
-          response.message.messages || {},
-          response.message.lang,
-        );
+        loadTranslations(response.messages || {}, response.lang);
       }
     } catch (error) {
       console.error(`Failed to load translations for ${lang}:`, error);

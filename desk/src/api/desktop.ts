@@ -1,4 +1,4 @@
-import { desk } from "../utils/desk";
+import { resource } from "../utils/resource";
 import {
   APP_SIDEBARS,
   type SidebarItem,
@@ -97,7 +97,7 @@ class DesktopAPI {
         return this.appsCache;
       }
 
-      const response = await desk.call({
+      const response = await resource.call({
         method: "desktop.api.apps.get_installed_apps",
       });
 
@@ -131,7 +131,7 @@ class DesktopAPI {
    */
   async getAvailableApps(): Promise<AppInfo[]> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "desktop.api.apps.get_available_apps",
       });
 
@@ -150,7 +150,7 @@ class DesktopAPI {
    * Install an app from bench
    */
   async installApp(app: string): Promise<any> {
-    const response = await desk.call({
+    const response = await resource.call({
       method: "desktop.api.apps.install_app",
       args: { app },
       freeze: true,
@@ -168,7 +168,7 @@ class DesktopAPI {
    * Uninstall an app from this site
    */
   async uninstallApp(app: string): Promise<any> {
-    const response = await desk.call({
+    const response = await resource.call({
       method: "desktop.api.apps.uninstall_app",
       args: { app },
       freeze: true,
@@ -196,7 +196,7 @@ class DesktopAPI {
         return this.searchDataCache;
       }
 
-      const response = await desk.call({
+      const response = await resource.call({
         method: "desktop.api.apps.get_search_data",
       });
 
@@ -230,7 +230,7 @@ class DesktopAPI {
    */
   async getModuleDoctypes(module: string): Promise<string[]> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "desktop.api.apps.get_module_doctypes",
         args: { module_name: module },
       });
@@ -252,7 +252,7 @@ class DesktopAPI {
    */
   async getModuleSidebar(app: string): Promise<SidebarResponse> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "desktop.api.apps.get_module_sidebar",
         args: { app },
       });
@@ -288,7 +288,7 @@ class DesktopAPI {
    */
   async getModuleContent(moduleName: string): Promise<ModuleContent> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "desktop.api.apps.get_module_content",
         args: { module_name: moduleName },
       });
@@ -327,7 +327,7 @@ class DesktopAPI {
    */
   async getWorkspaceContent(workspaceName: string): Promise<WorkspaceContent> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "desktop.api.apps.get_workspace_content",
         args: { workspace_name: workspaceName },
       });
@@ -369,7 +369,7 @@ class DesktopAPI {
         return [];
       }
 
-      const response = await desk.call({
+      const response = await resource.call({
         method: "desktop.api.apps.search_doctypes",
         args: { query },
       });

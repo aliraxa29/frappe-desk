@@ -167,7 +167,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import type { Field, DocTypeMeta } from "../../types";
-import { desk } from "../../utils/desk";
+import { desk } from "../../utils/resource";
 
 const props = defineProps<{
 	field: Field;

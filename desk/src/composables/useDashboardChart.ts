@@ -3,7 +3,7 @@
  */
 
 import { ref, onMounted } from "vue";
-import { desk } from "../utils/desk";
+import { desk } from "../utils/resource";
 import type {
   DashboardChart,
   ChartData,

@@ -38,8 +38,9 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import type { Field, FormContext } from "../types";
+import type { Field } from "../types";
 import { evaluateDependsOn } from "../utils/dependsOn";
+import type { Form } from "../metadata/form";
 
 export interface TabDefinition {
 	fieldname?: string;
@@ -53,7 +54,7 @@ const props = withDefaults(
 	defineProps<{
 		tabs: TabDefinition[];
 		defaultTab?: number;
-		ctx?: FormContext | null;
+		ctx?: Form | null;
 	}>(),
 	{
 		defaultTab: 0,

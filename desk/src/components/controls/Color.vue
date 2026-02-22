@@ -361,6 +361,7 @@ watch(
 			setSelectorPositions();
 		}
 	},
+	{ immediate: true },
 );
 
 let clickOutsideHandler: ((e: Event) => void) | null = null;

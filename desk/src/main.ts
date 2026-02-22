@@ -5,13 +5,12 @@ import App from "./App.vue";
 import { router } from "./router";
 import { initializeGlobals } from "./utils/app";
 import "./utils/index";
-import { initializeLocalsGlobal } from "./utils/locals/localsGlobal";
-import desk_object from "./plugins/desk_object";
 import { realtime } from "./utils/socketio/client";
 import { initializeRealtimeNotifications } from "./utils/socketio/notifications";
 import { useThemeStore } from "./stores/theme";
 import { useTranslationStore } from "./stores/translation";
 import "./utils/translate";
+import dayjs from "./plugins/dayjs";
 
 initializeGlobals();
 
@@ -19,9 +18,6 @@ const app = createApp(App);
 const pinia = createPinia();
 app.use(pinia);
 
-initializeLocalsGlobal(pinia);
-
-// Initialize theme
 const themeStore = useThemeStore(pinia);
 themeStore.initializeTheme();
 themeStore.watchSystemTheme();
@@ -43,5 +39,5 @@ realtime.init(bootData);
 initializeRealtimeNotifications();
 
 app.use(router);
-app.use(desk_object);
+app.provide("dayjs", dayjs);
 app.mount("#app");

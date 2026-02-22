@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import { desk } from "../utils/desk";
+import { resource } from "../utils/resource";
 
 export const useAuthStore = defineStore("auth", () => {
   // Initialize from boot data — no API call needed on page load
@@ -29,7 +29,7 @@ export const useAuthStore = defineStore("auth", () => {
     loading.value = true;
     error.value = null;
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "frappe.auth.get_logged_user",
       });
 
@@ -59,7 +59,7 @@ export const useAuthStore = defineStore("auth", () => {
     loading.value = true;
     error.value = null;
     try {
-      await desk.call({
+      await resource.call({
         method: "login",
         args: {
           usr: email,
@@ -85,7 +85,7 @@ export const useAuthStore = defineStore("auth", () => {
     loading.value = true;
     error.value = null;
     try {
-      await desk.call({
+      await resource.call({
         method: "logout",
       });
       user.value = null;
@@ -106,7 +106,7 @@ export const useAuthStore = defineStore("auth", () => {
     loading.value = true;
     error.value = null;
     try {
-      await desk.call({
+      await resource.call({
         method: "frappe.core.doctype.user.user.reset_password",
         args: {
           user: loginId,

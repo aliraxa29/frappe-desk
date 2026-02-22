@@ -228,7 +228,14 @@ function handleClickOutside(event: MouseEvent) {
 watch(
 	() => props.modelValue,
 	(val) => {
-		if (val) {
+		if (val && typeof val === "string") {
+			if (val.toLowerCase() === "now") {
+				const today = new Date();
+				year.value = today.getFullYear();
+				month.value = today.getMonth();
+				day.value = today.getDate();
+				return;
+			}
 			const date = new Date(val);
 			if (!isNaN(date.getTime())) {
 				year.value = date.getFullYear();

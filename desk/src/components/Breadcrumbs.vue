@@ -1,8 +1,6 @@
 <template>
 	<div v-if="breadcrumbs.length > 0" class="flex items-center min-w-0 gap-1.5 text-sm">
-		<!-- Collapsed breadcrumbs (shown when there are many items) -->
 		<template v-if="shouldCollapse">
-			<!-- First item (App) - always show -->
 			<router-link
 				v-if="breadcrumbs[0]?.route"
 				:to="breadcrumbs[0].route"
@@ -11,9 +9,9 @@
 			>
 				{{ breadcrumbs[0].label }}
 			</router-link>
-
-			<!-- Separator -->
-			<span class="shrink-0">></span>
+			<span class="shrink-0">
+				<chevron-right />
+			</span>
 
 			<!-- Ellipsis dropdown for middle items -->
 			<div class="relative" v-if="middleItems.length > 0">
@@ -84,6 +82,7 @@ import { useRoute } from "vue-router";
 import { useBreadcrumbStore } from "../stores/breadcrumbs";
 import { storeToRefs } from "pinia";
 import { toast } from "../stores/toast";
+import ChevronRight from "../icons/ChevronRight.vue";
 
 const route = useRoute();
 const breadcrumbStore = useBreadcrumbStore();

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import { desk } from "../utils/desk";
+import { resource } from "../utils/resource";
 
 export interface UserInfo {
   name: string;
@@ -57,7 +57,7 @@ export const useUserStore = defineStore("user", () => {
     loading.value = true;
     error.value = null;
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "frappe.client.get",
         args: {
           doctype: "User",
@@ -88,7 +88,7 @@ export const useUserStore = defineStore("user", () => {
     try {
       if (!currentUser.value) return false;
 
-      const response = await desk.call({
+      const response = await resource.call({
         method: "frappe.client.set_value",
         args: {
           doctype: "User",

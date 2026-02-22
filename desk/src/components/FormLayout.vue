@@ -67,17 +67,18 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import type { Field, FormContext, ParsedSection } from "../types";
+import type { Field, ParsedSection } from "../types";
 import FieldRenderer from "../fields/FieldRenderer.vue";
 import FormSectionContent from "./FormSectionContent.vue";
 import Accordion from "./Accordion.vue";
 import X from "../icons/X.vue";
 import { __ } from "../utils/translate";
 import { evaluateDependsOn } from "../utils/dependsOn";
+import type { Form } from "../metadata/form";
 
 interface Props {
 	sections: ParsedSection[];
-	ctx: FormContext | null;
+	ctx: Form | null;
 	imageFieldname?: string;
 }
 

@@ -152,7 +152,11 @@ function handleClickOutside(event: MouseEvent) {
 watch(
 	() => props.modelValue,
 	(val) => {
-		if (val) {
+		if (val && typeof val === "string") {
+			if (val.toLowerCase() === "now") {
+				setNow();
+				return;
+			}
 			const parts = val.split(":");
 			hour.value = parseInt(parts[0]) || 0;
 			minute.value = parseInt(parts[1]) || 0;

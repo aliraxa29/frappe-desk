@@ -1,4 +1,4 @@
-import { desk } from "../utils/desk";
+import { resource } from "../utils/resource";
 
 export interface MarketplaceApp {
   app_name: string;
@@ -40,7 +40,7 @@ class MarketplaceAPI {
     filters?: MarketplaceFilters,
   ): Promise<MarketplaceApp[]> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "desktop.api.get_marketplace_apps",
       });
       let apps = response.message.data || [];
@@ -73,7 +73,7 @@ class MarketplaceAPI {
    */
   async getMarketplaceApp(appName: string): Promise<MarketplaceApp | null> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "frappe.client.get",
         args: {
           doctype: "Marketplace App",
@@ -167,7 +167,7 @@ class MarketplaceAPI {
    */
   async installMarketplaceApp(repoUrl: string, appName?: string): Promise<any> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "desktop.api.install_marketplace_app",
         args: {
           repo_url: repoUrl,

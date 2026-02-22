@@ -52,6 +52,7 @@ import Button from "../components/Button.vue";
 import { realtime } from "../utils/socketio/client";
 import { openQuickEntry } from "../composables/useQuickEntry";
 import { getMeta } from "../metadata";
+import { __ } from "@/utils/translate";
 
 const route = useRoute();
 const router = useRouter();

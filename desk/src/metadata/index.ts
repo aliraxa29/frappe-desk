@@ -1,8 +1,8 @@
-import { desk } from "../utils/desk";
+import { resource } from "../utils/resource";
 
 export async function getMeta(doctype: string) {
   try {
-    const response = await desk.call({
+    const response = await resource.call({
       method: "desktop.meta.get_meta",
       args: {
         doctype: doctype,

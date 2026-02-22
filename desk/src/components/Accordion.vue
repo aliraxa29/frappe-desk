@@ -36,7 +36,7 @@
 				class="transition-all duration-300"
 				:style="isOpen ? 'max-height: none;' : 'max-height: 0; overflow: hidden;'"
 			>
-				<div class="py-2 px-6">
+				<div class="py-6 px-3.5">
 					<slot />
 				</div>
 			</div>

@@ -135,7 +135,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import type { Field } from "../../types";
-import { desk } from "../../utils/desk";
+import { desk } from "../../utils/resource";
 import { __ } from "../../utils/translate";
 import ArrowRight from "../../icons/ArrowRight.vue";
 import Close from "../../icons/Close.vue";
@@ -368,13 +368,17 @@ onMounted(() => {
 });
 
 // Watch for external changes (discard, reload, etc)
-watch(currentValue, (newVal) => {
-	if (newVal) {
-		searchText.value = newVal;
-	} else {
-		searchText.value = "";
-	}
-});
+watch(
+	currentValue,
+	(newVal) => {
+		if (newVal) {
+			searchText.value = newVal;
+		} else {
+			searchText.value = "";
+		}
+	},
+	{ immediate: true },
+);
 
 onBeforeUnmount(() => {
 	if (searchTimeout) clearTimeout(searchTimeout);

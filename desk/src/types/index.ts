@@ -87,6 +87,7 @@ export interface Field {
   make_attachment_public?: number;
   documentation_url?: string;
   placeholder?: string;
+  parent?: string;
 }
 
 // List View Column definition
@@ -118,7 +119,7 @@ export type FieldType =
   | "Attach Image"
   | "Currency"
   | "Date"
-  | "DateTime"
+  | "Datetime"
   | "Time"
   | "Float"
   | "Int"

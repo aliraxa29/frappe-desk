@@ -1,8 +1,12 @@
-import { call } from "../utils/desk";
+import { resource } from "../utils/resource";
 import { __ } from "../utils/translate";
 import { loadScript } from "../runtime/scriptLoader";
+import { getMeta } from "@/metadata";
+import { Form } from "@/runtime/formContext";
+import { dialog } from "@/stores/dialog";
 
 export interface Model {
+  docinfo: any;
   all_fieldtypes: string[];
   no_value_type: string[];
   layout_fields: string[];
@@ -68,9 +72,27 @@ export interface Model {
     doc: any,
     skip_dirty_trigger?: boolean,
   ): Promise<void>;
+  sync: (r: any) => any;
+  add_to_locals: (doc: any) => void;
+  rename_after_save: (d: any, i: number) => void;
+  sync_docinfo: (r: any) => any;
+  update_in_locals: (doc: any) => void;
+  get_new_doc: (
+    doctype: string,
+    parent_doc?: any,
+    parentfield?: string,
+    with_mandatory_children?: boolean,
+  ) => any;
+  make_new_doc_and_get_name: (
+    doctype: string,
+    with_mandatory_children?: boolean,
+  ) => string;
+  get_new_name: (doctype: string) => string;
 }
 
 export const model: Model = {
+  docinfo: {},
+
   all_fieldtypes: [
     "Autocomplete",
     "Attach",
@@ -225,48 +247,12 @@ export const model: Model = {
   events: {},
   user_settings: {},
 
-  init: function () {
-    // setup refresh if the document is updated somewhere else
-    desk.realtime.on("doc_update", function (data) {
-      var doc = locals[data.doctype] && locals[data.doctype][data.name];
-
-      if (doc) {
-        // current document is dirty, show message if its not me
-        if (
-          desk.get_route()[0] === "Form" &&
-          cur_frm.doc.doctype === doc.doctype &&
-          cur_frm.doc.name === doc.name
-        ) {
-          if (
-            data.modified !== cur_frm.doc.modified &&
-            !desk.ui.form.is_saving
-          ) {
-            if (!cur_frm.is_dirty()) {
-              cur_frm.debounced_reload_doc();
-            } else {
-              doc.__needs_refresh = true;
-              cur_frm.show_conflict_message();
-            }
-          }
-        } else {
-          if (!doc.__unsaved) {
-            // no local changes, remove from locals
-            desk.model.remove_from_locals(doc.doctype, doc.name);
-          } else {
-            // show message when user navigates back
-            doc.__needs_refresh = true;
-          }
-        }
-      }
-    });
-  },
-
   is_value_type: function (fieldtype) {
     if (typeof fieldtype == "object") {
       fieldtype = fieldtype.fieldtype;
     }
     // not in no-value type
-    return desk.model.no_value_type.indexOf(fieldtype) === -1;
+    return window.desk.model.no_value_type.indexOf(fieldtype) === -1;
   },
 
   is_non_std_field: function (fieldname) {
@@ -276,19 +262,19 @@ export const model: Model = {
     ].includes(fieldname);
   },
 
-  get_std_field: function (fieldname, ignore = false) {
-    var docfield = $.map(
-      [].concat(desk.model.std_fields).concat(desk.model.std_fields_table),
+  get_std_field: (fieldname, ignore = false) => {
+    var docfield = [...model.std_fields, ...model.std_fields_table].filter(
       function (d) {
         if (d.fieldname == fieldname) return d;
       },
     );
+
     if (!docfield.length) {
       //Standard fields are ignored in case of adding columns as a result of groupby
       if (ignore) {
         return { fieldname: fieldname };
       } else {
-        desk.msgprint(__("Unknown Column: {0}", [fieldname]));
+        dialog.alert(__("Unknown Column: {0}", [fieldname]));
       }
     }
     return docfield[0];
@@ -311,12 +297,274 @@ export const model: Model = {
     }
   },
 
-  clear_local_storage: function () {
+  clear_local_storage: () => {
     for (var key in localStorage) {
       if (key.startsWith("_doctype:")) {
         localStorage.removeItem(key);
       }
     }
+  },
+
+  sync: (r: any) => {
+    /* docs:
+      extract docs, docinfo (attachments, comments, assignments)
+      from incoming request and set in `locals` and `frappe.model.docinfo`
+    */
+    var isPlain;
+    if (!r.docs && !r.docinfo) r = { docs: r };
+
+    isPlain = Object.prototype.toString.call(r.docs) === "[object Object]";
+    if (isPlain) r.docs = [r.docs];
+
+    if (r.docs) {
+      for (var i = 0, l = r.docs.length; i < l; i++) {
+        var d = r.docs[i];
+
+        if (locals[d.doctype] && locals[d.doctype][d.name]) {
+          // update values
+          model.update_in_locals(d);
+        } else {
+          model.add_to_locals(d);
+        }
+
+        d.__last_sync_on = new Date();
+
+        if (d.doctype === "DocType") {
+          desk.meta.sync(d);
+        }
+
+        if (d.localname) {
+          model.rename_after_save(d, i);
+        }
+      }
+    }
+
+    model.sync_docinfo(r);
+    return r.docs;
+  },
+
+  rename_after_save: (d, i) => {
+    model.new_names[d.localname] = d.name;
+    $(document).trigger("rename", [d.doctype, d.localname, d.name]);
+    delete locals[d.doctype][d.localname];
+
+    // update docinfo to new dict keys
+    if (i === 0) {
+      model.docinfo[d.doctype][d.name] = model.docinfo[d.doctype][d.localname];
+      model.docinfo[d.doctype][d.localname] = undefined;
+    }
+  },
+
+  sync_docinfo: (r) => {
+    // set docinfo (comments, assign, attachments)
+    if (r.docinfo) {
+      const { doctype, name } = r.docinfo;
+      if (!model.docinfo[doctype]) {
+        model.docinfo[doctype] = {};
+      }
+      model.docinfo[doctype][name] = r.docinfo;
+
+      // copy values to frappe.boot.user_info
+      Object.assign(frappe.boot.user_info, r.docinfo.user_info);
+    }
+
+    return r.docs;
+  },
+
+  add_to_locals: (doc: any) => {
+    if (!locals[doc.doctype]) locals[doc.doctype] = {};
+
+    if (!doc.name && doc.__islocal) {
+      // get name (local if required)
+      if (!doc.parentfield) model.clear_doc(doc);
+
+      doc.name = model.get_new_name(doc.doctype);
+
+      if (!doc.parentfield)
+        model.provide("model.docinfo." + doc.doctype + "." + doc.name);
+    }
+
+    locals[doc.doctype][doc.name] = doc;
+
+    let meta = frappe.get_meta(doc.doctype);
+    let is_table = meta ? meta.istable : doc.parentfield;
+    // add child docs to locals
+    if (!is_table) {
+      for (var i in doc) {
+        var value = doc[i];
+
+        if ($.isArray(value)) {
+          for (var x = 0, y = value.length; x < y; x++) {
+            var d = value[x];
+
+            if (typeof d == "object" && !d.parent) d.parent = doc.name;
+
+            model.add_to_locals(d);
+          }
+        }
+      }
+    }
+  },
+
+  update_in_locals: function (doc) {
+    // update values in the existing local doc instead of replacing
+    let local_doc = locals[doc.doctype][doc.name];
+    let clear_keys = function (source, target) {
+      Object.keys(target).map((key) => {
+        if (source[key] == undefined) delete target[key];
+      });
+    };
+
+    for (let fieldname in doc) {
+      let df = frappe.meta.get_field(doc.doctype, fieldname);
+      if (df && frappe.model.table_fields.includes(df.fieldtype)) {
+        // table
+        if (!(doc[fieldname] instanceof Array)) {
+          doc[fieldname] = [];
+        }
+
+        if (!(local_doc[fieldname] instanceof Array)) {
+          local_doc[fieldname] = [];
+        }
+
+        // child table, override each row and append new rows if required
+        for (let i = 0; i < doc[fieldname].length; i++) {
+          let d = doc[fieldname][i];
+          let local_d = local_doc[fieldname][i];
+          if (local_d) {
+            // deleted and added again
+            if (!locals[d.doctype]) locals[d.doctype] = {};
+
+            if (!d.name) {
+              // incoming row is new, find a new name
+              d.name = desk.model.get_new_name(doc.doctype);
+            }
+
+            // if incoming row is not registered, register it
+            if (!locals[d.doctype][d.name]) {
+              // detach old key
+              delete locals[d.doctype][local_d.name];
+
+              // re-attach with new name
+              locals[d.doctype][d.name] = local_d;
+            }
+
+            // row exists, just copy the values
+            Object.assign(local_d, d);
+            clear_keys(d, local_d);
+          } else {
+            local_doc[fieldname].push(d);
+            if (!d.parent) d.parent = doc.name;
+            desk.model.add_to_locals(d);
+          }
+        }
+
+        // remove extra rows
+        if (local_doc[fieldname].length > doc[fieldname].length) {
+          for (
+            let i = doc[fieldname].length;
+            i < local_doc[fieldname].length;
+            i++
+          ) {
+            // clear from local
+            let d = local_doc[fieldname][i];
+            if (locals[d.doctype] && locals[d.doctype][d.name]) {
+              delete locals[d.doctype][d.name];
+            }
+          }
+          local_doc[fieldname].length = doc[fieldname].length;
+        }
+      } else {
+        // literal
+        local_doc[fieldname] = doc[fieldname];
+      }
+    }
+
+    if (local_doc?.on_paste_event && local_doc?.__newname) {
+      doc.__newname = local_doc.__newname;
+    }
+
+    // clear keys on parent
+    clear_keys(doc, local_doc);
+  },
+
+  get_new_doc: function (
+    doctype,
+    parent_doc,
+    parentfield,
+    with_mandatory_children,
+  ) {
+    frappe.provide("locals." + doctype);
+    var doc = {
+      docstatus: 0,
+      doctype: doctype,
+      name: frappe.model.get_new_name(doctype),
+      __islocal: 1,
+      __unsaved: 1,
+      owner: frappe.session.user,
+    };
+    frappe.model.set_default_values(doc, parent_doc);
+
+    if (parent_doc) {
+      $.extend(doc, {
+        parent: parent_doc.name,
+        parentfield: parentfield,
+        parenttype: parent_doc.doctype,
+      });
+      if (!parent_doc[parentfield]) parent_doc[parentfield] = [];
+      doc.idx = parent_doc[parentfield].length + 1;
+      parent_doc[parentfield].push(doc);
+    } else {
+      frappe.provide("frappe.model.docinfo." + doctype + "." + doc.name);
+    }
+
+    frappe.model.add_to_locals(doc);
+
+    if (with_mandatory_children) {
+      frappe.model.create_mandatory_children(doc);
+    }
+
+    if (!parent_doc) {
+      doc.__run_link_triggers = 1;
+    }
+
+    // set the name if called from a link field
+    if (frappe.route_options && frappe.route_options.name_field) {
+      var meta = frappe.get_meta(doctype);
+      // set title field / name as name
+      if (meta.autoname && meta.autoname.indexOf("field:") !== -1) {
+        doc[meta.autoname.substr(6)] = frappe.route_options.name_field;
+      } else if (meta.autoname && meta.autoname === "prompt") {
+        doc.__newname = frappe.route_options.name_field;
+      } else if (meta.title_field) {
+        doc[meta.title_field] = frappe.route_options.name_field;
+      }
+
+      delete frappe.route_options.name_field;
+    }
+
+    // set route options
+    if (frappe.route_options && !doc.parent) {
+      $.each(frappe.route_options, function (fieldname, value) {
+        var df = frappe.meta.has_field(doctype, fieldname);
+        if (df && !df.no_copy) {
+          doc[fieldname] = value;
+        }
+      });
+      frappe.route_options = null;
+    }
+
+    return doc;
+  },
+
+  make_new_doc_and_get_name: function (doctype, with_mandatory_children) {
+    return desk.model.get_new_doc(doctype, null, null, with_mandatory_children)
+      .name;
+  },
+
+  get_new_name: function (doctype) {
+    // random hash is added to idenity mislinked files when doc is not saved and file is uploaded.
+    return frappe.router.slug(`new-${doctype}-${frappe.utils.get_random(10)}`);
   },
 
   with_doctype: function (
@@ -325,7 +573,7 @@ export const model: Model = {
     async = false,
   ) {
     if (locals.DocType[doctype]) {
-      callback && callback();
+      callback && callback(locals.DocType[doctype]);
       return Promise.resolve();
     } else {
       let cached_timestamp = null;
@@ -344,7 +592,7 @@ export const model: Model = {
         }
       }
 
-      return call({
+      return resource.call({
         method: "desktop.meta.get_meta",
         args: {
           doctype,
@@ -352,11 +600,11 @@ export const model: Model = {
         async: async,
         callback: function (r) {
           if (r.exc) {
-            desk.msgprint(__("Unable to load: {0}", [__(doctype)]));
+            dialog.alert(__("Unable to load doctype {0}", [doctype]));
             throw "No doctype";
           }
           if (r.message == "use_cache") {
-            desk.model.sync(cached_doc);
+            model.sync(cached_doc);
           } else {
             const docs = Array.isArray(r.message?.docs)
               ? r.message.docs
@@ -838,9 +1086,9 @@ export const model: Model = {
     return no_copy_list;
   },
 
-  delete_doc: function (doctype, docname, callback) {
+  delete_doc: async (doctype: string, docname: string, callback: Function) => {
     let title = docname;
-    const title_field = desk.get_meta(doctype).title_field;
+    const title_field = await getMeta(doctype).title_field;
     if (desk.get_meta(doctype).autoname == "hash" && title_field) {
       const value = desk.model.get_value(doctype, docname, title_field);
       if (value) {
@@ -867,7 +1115,7 @@ export const model: Model = {
     });
   },
 
-  rename_doc: function (doctype, docname, callback) {
+  rename_doc: (doctype: string, docname: string, callback: Function) => {
     let message = __("Merge with existing");
     let warning = __("This cannot be undone");
     let merge_label = message + " <b>(" + warning + ")</b>";
@@ -919,7 +1167,7 @@ export const model: Model = {
     d.show();
   },
 
-  round_floats_in: function (doc, fieldnames) {
+  round_floats_in: (doc: any, fieldnames: string[] = []) => {
     if (!doc) {
       return;
     }
@@ -928,13 +1176,13 @@ export const model: Model = {
         fieldtype: ["in", ["Currency", "Float"]],
       });
     }
-    for (var i = 0, j = fieldnames.length; i < j; i++) {
+    for (var i = 0; i < fieldnames.length; i++) {
       var fieldname = fieldnames[i];
       doc[fieldname] = flt(doc[fieldname], precision(fieldname, doc));
     }
   },
 
-  validate_missing: function (doc, fieldname) {
+  validate_missing: (doc: any, fieldname: string) => {
     if (!doc[fieldname]) {
       desk.throw(
         __("Please specify") +
@@ -946,10 +1194,10 @@ export const model: Model = {
     }
   },
 
-  get_all_docs: function (doc) {
+  get_all_docs: (doc: any) => {
     var all = [doc];
     for (var key in doc) {
-      if ($.isArray(doc[key]) && !key.startsWith("_")) {
+      if (Array.isArray(doc[key]) && !key.startsWith("_")) {
         var children = doc[key];
         for (var i = 0, l = children.length; i < l; i++) {
           all.push(children[i]);
@@ -959,12 +1207,12 @@ export const model: Model = {
     return all;
   },
 
-  get_full_column_name: function (fieldname, doctype) {
+  get_full_column_name: (fieldname: string, doctype: string) => {
     if (fieldname.includes("`tab")) return fieldname;
     return "`tab" + doctype + "`.`" + fieldname + "`";
   },
 
-  is_numeric_field: function (fieldtype) {
+  is_numeric_field: (fieldtype: any) => {
     if (!fieldtype) return;
     if (typeof fieldtype === "object") {
       fieldtype = fieldtype.fieldtype;
@@ -972,9 +1220,9 @@ export const model: Model = {
     return desk.model.numeric_fieldtypes.includes(fieldtype);
   },
 
-  set_default_views_for_doctype(doctype, frm) {
-    desk.model.with_doctype(doctype, () => {
-      let meta = desk.get_meta(doctype);
+  set_default_views_for_doctype(doctype: string, frm: Form) {
+    desk.model.with_doctype(doctype, async () => {
+      let meta = await getMeta(doctype);
       let default_views = ["List", "Report", "Dashboard", "Kanban"];
 
       if (meta.is_calendar_and_gantt) {
@@ -995,10 +1243,11 @@ export const model: Model = {
       }
 
       if (
-        (frm.doc.fields?.find((i) => i.fieldname === "latitude") &&
-          frm.doc.fields?.find((i) => i.fieldname === "longitude")) ||
+        (frm.doc.fields?.find((i: any) => i.fieldname === "latitude") &&
+          frm.doc.fields?.find((i: any) => i.fieldname === "longitude")) ||
         frm.doc.fields?.find(
-          (i) => i.fieldname === "location" && i.fieldtype == "Geolocation",
+          (i: any) =>
+            i.fieldname === "location" && i.fieldtype == "Geolocation",
         )
       ) {
         default_views.push("Map");

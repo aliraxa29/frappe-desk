@@ -104,7 +104,7 @@ import { useBreadcrumbStore } from "../stores/breadcrumbs";
 import type { FormButton } from "../composables/useFormButtons";
 import FormActionsMenu, { type MenuAction } from "../components/FormActionsMenu.vue";
 import { frappeClient } from "../api/resource";
-import { desk } from "../utils/desk";
+import { resource } from "../utils/resource";
 import { dialog } from "../stores/dialog";
 import { useToastStore } from "../stores/toast";
 import Button from "../components/Button.vue";
@@ -259,7 +259,7 @@ async function loadNeighbors() {
 
 	try {
 		const [prevResult, nextResult] = await Promise.all([
-			desk.call({
+			resource.call({
 				method: "frappe.client.get_list",
 				args: {
 					doctype: doctype.value,
@@ -269,7 +269,7 @@ async function loadNeighbors() {
 					limit_page_length: 1,
 				},
 			}),
-			desk.call({
+			resource.call({
 				method: "frappe.client.get_list",
 				args: {
 					doctype: doctype.value,
@@ -401,7 +401,7 @@ async function handleMenuAction(action: MenuAction) {
 		case "links":
 			if (!doc?.name) return;
 			try {
-				const response = await desk.call({
+				const response = await resource.call({
 					method: "frappe.desk.form.linked_with.get_linked_docs",
 					args: {
 						doctype: doctype.value,
@@ -510,7 +510,7 @@ async function handleMenuAction(action: MenuAction) {
 async function printDocument(doc: Record<string, any>) {
 	try {
 		// Fetch available print formats for this doctype
-		const response = await desk.call({
+		const response = await resource.call({
 			method: "frappe.client.get_list",
 			args: {
 				doctype: "Print Format",
@@ -557,7 +557,7 @@ async function emailDocument(doc: Record<string, any>) {
 		});
 		if (recipient === null || !recipient) return;
 
-		await desk.call({
+		await resource.call({
 			method: "frappe.core.doctype.communication.email.make",
 			args: {
 				recipients: recipient,
@@ -633,7 +633,7 @@ async function setReminder(doc: Record<string, any> | null) {
 	if (reminderDate === null || !reminderDate) return;
 
 	try {
-		await desk.call({
+		await resource.call({
 			method: "frappe.desk.doctype.event.event.create_event",
 			args: {
 				subject: `Reminder: ${doctype.value} ${doc?.name || "(New)"}`,

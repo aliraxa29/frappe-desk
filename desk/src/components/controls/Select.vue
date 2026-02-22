@@ -10,13 +10,11 @@
 		</label>
 		<select
 			:id="`field-${field.fieldname}`"
-			:value="modelValue || ''"
+			:v-model="value"
 			:disabled="field.read_only"
 			:required="field.reqd"
 			class="px-3 py-2.5 border border-slate-300 dark:border-slate-600 rounded text-[0.95rem] transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-600 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-600/10 dark:focus:ring-blue-500/20 disabled:bg-slate-50 dark:disabled:bg-slate-900/50 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-			@change="onChange"
 		>
-			<option value="">{{ placeholderText }}</option>
 			<option v-for="option in options" :key="option.value" :value="option.value">
 				{{ option.label }}
 			</option>
@@ -43,8 +41,13 @@ const emit = defineEmits<{
 	"update:modelValue": [value: any];
 }>();
 
-const placeholderText = computed(() => {
-	return props.field.reqd ? "-- Select --" : "-- No Selection --";
+const value = computed({
+	get() {
+		return props.modelValue;
+	},
+	set(value: any) {
+		emit("update:modelValue", value);
+	},
 });
 
 const options = computed(() => {
@@ -59,16 +62,9 @@ const options = computed(() => {
 			optionsList = optionsStr.split("\n").filter((o) => o.trim());
 		}
 	} else {
-		optionsList = optionsStr
-			.split(/[\n,]/)
-			.map((o) => o.trim())
-			.filter((o) => o);
+		optionsList = optionsStr.split("\n");
 	}
 
 	return optionsList.map((option) => ({ value: option, label: option }));
 });
-
-function onChange(e: Event) {
-	emit("update:modelValue", (e.target as HTMLSelectElement).value || null);
-}
 </script>

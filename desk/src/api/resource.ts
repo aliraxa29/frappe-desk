@@ -1,5 +1,5 @@
 import type { ListResponse, DocTypeMetaResponse, Document } from "../types";
-import { desk } from "../utils/desk";
+import { resource } from "../utils/resource";
 import { toast } from "../stores/toast";
 
 class FrappeClient {
@@ -9,45 +9,12 @@ class FrappeClient {
     toast.error(message, errorMsg);
   }
 
-  async getDocTypeMeta(doctype: string): Promise<DocTypeMetaResponse> {
-    try {
-      const response = await desk.get(
-        `/api/method/desktop.doctype_scripts.get_doctype_with_scripts?doctype=${doctype}`,
-      );
-      return {
-        docs: response.message?.docs || response.docs || [],
-        user_settings:
-          response.message?.user_settings || response.user_settings,
-      };
-    } catch (error) {
-      this.handleError(`Failed to fetch DocType meta for ${doctype}`, error);
-      throw error;
-    }
-  }
-
-  async getDocument(doctype: string, name: string): Promise<Document> {
-    try {
-      const response = await desk.get(`/api/resource/${doctype}/${name}`);
-      const doc = response.data || response.message || response;
-
-      if (!doc || typeof doc !== "object") {
-        console.error("Invalid document response structure:", response);
-        throw new Error("Invalid document response");
-      }
-
-      return doc;
-    } catch (error) {
-      this.handleError(`Failed to fetch ${doctype} "${name}"`, error);
-      throw error;
-    }
-  }
-
   async createDocument(
     doctype: string,
     data: Record<string, any>,
   ): Promise<Document> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "frappe.client.insert",
         args: {
           doc: { ...data, doctype },
@@ -66,7 +33,7 @@ class FrappeClient {
     data: Record<string, any>,
   ): Promise<Document> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "frappe.client.set_value",
         args: {
           doctype,
@@ -83,7 +50,7 @@ class FrappeClient {
 
   async deleteDocument(doctype: string, name: string): Promise<void> {
     try {
-      await desk.call({
+      await resource.call({
         method: "frappe.client.delete",
         args: {
           doctype,
@@ -108,7 +75,7 @@ class FrappeClient {
     },
   ): Promise<ListResponse> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "frappe.client.get_list",
         args: {
           doctype,
@@ -130,7 +97,7 @@ class FrappeClient {
 
   async callMethod(method: string, args?: Record<string, any>): Promise<any> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method,
         args: args || {},
       });
@@ -143,7 +110,7 @@ class FrappeClient {
 
   async getInstalledApps(): Promise<string[]> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "frappe.client.get_list",
         args: {
           doctype: "Desk App",
@@ -159,7 +126,7 @@ class FrappeClient {
 
   async getAppDoctypes(app: string): Promise<string[]> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "frappe.client.get_list",
         args: {
           doctype: "DocType",
@@ -179,7 +146,7 @@ class FrappeClient {
     action: string = "read",
   ): Promise<boolean> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "frappe.client.has_permission",
         args: {
           doctype,
@@ -195,7 +162,7 @@ class FrappeClient {
 
   async getValue(doctype: string, name: string, field: string): Promise<any> {
     try {
-      const response = await desk.call({
+      const response = await resource.call({
         method: "frappe.client.get_value",
         args: {
           doctype,

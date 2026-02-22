@@ -8,7 +8,7 @@ import type {
 import { toast } from "../stores/toast";
 import { dialog } from "../stores/dialog";
 import { model } from "../data/model";
-import { call } from "../utils/desk";
+import { resource } from "../utils/resource";
 import { __ } from "../utils/translate";
 import { evaluateDependsOn } from "../utils/dependsOn";
 import { FormDashboard } from "./dashboard";
@@ -605,7 +605,7 @@ export class Form {
     try {
       await this.trigger("before_submit");
 
-      const response = await call({
+      const response = await resource.call({
         method: "frappe.client.submit",
         args: { doc: this.doc },
       });
@@ -643,7 +643,7 @@ export class Form {
     try {
       await this.trigger("before_cancel");
 
-      const response = await call({
+      const response = await resource.call({
         method: "frappe.client.cancel",
         args: { doctype: this.doctype, name: this.doc.name },
       });
@@ -677,7 +677,7 @@ export class Form {
     try {
       await this.trigger("before_amend");
 
-      const response = await call({
+      const response = await resource.call({
         method: "frappe.client.amend",
         args: { doctype: this.doctype, name: this.doc.name },
       });
@@ -731,7 +731,7 @@ export class Form {
         }
       }
 
-      const response = await call({
+      const response = await resource.call({
         method: "frappe.client.insert",
         args: { doc: { ...payload, doctype: this.doctype } },
       });
@@ -835,7 +835,7 @@ export class Form {
     callback?: (response: any) => void,
   ): Promise<any> {
     try {
-      const response = await call({
+      const response = await resource.call({
         method,
         args: { ...args, doctype: this.doctype, name: this.doc.name },
         callback,
@@ -1120,7 +1120,7 @@ export class Form {
   }
 
   private async _createDocument(): Promise<Document> {
-    const response = await call({
+    const response = await resource.call({
       method: "frappe.client.insert",
       args: { doc: { ...this.doc, doctype: this.doctype } },
     });
@@ -1128,7 +1128,7 @@ export class Form {
   }
 
   private async _updateDocument(): Promise<Document> {
-    const response = await call({
+    const response = await resource.call({
       method: "frappe.client.save",
       args: {
         doc: { ...this.doc, doctype: this.doctype },
