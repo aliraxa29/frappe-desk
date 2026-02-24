@@ -86,6 +86,8 @@
 				v-if="sidebarOpen && !isNewDocument"
 				:doc="currentDoc"
 				:doctype="doctype"
+				:docinfo="currentDocinfo"
+				:frm="currentFrm"
 				:is-open="true"
 				@update:is-open="sidebarOpen = $event"
 			/>
@@ -171,6 +173,8 @@ const isDirty = computed(() => formContext.value?.isDirty ?? false);
 
 const currentDoc = computed(() => formContext.value?.ctx?.doc || null);
 const currentMeta = computed(() => formContext.value?.ctx?.meta || null);
+const currentDocinfo = computed(() => formContext.value?.docinfo || null);
+const currentFrm = computed(() => formContext.value?.ctx || null);
 
 const navigation = ref<{ prev: string | null; next: string | null }>({
 	prev: null,

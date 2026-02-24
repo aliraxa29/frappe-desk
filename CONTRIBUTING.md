@@ -33,9 +33,7 @@ bench --site your-site.local install-app desktop
 ### Run backend (Frappe)
 
 ```bash
-bench serve
-# in another terminal
-bench watch
+bench start
 ```
 
 ### Run frontend (Vite)

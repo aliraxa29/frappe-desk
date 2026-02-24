@@ -73,6 +73,7 @@ const route = useRoute();
 const viewers = ref<Array<{ user: string; full_name: string }>>([]);
 
 const unsubscribeDoc = ref<(() => void) | null>(null);
+const docinfo = ref<Record<string, any> | null>(null);
 
 const hasTabs = computed(() => {
 	if (!meta.value?.fields) return false;
@@ -189,7 +190,6 @@ onMounted(async () => {
 });
 
 function createNewDocument(doctype: string, meta: DocTypeMeta): Document {
-	debugger;
 	const doc: Document = model.get_new_doc(doctype);
 
 	for (const field of meta.fields) {
@@ -435,8 +435,9 @@ async function onLoad() {
 		let doc: Document;
 
 		if (!isNewDocument && props.docname) {
-			doc = await desk.db.get_doc(props.doctype, props.docname);
-
+			const result = await desk.db.get_doc(props.doctype, props.docname);
+			doc = result.docs[0];
+			docinfo.value = (result as any).docinfo || null;
 			if (!doc || typeof doc !== "object") {
 				throw new Error("Failed to load document: Invalid response");
 			}
@@ -575,6 +576,7 @@ defineExpose({
 	ctx,
 	frm: ctx, // Form class instance (preferred access)
 	custom_buttons: computed(() => ctx.value?.custom_buttons || []),
+	docinfo,
 });
 </script>
 

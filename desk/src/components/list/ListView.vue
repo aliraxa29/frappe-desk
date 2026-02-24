@@ -1,6 +1,5 @@
 <template>
 	<div class="w-full bg-white dark:bg-gray-950 rounded-lg">
-		<!-- Loading State -->
 		<div v-if="loading && rows.length === 0" class="flex items-center justify-center h-64">
 			<div class="flex flex-col items-center gap-3">
 				<div
@@ -10,7 +9,6 @@
 			</div>
 		</div>
 
-		<!-- Error State -->
 		<div
 			v-else-if="error"
 			class="m-4 p-4 rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-700"
@@ -21,9 +19,7 @@
 			</div>
 		</div>
 
-		<!-- List Content -->
 		<template v-else>
-			<!-- Filter Area (pill-based) -->
 			<FilterArea
 				:filters="queryFilters"
 				:field-options="allFilterableFields"
@@ -34,7 +30,6 @@
 				@toggle-query-builder="toggleQueryBuilder"
 			/>
 
-			<!-- Query Builder Popover -->
 			<QueryBuilder
 				:show="showQueryBuilder"
 				:filters="queryFilters"
@@ -48,7 +43,6 @@
 				@clear-all="clearFilters"
 			/>
 
-			<!-- Bulk Actions Bar -->
 			<BulkActionsBar
 				:selected-count="selectedRows.length"
 				:can-write="true"
@@ -61,7 +55,6 @@
 				@deselect-all="deselectAll"
 			/>
 
-			<!-- Bulk Edit Dialog -->
 			<BulkEditDialog
 				:show="showBulkEdit"
 				:fields="meta?.fields || []"
@@ -70,15 +63,15 @@
 				@apply="handleBulkEditApply"
 			/>
 
-			<!-- Table -->
 			<div class="overflow-x-auto scroll-area" ref="tableContainerRef">
 				<table class="w-full">
 					<thead
 						class="sticky top-0 z-10 bg-slate-50 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800"
 					>
 						<tr>
-							<!-- Checkbox column -->
-							<th class="w-10 px-4 py-2.5">
+							<th
+								class="w-10 px-4 py-2.5 text-left text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
+							>
 								<input
 									type="checkbox"
 									:checked="isAllSelected"
@@ -88,10 +81,8 @@
 								/>
 							</th>
 
-							<!-- Like column -->
 							<th class="w-8 px-1 py-2.5" />
 
-							<!-- ID column (replaces serial No.) -->
 							<th
 								v-if="!listSettings.hide_serial_column"
 								class="w-16 px-2 py-2.5 text-left text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
@@ -99,13 +90,13 @@
 								{{ listSettings.show_id_column !== false ? "ID" : "No." }}
 							</th>
 
-							<!-- Data columns -->
 							<th
 								v-for="col in columns"
 								:key="col.fieldname || col.type"
 								class="px-3 py-2.5 text-left text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer select-none group hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
 								:class="{
 									'w-70 min-w-50': col.type === 'Subject',
+									'min-w-28': col.type !== 'Subject',
 									'text-right': isNumericField(col),
 								}"
 								@click="toggleSort(col)"
@@ -129,12 +120,11 @@
 								</div>
 							</th>
 
-							<!-- Actions column header (from custom script) -->
 							<th
 								v-if="hasRowActions"
 								class="w-24 px-3 py-2.5 text-right text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
 							>
-								Actions
+								{{ __("Actions") }}
 							</th>
 						</tr>
 					</thead>
@@ -151,7 +141,6 @@
 							]"
 							@click="openDocument(row.name!)"
 						>
-							<!-- Checkbox -->
 							<td class="px-4 py-2.5" @click.stop>
 								<input
 									type="checkbox"
@@ -161,7 +150,6 @@
 								/>
 							</td>
 
-							<!-- Like -->
 							<td class="px-1 py-2.5" @click.stop>
 								<button
 									type="button"
@@ -180,16 +168,15 @@
 								</button>
 							</td>
 
-							<!-- ID / Serial # -->
 							<td
 								v-if="!listSettings.hide_serial_column"
 								class="px-2 py-2.5 text-xs text-slate-400 dark:text-slate-500 tabular-nums"
 								:title="row.name"
 							>
 								<template v-if="listSettings.show_id_column !== false">
-									<span class="truncate max-w-24 inline-block align-middle">{{
-										row.name
-									}}</span>
+									<span class="truncate max-w-24 inline-block align-middle">
+										{{ row.name }}</span
+									>
 								</template>
 								<template v-else>
 									{{ startIndex + index + 1 }}
@@ -455,6 +442,7 @@ import ChevronRight from "../../icons/ChevronRight.vue";
 import DoubleChevronLeft from "../../icons/DoubleChevronLeft.vue";
 import DoubleChevronRight from "../../icons/DoubleChevronRight.vue";
 import { getMeta } from "../../metadata";
+import { __ } from "@/utils/translate";
 
 declare const desk: any;
 
@@ -1134,9 +1122,12 @@ function isNumericField(col: ListColumn): boolean {
 }
 
 function getCellClass(col: ListColumn): string {
-	if (isNumericField(col)) return "text-right font-mono tabular-nums";
-	if (col.df?.fieldtype === "Check") return "text-center";
-	return "text-slate-700 dark:text-slate-200";
+	if (isNumericField(col))
+		return "min-w-28 text-right font-mono tabular-nums text-slate-700 dark:text-slate-200";
+	if (col.df?.fieldtype === "Check")
+		return "min-w-28 text-center text-slate-700 dark:text-slate-200";
+	if (col.type === "Subject") return "w-70 min-w-50 text-left";
+	return "min-w-28 text-left text-slate-700 dark:text-slate-200";
 }
 
 function getCellComponent(df: Field) {

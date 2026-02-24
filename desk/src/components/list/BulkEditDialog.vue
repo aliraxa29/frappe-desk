@@ -8,28 +8,25 @@
 			>
 				<div class="absolute inset-0 bg-black/50" />
 				<div
-					class="relative bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden"
+					class="relative bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-lg"
 				>
 					<div class="px-5 py-4 border-b border-slate-200 dark:border-slate-700">
 						<h3 class="text-base font-semibold text-slate-900 dark:text-white">
-							Bulk Edit {{ selectedCount }}
-							{{ selectedCount === 1 ? "record" : "records" }}
+							{{ __("Bulk Edit") }} {{ selectedCount }}
+							{{ selectedCount === 1 ? __("record") : __("records") }}
 						</h3>
 						<p class="text-xs text-slate-500 mt-1">
-							Set a field value for all selected records
+							{{ __("Set a field value for all selected records") }}
 						</p>
 					</div>
 
 					<div class="p-5 space-y-4">
-						<!-- Field selector with autocomplete -->
 						<FieldAutocomplete
 							v-model="selectedField"
 							:items="fieldItems"
-							label="Field"
-							placeholder="Search fields..."
+							:label="__('Field')"
+							:placeholder="__('Search fields...')"
 						/>
-
-						<!-- Dynamic value input based on field type -->
 						<div
 							v-if="selectedFieldMeta && fieldForRenderer"
 							class="bulk-edit-value-field"
@@ -43,14 +40,14 @@
 					</div>
 
 					<div
-						class="flex items-center justify-end gap-2 px-5 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50"
+						class="flex items-center justify-end gap-2 px-5 py-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl"
 					>
 						<button
 							type="button"
 							class="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
 							@click="$emit('close')"
 						>
-							Cancel
+							{{ __("Cancel") }}
 						</button>
 						<button
 							type="button"
@@ -58,7 +55,8 @@
 							:disabled="!canApply"
 							@click="apply"
 						>
-							Update {{ selectedCount }} Records
+							{{ __("Update") }} {{ selectedCount }}
+							{{ selectedCount === 1 ? __("Record") : __("Records") }}
 						</button>
 					</div>
 				</div>
@@ -72,8 +70,8 @@ import { ref, computed, watch, reactive } from "vue";
 import type { Field } from "../../types";
 import FieldAutocomplete from "./FieldAutocomplete.vue";
 import FieldRenderer from "../../fields/FieldRenderer.vue";
+import { __ } from "@/utils/translate";
 
-// Simplified form context for bulk edit
 interface BulkEditFormContext {
 	doc: Record<string, any>;
 	doctype: string;
@@ -102,7 +100,6 @@ const emit = defineEmits<{
 const selectedField = ref("");
 const fieldValue = ref<any>("");
 
-// Reactive document for the form context
 const bulkEditDoc = reactive<Record<string, any>>({});
 
 const editableFields = computed(() => {
@@ -110,7 +107,6 @@ const editableFields = computed(() => {
 		(f) =>
 			!f.read_only &&
 			!f.hidden &&
-			// Exclude structural/non-editable field types
 			![
 				"Section Break",
 				"Column Break",
@@ -138,18 +134,16 @@ const selectedFieldMeta = computed(() => {
 	return props.fields.find((f) => f.fieldname === selectedField.value);
 });
 
-// Create a modified field for the renderer (without label since we show it separately)
 const fieldForRenderer = computed(() => {
 	if (!selectedFieldMeta.value) return null;
 	return {
 		...selectedFieldMeta.value,
 		label: "Value",
-		reqd: false, // Don't require in bulk edit
+		reqd: false,
 		read_only: false,
 	} as Field;
 });
 
-// Create a form context for the FieldRenderer
 const formContext = computed<BulkEditFormContext>(() => {
 	return {
 		doc: bulkEditDoc,
@@ -175,7 +169,6 @@ const formContext = computed<BulkEditFormContext>(() => {
 
 const canApply = computed(() => {
 	const value = fieldValue.value;
-	// For Check field, 0 is a valid value
 	if (selectedFieldMeta.value?.fieldtype === "Check") {
 		return selectedField.value && (value === 0 || value === 1);
 	}
@@ -188,7 +181,6 @@ watch(
 		if (val) {
 			selectedField.value = "";
 			fieldValue.value = "";
-			// Clear the bulk edit document
 			Object.keys(bulkEditDoc).forEach((key) => {
 				delete bulkEditDoc[key];
 			});
@@ -198,7 +190,6 @@ watch(
 
 watch(selectedField, (newField) => {
 	fieldValue.value = "";
-	// Clear previous field value and set up for new field
 	Object.keys(bulkEditDoc).forEach((key) => {
 		delete bulkEditDoc[key];
 	});

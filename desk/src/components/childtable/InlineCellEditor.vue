@@ -167,7 +167,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import type { Field, DocTypeMeta } from "../../types";
-import { desk } from "../../utils/resource";
+import { resource } from "../../utils/resource";
 
 const props = defineProps<{
 	field: Field;
@@ -222,7 +222,7 @@ async function searchLink(txt: string) {
 	if (!props.field.options) return;
 	linkSearching.value = true;
 	try {
-		const resp = await desk.call({
+		const resp = await resource.call({
 			method: "frappe.client.get_list",
 			args: {
 				doctype: props.field.options,

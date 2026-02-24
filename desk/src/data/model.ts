@@ -3,9 +3,8 @@ import { __ } from "../utils/translate";
 import { loadScript } from "../runtime/scriptLoader";
 import { getMeta } from "@/metadata";
 import { Form } from "@/runtime/formContext";
-import { dialog, dialog } from "@/stores/dialog";
+import { dialog } from "@/stores/dialog";
 import { Document } from "@/types";
-import { meta } from "@/utils/meta";
 
 export interface Model {
   docinfo: Record<string, any>;
@@ -35,7 +34,10 @@ export interface Model {
   sync_docinfo: (r: any) => any;
   add_to_locals: (doc: any) => void;
   update_in_locals: (doc: any) => void;
-  set_default_values: (doc: any, parent_doc: any) => string[];
+  set_default_values: (
+    doc: Document,
+    parent_doc: Document | null,
+  ) => Promise<void>;
   get_new_doc: (
     doctype: string,
     parent_doc?: Document | null,
@@ -357,7 +359,7 @@ export const model: Model = {
       }
       model.docinfo[doctype][name] = r.docinfo;
 
-      // copy values to dash.boot.user_info
+      desk.provide("dash.boot.user_info");
       Object.assign(dash.boot.user_info, r.docinfo.user_info);
     }
 
@@ -374,7 +376,7 @@ export const model: Model = {
       doc.name = model.get_new_name(doc.doctype);
 
       if (!doc.parentfield)
-        desk.provide("model.docinfo." + doc.doctype + "." + doc.name);
+        desk.provide("desk.model.docinfo." + doc.doctype + "." + doc.name);
     }
 
     locals[doc.doctype][doc.name] = doc;
@@ -483,9 +485,12 @@ export const model: Model = {
     clear_keys(doc, local_doc);
   },
 
-  set_default_values: function (doc: Document, parent_doc: Document | null) {
+  set_default_values: async function (
+    doc: Document,
+    parent_doc: Document | null,
+  ) {
     let doctype = doc.doctype;
-    let docfields = desk.meta.get_docfields(doctype);
+    let docfields = (await getMeta(doctype ?? ""))?.fields || [];
     let updated: string[] = [];
 
     // Table types should be initialized
@@ -501,7 +506,7 @@ export const model: Model = {
         return;
       }
 
-      let v = desk.model.get_default_value(f, doc, parent_doc);
+      let v: string | number | undefined = f.default;
       if (v) {
         if (["Int", "Check"].includes(f.fieldtype)) v = cint(v);
         else if (["Currency", "Float"].includes(f.fieldtype)) v = flt(v);

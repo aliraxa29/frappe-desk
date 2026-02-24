@@ -4,7 +4,7 @@ import type {
   FormButton,
   FormButtonGroup,
 } from "./useFormButtons";
-import { desk } from "../utils/resource";
+import { resource as desk } from "../utils/resource";
 
 export interface FormContext {
   doctype: string;

@@ -11,6 +11,7 @@ import { Model } from "@/data/model";
 import { Session } from "@/utils/session";
 import { Locals } from "@/utils/locals";
 import { Meta } from "@/utils/meta";
+import { Perm } from "@/utils/perm";
 
 export {};
 
@@ -33,12 +34,36 @@ declare global {
     user: User;
     model: Model;
     meta: Meta;
+    perm: Perm;
     realtime: RealTimeClient;
     user_defaults: any;
     user_roles: string[];
     user_info: any;
     provide: (namespace: string) => any;
     get_languages: () => { [key: string]: string };
+
+    // RPC call
+    call: (options: DeskCallOptions) => Promise<any>;
+    xcall: (options: DeskCallOptions) => Promise<any>;
+
+    // Formatters
+    format: (value: any, df: any, options?: any, doc?: any) => string;
+    get_formatter: (fieldtype?: string) => Function;
+    get_format_helper: (doc: any) => any;
+
+    // Expression evaluation
+    evaluate_depends_on: (
+      expression: string | undefined | null,
+      doc: any,
+    ) => boolean;
+
+    // Resource (HTTP)
+    resource: {
+      call: (options: DeskCallOptions) => Promise<any>;
+      buildUrl: (base: string, params?: Record<string, any>) => string;
+      freeze: (message?: string) => void;
+      unfreeze: () => void;
+    };
   }
 
   var desk: Desk;
@@ -81,10 +106,27 @@ declare global {
   var nth: Datatype["nth"];
   var has_words: Datatype["has_words"];
   var has_common: Datatype["has_common"];
+  var defineForm: (doctype: string, handlers: any) => void;
+  var defineList: (doctype: string, handlers: any) => void;
+  var __n: (
+    singular: string,
+    plural: string,
+    count: number,
+    replace?: Record<string, any>,
+  ) => string;
 
   interface Window extends Datatype {
     desk: Desk;
     dash: any;
     __: (text: string, ...args: any[]) => string;
+    __n: (
+      singular: string,
+      plural: string,
+      count: number,
+      replace?: Record<string, any>,
+    ) => string;
+    defineForm: (doctype: string, handlers: any) => void;
+    defineList: (doctype: string, handlers: any) => void;
+    format: (message: string, ...args: any[]) => string;
   }
 }

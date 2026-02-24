@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/vue-table": "^8.21.3",
     "apexcharts": "^5.3.6",
     "dayjs": "^1.11.19",
     "pinia": "^3.0.4",

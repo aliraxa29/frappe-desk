@@ -2,13 +2,12 @@
 	<div
 		class="w-64 border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col overflow-hidden h-full shrink-0"
 	>
-		<!-- Header -->
 		<div
 			class="flex items-center justify-between px-4 py-5 border-b border-slate-200 dark:border-slate-700 shrink-0"
 		>
-			<span class="text-sm font-semibold text-slate-800 dark:text-slate-100 tracking-wide">{{
-				__("Document Info")
-			}}</span>
+			<span class="text-sm font-semibold text-slate-800 dark:text-slate-100 tracking-wide">
+				{{ __("Document Info") }}
+			</span>
 			<button
 				@click="closeSidebar"
 				class="p-1.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition-colors"
@@ -18,7 +17,6 @@
 			</button>
 		</div>
 
-		<!-- Tab Bar -->
 		<div class="flex border-b border-slate-200 dark:border-slate-700 shrink-0">
 			<button
 				v-for="tab in tabs"
@@ -35,9 +33,14 @@
 			</button>
 		</div>
 
-		<!-- Tab Content -->
 		<div class="flex-1 overflow-y-auto">
-			<SidebarTimeline v-if="activeTab === 'timeline'" :doc="doc" :doctype="doctype" />
+			<SidebarTimeline
+				v-if="activeTab === 'timeline'"
+				:doc="doc"
+				:doctype="doctype"
+				:docinfo="docinfo"
+				:frm="frm"
+			/>
 			<SidebarAssignments
 				v-else-if="activeTab === 'assignments'"
 				:doc="doc"
@@ -61,6 +64,8 @@ interface Props {
 	doc: Document | null;
 	doctype: string;
 	isOpen: boolean;
+	docinfo?: Record<string, any> | null;
+	frm?: any;
 }
 
 defineProps<Props>();

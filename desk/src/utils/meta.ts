@@ -3,7 +3,44 @@ import { __ } from "./translate";
 
 export interface Meta {
   get_meta: (doctype: string) => any;
-  get_field: (doctype: string, fieldname: string) => any;
+  sync: (doc: Document) => void;
+  add_field: (df: Field) => void;
+  make_docfield_copy_for: (
+    doctype: string,
+    docname: string,
+    docfield_list?: Field[] | null,
+  ) => void;
+  get_field: (doctype: string, fieldname: string, name?: string) => any;
+  get_docfield: (doctype: string, fieldname: string, name?: string) => any;
+  set_formatter: (
+    doctype: string,
+    fieldname: string,
+    name: string,
+    formatter: Function,
+  ) => void;
+  set_indicator_formatter: (
+    doctype: string,
+    fieldname: string,
+    name: string,
+    get_text: Function,
+    get_color: Function,
+  ) => void;
+  get_docfields: (doctype: string, name?: string, filters?: any) => any[];
+  get_linked_fields: (doctype: string) => any[];
+  get_fields_to_check_permissions: (doctype: string) => any[];
+  sort_docfields: (docs: Field[]) => any[];
+  get_docfield_copy: (doctype: string, name?: string) => any;
+  get_fieldnames: (doctype: string, name?: string, filters?: any) => any[];
+  has_field: (dt: string, fn: string) => boolean;
+  get_table_fields: (dt: string) => any[];
+  get_doctype_for_field: (doctype: string, key: string) => any;
+  get_parentfield: (parent_dt: string, child_dt: string) => any;
+  get_label: (dt: string, fn: string, dn: string) => any;
+  get_print_sizes: () => any[];
+  get_print_formats: (doctype: string) => any[];
+  sync_messages: (doc: any) => void;
+  get_field_currency: (df: Field, doc?: any) => any;
+  get_field_precision: (df: Field, doc?: any) => any;
 }
 
 export const meta: Meta = {
@@ -15,14 +52,14 @@ export const meta: Meta = {
     doc.fields.forEach((df: Field, i: number) => {
       desk.meta.add_field(df);
     });
-    frappe.meta.sync_messages(doc);
-    if (doc.__print_formats) frappe.model.sync(doc.__print_formats);
-    if (doc.__workflow_docs) frappe.model.sync(doc.__workflow_docs);
+    desk.meta.sync_messages(doc);
+    if (doc.__print_formats) desk.model.sync(doc.__print_formats);
+    if (doc.__workflow_docs) desk.model.sync(doc.__workflow_docs);
   },
 
   // build docfield_map and docfield_list
   add_field: function (df: Field) {
-    desk.provide("frappe.meta.docfield_map." + df.parent);
+    desk.provide("desk.meta.docfield_map." + df.parent);
     desk.meta.docfield_map[df.parent][df.fieldname || df.label] = df;
 
     if (!desk.meta.docfield_list[df.parent])
@@ -169,8 +206,8 @@ export const meta: Meta = {
   },
 
   get_table_fields: function (dt: string) {
-    return $.map(desk.meta.docfield_list[dt], function (d) {
-      return frappe.model.table_fields.includes(d.fieldtype) ? d : null;
+    return (desk.meta.docfield_list[dt] || []).filter(function (d: any) {
+      return desk.model.table_fields.includes(d.fieldtype);
     });
   },
 
@@ -207,9 +244,9 @@ export const meta: Meta = {
   },
 
   get_parentfield: function (parent_dt: string, child_dt: string) {
-    var df = (frappe.get_doc("DocType", parent_dt).fields || []).filter(
-      (df) =>
-        frappe.model.table_fields.includes(df.fieldtype) &&
+    var df = (desk.meta.get_meta(parent_dt)?.fields || []).filter(
+      (df: any) =>
+        desk.model.table_fields.includes(df.fieldtype) &&
         df.options === child_dt,
     );
     if (!df.length)

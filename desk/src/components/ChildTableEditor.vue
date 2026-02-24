@@ -481,6 +481,7 @@ import ChevronUp from "../icons/ChevronUp.vue";
 import ChevronDown from "../icons/ChevronDown.vue";
 import ChevronLeft from "../icons/ChevronLeft.vue";
 import ChevronRight from "../icons/ChevronRight.vue";
+import { __ } from "@/utils/translate";
 
 export interface ChildRow {
 	[key: string]: any;

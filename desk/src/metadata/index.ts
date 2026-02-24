@@ -1,7 +1,11 @@
+import { DocTypeMeta } from "@/types";
 import { resource } from "../utils/resource";
 
-export async function getMeta(doctype: string) {
+export async function getMeta(doctype: string): Promise<DocTypeMeta> {
   try {
+    if (locals.DocType[doctype]) {
+      return locals.DocType[doctype];
+    }
     const response = await resource.call({
       method: "desktop.meta.get_meta",
       args: {

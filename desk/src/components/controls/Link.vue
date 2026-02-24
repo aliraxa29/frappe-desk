@@ -143,6 +143,7 @@ import Close from "../../icons/Close.vue";
 interface Props {
 	modelValue: string;
 	field: Field;
+	fetchFields?: string[];
 }
 
 interface LinkItem {
@@ -154,10 +155,13 @@ interface LinkItem {
 	icon?: string;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+	fetchFields: () => [],
+});
 
 const emit = defineEmits<{
 	"update:modelValue": [value: any];
+	validated: [payload: { value: string; fetchedValues: Record<string, any> }];
 }>();
 
 const searchText = ref("");
@@ -323,13 +327,60 @@ function handleKeydown(e: KeyboardEvent) {
 	}
 }
 
-function selectItem(item: LinkItem) {
+async function selectItem(item: LinkItem) {
 	if (item.action) {
 		item.action(item);
-	} else {
+		return;
+	}
+
+	const doctype = props.field.options;
+	const value = item.value;
+
+	if (!doctype || !value) {
 		searchText.value = item.label;
 		showDropdown.value = false;
-		emit("update:modelValue", item.value);
+		emit("update:modelValue", value);
+		return;
+	}
+	try {
+		const response = await resource.call({
+			method: "frappe.client.validate_link",
+			args: {
+				doctype,
+				docname: value,
+				fields:
+					props.fetchFields.length > 0 ? JSON.stringify(props.fetchFields) : undefined,
+			},
+		});
+
+		const data = response.message || response;
+
+		if (!data || !data.name) {
+			// Validation failed — document doesn't exist or no permission
+			console.warn(`[Link] validate_link failed for ${doctype}/${value}`);
+			searchText.value = "";
+			return;
+		}
+
+		searchText.value = item.label;
+		showDropdown.value = false;
+		emit("update:modelValue", data.name);
+
+		// Build fetched values (exclude 'name' — that's the validated docname)
+		const fetchedValues: Record<string, any> = {};
+		for (const key of Object.keys(data)) {
+			if (key !== "name") {
+				fetchedValues[key] = data[key];
+			}
+		}
+		emit("validated", { value: data.name, fetchedValues });
+	} catch (err) {
+		console.error(`[Link] validate_link error for ${doctype}/${value}:`, err);
+		// Fall back to setting the value without validation
+		searchText.value = item.label;
+		showDropdown.value = false;
+		emit("update:modelValue", value);
+		emit("validated", { value, fetchedValues: {} });
 	}
 }
 
@@ -337,6 +388,7 @@ function clearValue() {
 	searchText.value = "";
 	showDropdown.value = false;
 	emit("update:modelValue", "");
+	emit("validated", { value: "", fetchedValues: {} });
 }
 
 function openDocument() {

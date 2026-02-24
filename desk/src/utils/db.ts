@@ -1,3 +1,4 @@
+import { model } from "@/data/model";
 import { resource } from "./resource";
 
 export interface DB {
@@ -52,6 +53,7 @@ export const db = {
       });
     });
   },
+
   exists: function (doctype: string, name: string) {
     return new Promise<boolean>((resolve) => {
       this.get_value(doctype, { name: name }, "name", (r: any) => {
@@ -59,6 +61,7 @@ export const db = {
       });
     });
   },
+
   get_value: function (
     doctype: string,
     filters: any,
@@ -80,6 +83,7 @@ export const db = {
       },
     });
   },
+
   get_single_value: (doctype: string, field: string) => {
     return new Promise((resolve) => {
       resource
@@ -91,6 +95,7 @@ export const db = {
         .then((r) => resolve(r ? r.message : null));
     });
   },
+
   set_value: function (
     doctype: string,
     docname: string,
@@ -112,19 +117,19 @@ export const db = {
     });
   },
 
-  get_doc(doctype: string, name: string, filters: any = null) {
+  get_doc(doctype: string, name: string) {
     return new Promise((resolve, reject) => {
       resource.call({
-        method: "frappe.client.get",
+        method: "frappe.desk.form.load.getdoc",
         type: "POST",
-        args: { doctype, name, filters },
+        args: { doctype, name },
         callback: (response) => {
-          if (!response?.message) {
+          if (!response) {
             reject(new Error(`No record found: ${doctype} - ${name}`));
             return;
           }
-          // model.sync(response.message)
-          resolve(response.message);
+          model.sync(response);
+          resolve(response);
         },
         error_callback: (error) => {
           console.error(`Failed to fetch ${doctype} (${name}):`, error);
@@ -137,6 +142,7 @@ export const db = {
   insert: function (doc: any) {
     return resource.call({ method: "frappe.client.insert", args: { doc } });
   },
+
   delete_doc: function (doctype: string, name: string) {
     return new Promise((resolve) => {
       resource.call({
@@ -146,6 +152,7 @@ export const db = {
       });
     });
   },
+
   count: function (doctype: string, args: any = {}) {
     let filters = args.filters || {};
     let limit = args.limit;
@@ -167,6 +174,7 @@ export const db = {
       },
     });
   },
+
   get_link_options(doctype: string, txt: string = "", filters: any = {}) {
     return new Promise((resolve) => {
       resource.call({

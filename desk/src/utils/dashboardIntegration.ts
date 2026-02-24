@@ -3,7 +3,7 @@
  * Helpers for integrating dashboard charts throughout the application
  */
 
-import { desk } from "./resource";
+import { resource as desk } from "./resource";
 import type { DashboardChart, ChartData } from "../types/dashboard";
 
 /**
