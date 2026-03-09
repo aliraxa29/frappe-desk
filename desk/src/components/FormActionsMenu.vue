@@ -3,7 +3,7 @@
 		<button
 			ref="triggerRef"
 			type="button"
-			class="inline-flex items-center justify-center h-9 w-9 rounded-md border border-slate-300 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 cursor-pointer"
+			class="inline-flex items-center justify-center h-9 w-9 rounded-md border border-border bg-background text-foreground shadow-sm transition hover:bg-secondary focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed dark:hover:bg-secondary cursor-pointer"
 			:aria-expanded="isOpen"
 			aria-haspopup="menu"
 			aria-label="More actions"
@@ -23,7 +23,7 @@
 		>
 			<div
 				v-if="isOpen"
-				class="absolute right-0 top-full mt-2 w-64 max-h-96 rounded-lg border border-slate-200 bg-white shadow-lg ring-1 ring-black/5 z-50 py-1 overflow-y-auto scroll-area dark:border-slate-700 dark:bg-slate-900"
+				class="absolute right-0 top-full mt-2 w-64 max-h-96 rounded-lg border border-border bg-background shadow-lg ring-1 ring-black/5 z-50 py-1 overflow-y-auto scroll-area"
 				role="menu"
 				@keydown="onMenuKeydown"
 			>
@@ -31,11 +31,11 @@
 					v-for="(action, idx) in actions"
 					:key="action.name"
 					:ref="(el) => setItemRef(el, idx)"
-					class="flex w-full items-center justify-between gap-4 px-4 py-2 text-sm text-slate-700 transition focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-200 cursor-pointer"
+					class="flex w-full items-center justify-between gap-4 px-4 py-2 text-sm text-foreground transition focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
 					:class="
 						action.destructive
 							? 'hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/40'
-							: 'hover:bg-slate-100 dark:hover:bg-slate-800'
+							: 'hover:bg-muted dark:hover:bg-secondary'
 					"
 					role="menuitem"
 					:type="'button'"
@@ -46,7 +46,7 @@
 					<span class="truncate">{{ action.label }}</span>
 					<kbd
 						v-if="action.shortcut"
-						class="inline-flex items-center gap-1 rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+						class="inline-flex items-center gap-1 rounded border border-border bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground"
 					>
 						{{ action.shortcut }}
 					</kbd>

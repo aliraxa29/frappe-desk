@@ -58,13 +58,9 @@ function goToResetPassword() {
 		</div>
 
 		<div class="relative w-full max-w-md">
-			<div
-				class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden text-slate-900 dark:text-slate-100"
-			>
-				<div class="bg-gray-900 px-8 py-12 text-center">
-					<div
-						class="w-12 h-12 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4"
-					>
+			<div class="bg-background">
+				<div class="bg-foreground px-8 py-12 text-center">
+					<div class="w-12 h-12 bg-background">
 						<Lock class="w-6 h-6" />
 					</div>
 					<h1 class="text-3xl font-bold text-white mb-2">{{ __("Welcome Back") }}</h1>
@@ -73,9 +69,7 @@ function goToResetPassword() {
 
 				<div class="px-8 py-10">
 					<div class="mb-6">
-						<label
-							class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2"
-						>
+						<label class="block text-sm font-semibold text-foreground mb-2">
 							{{ __("Email or Username") }}</label
 						>
 						<input
@@ -84,12 +78,12 @@ function goToResetPassword() {
 							placeholder="you@example.com"
 							:disabled="isLoading"
 							@keydown.enter="handleLogin"
-							class="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 disabled:bg-slate-100 disabled:dark:bg-slate-700 disabled:cursor-not-allowed"
+							class="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-background"
 						/>
 					</div>
 
 					<div class="mb-2">
-						<label class="block text-sm font-semibold text-slate-700 mb-2">{{
+						<label class="block text-sm font-semibold text-foreground mb-2">{{
 							__("Password")
 						}}</label>
 						<div class="relative">
@@ -99,13 +93,13 @@ function goToResetPassword() {
 								placeholder="••••••••"
 								:disabled="isLoading"
 								@keydown.enter="handleLogin"
-								class="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 disabled:bg-slate-100 disabled:dark:bg-slate-700 disabled:cursor-not-allowed"
+								class="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-background"
 							/>
 							<button
 								@click="showPassword = !showPassword"
 								:disabled="isLoading"
 								type="button"
-								class="absolute right-3 top-4 text-slate-500 dark:text-slate-300 hover:text-slate-700 dark:hover:text-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+								class="absolute right-3 top-4 text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
 							>
 								<Eye v-if="!showPassword" />
 								<EyeOff v-else />
@@ -128,14 +122,10 @@ function goToResetPassword() {
 
 					<div class="mt-8 relative">
 						<div class="absolute inset-0 flex items-center">
-							<div
-								class="w-full border-t border-slate-300 dark:border-slate-700"
-							></div>
+							<div class="w-full border-t border-border"></div>
 						</div>
 						<div class="relative flex justify-center text-sm">
-							<span
-								class="px-2 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-300"
-							>
+							<span class="px-2 bg-background">
 								{{ __("Don't have an account?") }}
 								<a
 									href="#"
@@ -158,7 +148,7 @@ function goToResetPassword() {
 					</Button>
 				</div>
 				<div
-					class="px-8 py-4 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500 dark:text-slate-300"
+					class="px-8 py-4 bg-secondary border-t border-border text-center text-xs text-muted-foreground"
 				>
 					<p>
 						{{
@@ -171,7 +161,7 @@ function goToResetPassword() {
 			</div>
 
 			<div class="mt-6 text-center">
-				<p class="text-sm text-slate-600">
+				<p class="text-sm text-muted-foreground">
 					{{ __("Need help?") }}
 					<a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium">
 						{{ __("Contact support") }}

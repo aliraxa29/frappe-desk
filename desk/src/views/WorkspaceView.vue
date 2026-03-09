@@ -1,15 +1,13 @@
 <template>
-	<div class="flex flex-col min-h-full bg-gray-50 dark:bg-gray-900 ml-64">
+	<div class="flex flex-col min-h-full bg-secondary ml-64">
 		<!-- Header -->
-		<header
-			class="bg-white dark:bg-gray-950 border-b border-slate-200 dark:border-slate-800 px-6 py-4"
-		>
+		<header class="bg-background">
 			<div class="flex items-center gap-3">
 				<span v-if="workspaceContent.icon" class="text-2xl">{{
 					getIcon(workspaceContent.icon)
 				}}</span>
 				<div>
-					<h1 class="text-xl font-semibold text-slate-900 dark:text-white">
+					<h1 class="text-xl font-semibold text-foreground">
 						{{
 							workspaceContent.label ||
 							workspaceContent.name ||
@@ -22,7 +20,7 @@
 
 		<!-- Loading State -->
 		<div v-if="loading" class="flex-1 flex items-center justify-center">
-			<div class="text-slate-400 dark:text-slate-500">Loading workspace...</div>
+			<div class="text-muted-foreground">Loading workspace...</div>
 		</div>
 
 		<!-- Workspace Content -->
@@ -30,7 +28,7 @@
 			<!-- Shortcuts Section -->
 			<section v-if="workspaceContent.shortcuts.length > 0">
 				<h2
-					class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-4"
+					class="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4"
 				>
 					Shortcuts
 				</h2>
@@ -39,7 +37,7 @@
 						v-for="shortcut in workspaceContent.shortcuts"
 						:key="`shortcut-${shortcut.name}`"
 						@click="handleShortcutClick(shortcut)"
-						class="group cursor-pointer rounded-xl bg-white dark:bg-gray-800 border border-slate-200 dark:border-slate-700 p-4 shadow-sm hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all"
+						class="group cursor-pointer rounded-xl bg-background"
 					>
 						<div class="flex items-center gap-3">
 							<span
@@ -47,19 +45,16 @@
 								:class="
 									shortcut.color
 										? `text-${shortcut.color}-500`
-										: 'text-slate-600 dark:text-slate-400'
+										: 'text-muted-foreground'
 								"
 							>
 								{{ getIcon(shortcut.icon) || "📄" }}
 							</span>
-							<span class="font-medium text-slate-800 dark:text-slate-200 truncate">
+							<span class="font-medium text-foreground truncate">
 								{{ shortcut.label }}
 							</span>
 						</div>
-						<p
-							v-if="shortcut.type"
-							class="mt-2 text-xs text-slate-500 dark:text-slate-400"
-						>
+						<p v-if="shortcut.type" class="mt-2 text-xs text-muted-foreground">
 							{{ shortcut.type }}
 						</p>
 					</div>
@@ -72,48 +67,48 @@
 					<div
 						v-for="card in workspaceContent.cards"
 						:key="`card-${card.label}`"
-						class="bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden"
+						class="bg-background"
 					>
 						<!-- Card Header -->
 						<div
-							class="px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-gray-850"
+							class="px-4 py-3 border-b border-border bg-secondary dark:bg-secondary"
 						>
 							<div class="flex items-center gap-2">
 								<span v-if="card.icon" class="text-lg">{{
 									getIcon(card.icon)
 								}}</span>
-								<h3 class="font-semibold text-slate-800 dark:text-slate-200">
+								<h3 class="font-semibold text-foreground">
 									{{ card.label }}
 								</h3>
 							</div>
 						</div>
 
 						<!-- Card Links -->
-						<div class="divide-y divide-slate-100 dark:divide-slate-700">
+						<div class="divide-y divide-border dark:divide-border">
 							<div
 								v-for="link in card.links"
 								:key="`link-${link.name}`"
 								@click="handleLinkClick(link)"
-								class="px-4 py-3 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-gray-750 cursor-pointer transition"
+								class="px-4 py-3 flex items-center gap-3 hover:bg-secondary dark:hover:bg-accent cursor-pointer transition"
 							>
-								<span class="text-base text-slate-500">{{
+								<span class="text-base text-muted-foreground">{{
 									getIcon(link.icon) || "📄"
 								}}</span>
 								<div class="flex-1 min-w-0">
 									<span
-										class="text-sm font-medium text-slate-700 dark:text-slate-300 truncate block"
+										class="text-sm font-medium text-foreground truncate block"
 									>
 										{{ link.label }}
 									</span>
 									<span
 										v-if="link.description"
-										class="text-xs text-slate-500 dark:text-slate-400 truncate block"
+										class="text-xs text-muted-foreground truncate block"
 									>
 										{{ link.description }}
 									</span>
 								</div>
 								<svg
-									class="w-4 h-4 text-slate-400"
+									class="w-4 h-4 text-muted-foreground"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -134,7 +129,7 @@
 			<!-- Charts Section -->
 			<section v-if="workspaceContent.charts.length > 0">
 				<h2
-					class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-4"
+					class="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4"
 				>
 					Charts
 				</h2>
@@ -142,13 +137,13 @@
 					<div
 						v-for="chart in workspaceContent.charts"
 						:key="`chart-${chart.name}`"
-						class="bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm"
+						class="bg-background"
 					>
-						<h3 class="font-medium text-slate-800 dark:text-slate-200 mb-3">
+						<h3 class="font-medium text-foreground mb-3">
 							{{ chart.label }}
 						</h3>
 						<div
-							class="h-40 bg-slate-100 dark:bg-gray-700 rounded-lg flex items-center justify-center text-slate-400"
+							class="h-40 bg-muted rounded-lg flex items-center justify-center text-muted-foreground"
 						>
 							<span>📊 {{ chart.chart_name }}</span>
 						</div>
@@ -159,7 +154,7 @@
 			<!-- Number Cards Section -->
 			<section v-if="workspaceContent.number_cards.length > 0">
 				<h2
-					class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-4"
+					class="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4"
 				>
 					Stats
 				</h2>
@@ -167,14 +162,12 @@
 					<div
 						v-for="nc in workspaceContent.number_cards"
 						:key="`nc-${nc.name}`"
-						class="bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm"
+						class="bg-background"
 					>
-						<div class="text-sm text-slate-500 dark:text-slate-400">
+						<div class="text-sm text-muted-foreground">
 							{{ nc.label }}
 						</div>
-						<div class="text-2xl font-bold text-slate-800 dark:text-white mt-1">
-							--
-						</div>
+						<div class="text-2xl font-bold text-foreground mt-1">--</div>
 					</div>
 				</div>
 			</section>
@@ -182,7 +175,7 @@
 			<!-- Quick Lists Section -->
 			<section v-if="workspaceContent.quick_lists.length > 0">
 				<h2
-					class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-4"
+					class="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-4"
 				>
 					Quick Lists
 				</h2>
@@ -191,19 +184,19 @@
 						v-for="ql in workspaceContent.quick_lists"
 						:key="`ql-${ql.name}`"
 						@click="handleQuickListClick(ql)"
-						class="bg-white dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm cursor-pointer hover:shadow-md transition"
+						class="bg-background"
 					>
-						<h3 class="font-medium text-slate-800 dark:text-slate-200">
+						<h3 class="font-medium text-foreground">
 							{{ ql.label }}
 						</h3>
-						<p class="text-sm text-slate-500 mt-1">{{ ql.document_type }}</p>
+						<p class="text-sm text-muted-foreground mt-1">{{ ql.document_type }}</p>
 					</div>
 				</div>
 			</section>
 
 			<!-- Empty State -->
 			<div v-if="isEmpty" class="flex-1 flex items-center justify-center py-20">
-				<div class="text-center text-slate-400 dark:text-slate-500">
+				<div class="text-center text-muted-foreground">
 					<div class="text-4xl mb-4">📭</div>
 					<p>This workspace is empty</p>
 				</div>

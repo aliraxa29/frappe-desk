@@ -1,23 +1,23 @@
 <template>
 	<aside
 		:class="[
-			'relative flex flex-col bg-white dark:bg-gray-950 border-r border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 h-full shrink-0 transition-all duration-200',
+			'relative flex flex-col bg-background border-r border-border text-foreground h-full shrink-0 transition-all duration-200',
 			sidebarStore.collapsed ? 'w-0 overflow-hidden border-r-0' : 'w-64',
 		]"
 	>
 		<!-- Sidebar Header -->
 		<div
-			class="px-4 py-3 border-b border-slate-100 dark:border-slate-800 shrink-0 flex items-center justify-between gap-2"
+			class="px-4 py-3 border-b border-border shrink-0 flex items-center justify-between gap-2"
 		>
 			<h2
-				class="text-sm font-bold text-slate-900 dark:text-white truncate flex-1"
+				class="text-sm font-bold text-foreground truncate flex-1"
 				:title="appInfoStore.currentAppTitle || String(route.params.app || '')"
 			>
 				{{ appInfoStore.currentAppTitle || route.params.app }}
 			</h2>
 			<button
 				@click="sidebarStore.toggleCollapsed()"
-				class="p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+				class="p-1 rounded-md text-muted-foreground hover:text-muted-foreground dark:hover:text-muted-foreground hover:bg-muted dark:hover:bg-secondary transition-colors shrink-0"
 				:title="__('Collapse sidebar')"
 			>
 				<svg
@@ -37,10 +37,10 @@
 		</div>
 
 		<!-- Search -->
-		<div class="px-3 py-2 border-b border-slate-100 dark:border-slate-800 shrink-0">
+		<div class="px-3 py-2 border-b border-border shrink-0">
 			<div class="relative">
 				<svg
-					class="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400"
+					class="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground"
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke="currentColor"
@@ -56,20 +56,17 @@
 					v-model="searchQuery"
 					type="text"
 					:placeholder="__('Search...')"
-					class="w-full rounded-md border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 pl-8 pr-3 py-1.5 text-xs text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+					class="w-full rounded-md border border-border bg-secondary/60 pl-8 pr-3 py-1.5 text-xs text-foreground placeholder-slate-400 dark:placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring focus:border-blue-500 transition-colors"
 				/>
 			</div>
 		</div>
 
 		<!-- Sidebar Content - Scrollable -->
-		<div
-			ref="sidebarContentRef"
-			class="scroll-area flex-1 overflow-y-auto px-2 py-2 dark:bg-gray-950"
-		>
+		<div ref="sidebarContentRef" class="scroll-area flex-1 overflow-y-auto px-2 py-2">
 			<!-- Loading -->
 			<div v-if="loading" class="py-8 flex justify-center">
 				<svg
-					class="animate-spin h-5 w-5 text-slate-400"
+					class="animate-spin h-5 w-5 text-muted-foreground"
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
 					viewBox="0 0 24 24"
@@ -89,7 +86,7 @@
 			<!-- Empty -->
 			<div v-else-if="allSidebarEmpty" class="py-8 text-center">
 				<svg
-					class="mx-auto h-8 w-8 text-slate-300 dark:text-slate-600 mb-2"
+					class="mx-auto h-8 w-8 text-muted-foreground mb-2"
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke="currentColor"
@@ -101,7 +98,7 @@
 						d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
 					/>
 				</svg>
-				<p class="text-xs text-slate-400">{{ __("No items") }}</p>
+				<p class="text-xs text-muted-foreground">{{ __("No items") }}</p>
 			</div>
 
 			<!-- Workspace Mode: Show workspaces as sidebar items -->
@@ -114,7 +111,7 @@
 						'group flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition-all cursor-pointer',
 						isWorkspaceActive(item)
 							? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold'
-							: 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200',
+							: 'text-muted-foreground hover:bg-secondary dark:hover:bg-secondary/60 hover:text-foreground dark:hover:text-muted-foreground',
 					]"
 				>
 					<span class="text-sm shrink-0">{{ getWorkspaceIcon(item.icon) }}</span>
@@ -132,7 +129,7 @@
 						'group flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition-all cursor-pointer',
 						isModuleActive(item)
 							? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold'
-							: 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200',
+							: 'text-muted-foreground hover:bg-secondary dark:hover:bg-secondary/60 hover:text-foreground dark:hover:text-muted-foreground',
 					]"
 				>
 					<span class="text-sm shrink-0">{{ getWorkspaceIcon(item.icon) }}</span>
@@ -145,7 +142,7 @@
 				<!-- DocTypes -->
 				<div v-if="groupedSidebar.doctypes.length">
 					<h4
-						class="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500"
+						class="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
 					>
 						{{ __("DocTypes") }}
 					</h4>
@@ -159,7 +156,7 @@
 								'group flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[13px] transition-all cursor-pointer',
 								isItemActive(item)
 									? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold'
-									: 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200',
+									: 'text-muted-foreground hover:bg-secondary dark:hover:bg-secondary/60 hover:text-foreground dark:hover:text-muted-foreground',
 							]"
 						>
 							<span class="text-sm shrink-0">{{ getWorkspaceIcon(item.icon) }}</span>
@@ -171,7 +168,7 @@
 				<!-- Pages -->
 				<div v-if="groupedSidebar.pages.length">
 					<h4
-						class="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500"
+						class="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
 					>
 						{{ __("Pages") }}
 					</h4>
@@ -185,7 +182,7 @@
 								'group flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[13px] transition-all',
 								isPageActive(item)
 									? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold'
-									: 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200',
+									: 'text-muted-foreground hover:bg-secondary dark:hover:bg-secondary/60 hover:text-foreground dark:hover:text-muted-foreground',
 							]"
 						>
 							<span class="text-sm shrink-0">{{ getWorkspaceIcon(item.icon) }}</span>
@@ -197,7 +194,7 @@
 				<!-- Reports -->
 				<div v-if="groupedSidebar.reports.length">
 					<h4
-						class="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500"
+						class="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
 					>
 						{{ __("Reports") }}
 					</h4>
@@ -211,7 +208,7 @@
 								'group flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[13px] transition-all',
 								isPageActive(item)
 									? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold'
-									: 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200',
+									: 'text-muted-foreground hover:bg-secondary dark:hover:bg-secondary/60 hover:text-foreground dark:hover:text-muted-foreground',
 							]"
 						>
 							<span class="text-sm shrink-0">{{
@@ -225,7 +222,7 @@
 				<!-- Dashboards -->
 				<div v-if="groupedSidebar.dashboards.length">
 					<h4
-						class="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500"
+						class="px-3 mb-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
 					>
 						{{ __("Dashboards") }}
 					</h4>
@@ -239,7 +236,7 @@
 								'group flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[13px] transition-all',
 								isPageActive(item)
 									? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold'
-									: 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-200',
+									: 'text-muted-foreground hover:bg-secondary dark:hover:bg-secondary/60 hover:text-foreground dark:hover:text-muted-foreground',
 							]"
 						>
 							<span class="text-sm shrink-0">{{

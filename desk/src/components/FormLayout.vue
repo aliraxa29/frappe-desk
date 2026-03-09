@@ -1,9 +1,7 @@
 <template>
 	<div data-form-content class="flex flex-col gap-6 p-4">
 		<div v-if="imageField && ctx" class="mb-4">
-			<div
-				class="rounded-2xl border border-slate-200 bg-white dark:bg-slate-800/50 dark:border-slate-600 shadow-sm p-6"
-			>
+			<div class="rounded-2xl border border-border bg-background">
 				<div v-if="imageValue" class="mb-4 flex justify-center">
 					<div class="relative group">
 						<img
@@ -42,16 +40,17 @@
 			</Accordion>
 
 			<div v-else-if="isSectionVisible(section)" class="mb-4">
-				<div
-					class="rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-600 dark:bg-slate-800/70 shadow-sm p-6"
-				>
+				<div class="rounded-2xl border border-border bg-secondary/70 shadow-sm p-6">
 					<div v-if="section.label" class="mb-4 flex items-center gap-2">
 						<div class="h-6 w-1 rounded bg-blue-500/70 mr-2"></div>
-						<h3 class="text-base font-semibold text-slate-800 dark:text-white m-0">
+						<h3 class="text-base font-semibold text-foreground m-0">
 							{{ section.label }}
 						</h3>
 					</div>
-					<p v-if="section.description" class="text-xs text-slate-500 mt-1 mb-4 m-0">
+					<p
+						v-if="section.description"
+						class="text-xs text-muted-foreground mt-1 mb-4 m-0"
+					>
 						{{ section.description }}
 					</p>
 					<FormSectionContent

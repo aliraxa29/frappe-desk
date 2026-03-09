@@ -3,16 +3,13 @@
 		<template #header>
 			<div class="flex items-center justify-between gap-4">
 				<div>
-					<h1 class="text-2xl font-bold text-slate-900 dark:text-white">
+					<h1 class="text-2xl font-bold text-foreground">
 						{{ currentConfig ? currentConfig.title : "Dashboards" }}
 					</h1>
-					<p
-						v-if="currentConfig"
-						class="text-slate-600 dark:text-slate-400 text-sm mt-1"
-					>
+					<p v-if="currentConfig" class="text-muted-foreground text-sm mt-1">
 						{{ currentConfig.description }}
 					</p>
-					<p v-else class="text-slate-600 dark:text-slate-400 text-sm mt-1">
+					<p v-else class="text-muted-foreground text-sm mt-1">
 						Select a dashboard to view
 					</p>
 				</div>
@@ -49,7 +46,7 @@
 						v-for="dashboard in availableDashboards"
 						:key="dashboard.name"
 						@click="selectDashboard(dashboard.name)"
-						class="group cursor-pointer rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 transition-all duration-200 hover:shadow-lg hover:border-blue-500 dark:hover:border-blue-400"
+						class="group cursor-pointer rounded-lg border border-border bg-background"
 					>
 						<div class="flex items-center gap-4 mb-4">
 							<div
@@ -61,12 +58,12 @@
 								/>
 							</div>
 							<div>
-								<h3 class="font-semibold text-slate-900 dark:text-white">
+								<h3 class="font-semibold text-foreground">
 									{{ dashboard.title }}
 								</h3>
 							</div>
 						</div>
-						<p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+						<p class="text-sm text-muted-foreground mb-4">
 							{{ dashboard.description }}
 						</p>
 						<button

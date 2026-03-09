@@ -3,16 +3,14 @@
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
-			class="font-medium mb-2 text-sm text-slate-700 dark:text-slate-300"
+			class="font-medium mb-2 text-sm text-foreground"
 		>
 			{{ field.label }}
 			<span v-if="field.reqd" class="text-red-500 ml-1">*</span>
 		</label>
 
 		<div class="relative">
-			<div
-				class="flex items-center gap-1 border border-[#ddd] dark:border-slate-700 rounded bg-white dark:bg-slate-800 overflow-hidden transition-colors duration-200 focus-within:border-[#0066cc] focus-within:shadow-[0_0_0_3px_rgba(0,102,204,0.1)]"
-			>
+			<div class="flex items-center gap-1 border border-input rounded bg-background">
 				<input
 					autocomplete="off"
 					:id="`field-${field.fieldname}`"
@@ -21,7 +19,7 @@
 					:required="field.reqd"
 					:placeholder="`Select a ${field.options || 'record'}...`"
 					type="text"
-					class="flex-1 px-3 py-2.5 outline-none text-[0.95rem] bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 transition-colors duration-200 read-only:bg-gray-100 read-only:dark:bg-slate-700 read-only:cursor-not-allowed focus:outline-none focus:border-blue-600 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-600/10 dark:focus:ring-blue-500/20"
+					class="flex-1 px-3 py-2.5 outline-none text-[0.95rem] bg-background"
 					@input="handleInput"
 					@focus="handleFocus"
 					@keydown="handleKeydown"
@@ -34,7 +32,7 @@
 					@click="openDocument"
 				>
 					<ArrowRight
-						class="text-slate-400 hover:text-slate-600 dark:hover:text-white"
+						class="text-muted-foreground hover:text-muted-foreground dark:hover:text-white"
 					/>
 				</button>
 				<button
@@ -43,7 +41,9 @@
 					title="Clear"
 					@click="clearValue"
 				>
-					<Close class="text-slate-400 hover:text-slate-600 dark:hover:text-white" />
+					<Close
+						class="text-muted-foreground hover:text-muted-foreground dark:hover:text-white"
+					/>
 				</button>
 				<div v-if="loading" class="px-3 py-2">
 					<div
@@ -54,9 +54,9 @@
 
 			<div
 				v-if="showDropdown"
-				class="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 border border-[#ddd] dark:border-slate-700 rounded shadow-lg z-180 max-h-87.5 overflow-y-auto scroll-area"
+				class="absolute top-full left-0 right-0 mt-1 z-50 bg-popover text-popover-foreground border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto"
 			>
-				<div v-if="loading" class="p-3 text-center text-sm text-slate-500">
+				<div v-if="loading" class="p-3 text-center text-sm text-muted-foreground">
 					<div class="flex items-center justify-center gap-2">
 						<div
 							class="w-4 h-4 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"
@@ -69,36 +69,30 @@
 					<button
 						v-for="(item, idx) in filteredResults"
 						:key="`result-${item.value}`"
-						class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-b-0 cursor-pointer"
+						class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 dark:hover:bg-secondary transition-colors border-b border-border last:border-b-0 cursor-pointer"
 						:class="
 							selectedIdx === idx
-								? 'bg-blue-100 text-blue-900 dark:text-slate-600 hover:dark:text-white'
-								: 'text-slate-700 dark:text-slate-200'
+								? 'bg-blue-100 text-blue-900 hover:dark:text-foreground'
+								: 'text-foreground'
 						"
 						@click="selectItem(item)"
 						@mouseenter="selectedIdx = idx"
 					>
 						<div class="font-medium">{{ item.label }}</div>
-						<div
-							v-if="item.description"
-							class="text-xs text-slate-500 mt-0.5 dark:text-white"
-						>
+						<div v-if="item.description" class="text-xs text-muted-foreground mt-0.5">
 							{{ item.description }}
 						</div>
 					</button>
 
-					<div
-						v-if="actionItems.length > 0"
-						class="border-t border-slate-200 dark:border-slate-700"
-					>
+					<div v-if="actionItems.length > 0" class="border-t border-border">
 						<button
 							v-for="(item, idx) in actionItems"
 							:key="`action-${item.value}`"
 							type="button"
-							class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-b-0 text-slate-600 dark:text-slate-200 flex items-center gap-2 cursor-pointer"
+							class="w-full px-3 py-2 text-left text-sm hover:bg-blue-50 dark:hover:bg-secondary transition-colors border-b border-border last:border-b-0 text-muted-foreground flex items-center gap-2 cursor-pointer"
 							:class="
 								selectedIdx === filteredResults.length + idx
-									? 'bg-blue-100 text-blue-900 dark:text-slate-600 hover:dark:text-white'
+									? 'bg-blue-100 text-blue-900 hover:dark:text-foreground'
 									: ''
 							"
 							@click="selectItem(item)"
@@ -112,21 +106,18 @@
 
 				<div
 					v-else-if="!loading && searchText"
-					class="p-3 text-center text-sm text-slate-500"
+					class="p-3 text-center text-sm text-muted-foreground"
 				>
 					{{ __(`No results for ${searchText}`) }}
 				</div>
 
-				<div v-else class="p-3 text-center text-sm text-slate-500">
+				<div v-else class="p-3 text-center text-sm text-muted-foreground">
 					{{ __("Start typing to search...") }}
 				</div>
 			</div>
 		</div>
 
-		<small
-			v-if="field.description"
-			class="block text-gray-600 dark:text-slate-300 mt-1 text-[0.85rem]"
-		>
+		<small v-if="field.description" class="block text-muted-foreground mt-1 text-[0.85rem]">
 			{{ __(field.description) }}
 		</small>
 	</div>

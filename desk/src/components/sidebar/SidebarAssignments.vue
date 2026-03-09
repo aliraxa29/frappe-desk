@@ -1,8 +1,6 @@
 <template>
 	<div class="p-4 space-y-3">
-		<p
-			class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500"
-		>
+		<p class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
 			{{ __("Assigned To") }}
 		</p>
 
@@ -11,7 +9,7 @@
 			<div
 				v-for="a in assignments"
 				:key="a.user"
-				class="flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 group"
+				class="flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg hover:bg-secondary dark:hover:bg-secondary group"
 			>
 				<div class="flex items-center gap-2 min-w-0">
 					<div
@@ -20,15 +18,15 @@
 						{{ getInitials(a.full_name || a.user) }}
 					</div>
 					<div class="min-w-0">
-						<p class="text-xs font-medium text-slate-700 dark:text-slate-200 truncate">
+						<p class="text-xs font-medium text-foreground truncate">
 							{{ a.full_name || a.user }}
 						</p>
-						<p class="text-[10px] text-slate-400 truncate">{{ a.user }}</p>
+						<p class="text-[10px] text-muted-foreground truncate">{{ a.user }}</p>
 					</div>
 				</div>
 				<button
 					@click="removeAssignment(a.user)"
-					class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/40 text-slate-400 hover:text-red-600 transition-all"
+					class="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/40 text-muted-foreground hover:text-red-600 transition-all"
 					:aria-label="__('Remove')"
 				>
 					<X class="h-3.5 w-3.5" />
@@ -36,7 +34,7 @@
 			</div>
 			<p
 				v-if="assignments.length === 0 && !loading"
-				class="text-xs text-slate-400 italic px-2"
+				class="text-xs text-muted-foreground italic px-2"
 			>
 				{{ __("Not assigned to anyone") }}
 			</p>
@@ -60,17 +58,17 @@
 					@input="searchUsers"
 					type="text"
 					:placeholder="__('Search users...')"
-					class="w-full px-2.5 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+					class="w-full px-2.5 py-1.5 text-xs border border-border rounded-md bg-background"
 				/>
 				<div
 					v-if="filteredUsers.length > 0"
-					class="rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden max-h-36 overflow-y-auto"
+					class="rounded-lg border border-border overflow-hidden max-h-36 overflow-y-auto"
 				>
 					<button
 						v-for="u in filteredUsers"
 						:key="u.name"
 						@click="addAssignment(u.name)"
-						class="w-full flex items-center gap-2 px-2.5 py-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-800 border-b border-slate-100 dark:border-slate-700 last:border-b-0 transition-colors"
+						class="w-full flex items-center gap-2 px-2.5 py-2 text-xs hover:bg-secondary dark:hover:bg-secondary border-b border-border last:border-b-0 transition-colors"
 					>
 						<div
 							class="h-6 w-6 rounded-full bg-linear-to-br from-slate-400 to-slate-600 flex items-center justify-center text-white text-[10px] font-semibold shrink-0"
@@ -78,16 +76,16 @@
 							{{ getInitials(u.full_name || u.name) }}
 						</div>
 						<div class="text-left min-w-0">
-							<p class="font-medium text-slate-700 dark:text-slate-200 truncate">
+							<p class="font-medium text-foreground truncate">
 								{{ u.full_name }}
 							</p>
-							<p class="text-[10px] text-slate-400 truncate">{{ u.name }}</p>
+							<p class="text-[10px] text-muted-foreground truncate">{{ u.name }}</p>
 						</div>
 					</button>
 				</div>
 				<div
 					v-else-if="searchQuery && !loadingUsers"
-					class="text-xs text-slate-400 text-center py-2"
+					class="text-xs text-muted-foreground text-center py-2"
 				>
 					{{ __("No users found") }}
 				</div>
@@ -96,7 +94,7 @@
 						showAddDialog = false;
 						searchQuery = '';
 					"
-					class="w-full py-1 text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+					class="w-full py-1 text-xs text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground"
 				>
 					{{ __("Cancel") }}
 				</button>

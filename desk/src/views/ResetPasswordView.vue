@@ -59,13 +59,9 @@ function goBackToLogin() {
 		</div>
 
 		<div class="relative w-full max-w-md">
-			<div
-				class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden text-slate-900 dark:text-slate-100"
-			>
-				<div class="bg-gray-950 px-8 py-12 text-center">
-					<div
-						class="w-12 h-12 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4"
-					>
+			<div class="bg-background">
+				<div class="bg-foreground px-8 py-12 text-center">
+					<div class="w-12 h-12 bg-background">
 						<Mail class="w-6 h-6" />
 					</div>
 					<h1 class="text-3xl font-bold text-white mb-2">{{ __("Reset Password") }}</h1>
@@ -77,19 +73,18 @@ function goBackToLogin() {
 				<div class="px-8 py-10">
 					<div v-if="!submitted" class="space-y-6">
 						<div>
-							<label
-								class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2"
-								>{{ __("Email or Username") }}</label
-							>
+							<label class="block text-sm font-semibold text-foreground mb-2">{{
+								__("Email or Username")
+							}}</label>
 							<input
 								v-model="loginId"
 								type="text"
 								placeholder="you@example.com or username"
 								:disabled="isLoading"
 								@keydown.enter="handleResetRequest"
-								class="w-full px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 disabled:bg-slate-100 disabled:dark:bg-slate-700 disabled:cursor-not-allowed"
+								class="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition bg-background"
 							/>
-							<p class="mt-2 text-xs text-slate-500">
+							<p class="mt-2 text-xs text-muted-foreground">
 								{{
 									__(
 										"Enter the email address or username associated with your account",
@@ -145,10 +140,8 @@ function goBackToLogin() {
 						</Button>
 					</div>
 				</div>
-				<div
-					class="px-8 py-4 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700"
-				>
-					<p class="text-xs text-slate-500 dark:text-slate-300 text-center">
+				<div class="px-8 py-4 bg-secondary border-t border-border">
+					<p class="text-xs text-muted-foreground text-center">
 						{{ __("Didn't receive an email?") }}
 						<span
 							class="text-indigo-600 hover:text-indigo-700 dark:text-indigo-300 font-medium cursor-pointer"

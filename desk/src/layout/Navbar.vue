@@ -1,13 +1,13 @@
 <template>
 	<nav
-		class="sticky top-0 z-40 flex items-center justify-between gap-6 px-6 py-1 bg-white/90 dark:bg-gray-950 backdrop-blur border-b border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white transition-colors"
+		class="sticky top-0 z-40 flex items-center justify-between gap-6 px-6 py-1 bg-background/90 backdrop-blur border-b border-border text-foreground transition-colors"
 	>
 		<div class="flex items-center gap-3">
 			<button
 				@click="goHome"
-				class="text-slate-900 dark:text-white w-26 flex items-center text-center gap-3 px-2 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition"
+				class="text-foreground w-26 flex items-center text-center gap-3 px-2 py-3 rounded-lg hover:bg-muted dark:hover:bg-secondary cursor-pointer transition"
 			>
-				<Grid class="w-7 h-7 text-slate-900 dark:text-white shrink-0" />
+				<Grid class="w-7 h-7 text-foreground shrink-0" />
 				<span class="hidden sm:inline text-lg font-semibold">{{ __("Apps") }}</span>
 			</button>
 
@@ -21,7 +21,7 @@
 		<div class="hidden md:flex flex-1 max-w-sm mx-auto">
 			<div class="relative w-full cursor-pointer" @click="openCommandDialog">
 				<Search
-					class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-400"
+					class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground"
 				/>
 
 				<input
@@ -29,10 +29,10 @@
 					:placeholder="__('Search or type command... (Ctrl+K)')"
 					readonly
 					@focus="openCommandDialog"
-					class="w-full rounded-lg bg-slate-100 dark:bg-gray-900 border border-slate-200 dark:border-gray-900 pl-10 pr-14 py-1 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition"
+					class="w-full rounded-lg bg-muted border border-border pl-10 pr-14 py-1 text-foreground placeholder-slate-500 dark:placeholder-white focus:outline-none focus:ring-1 focus:ring-ring focus:border-blue-500 transition"
 				/>
 				<span
-					class="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs font-mono text-slate-500 bg-slate-200 dark:bg-slate-600 border border-slate-300 dark:border-slate-500 rounded dark:text-white"
+					class="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs font-mono text-muted-foreground bg-muted border border-border rounded"
 				>
 					⌘K
 				</span>
@@ -44,13 +44,13 @@
 			<button
 				@click="toggleUserMenu"
 				:title="`${userFullName} (${userEmail})`"
-				class="user-profile-button flex items-center p-1 rounded-full text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
+				class="user-profile-button flex items-center p-1 rounded-full text-foreground hover:bg-muted dark:hover:bg-secondary transition cursor-pointer"
 			>
 				<img
 					v-if="userImage"
 					:src="userImage"
 					:alt="userFullName"
-					class="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-slate-700"
+					class="w-9 h-9 rounded-full object-cover border border-border"
 				/>
 				<div
 					v-else
@@ -64,14 +64,14 @@
 			<transition name="fade">
 				<div
 					v-if="showUserMenu"
-					class="user-menu absolute right-0 mt-2 w-64 z-50 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg shadow-xl p-2 text-slate-900 dark:text-slate-100"
+					class="user-menu absolute right-0 mt-2 w-64 z-50 bg-background"
 				>
 					<div class="flex items-center gap-3 px-4 py-3">
 						<img
 							v-if="userImage"
 							:src="userImage"
 							:alt="userFullName"
-							class="w-12 h-12 rounded-full object-cover border border-slate-200 dark:border-slate-700"
+							class="w-12 h-12 rounded-full object-cover border border-border"
 						/>
 						<div
 							v-else
@@ -81,20 +81,20 @@
 						</div>
 
 						<div class="min-w-0 flex-1">
-							<div class="font-semibold text-slate-900 dark:text-slate-100 truncate">
+							<div class="font-semibold text-foreground truncate">
 								{{ userFullName }}
 							</div>
-							<div class="text-sm text-slate-500 dark:text-slate-400 truncate">
+							<div class="text-sm text-muted-foreground truncate">
 								{{ userEmail }}
 							</div>
 						</div>
 					</div>
 
-					<div class="h-px bg-slate-200 dark:bg-slate-600 my-2"></div>
+					<div class="h-px bg-muted my-2"></div>
 
 					<button
 						@click="themeStore.toggleTheme()"
-						class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-600 transition cursor-pointer"
+						class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-muted-foreground hover:text-foreground dark:hover:text-white hover:bg-muted dark:hover:bg-muted transition cursor-pointer"
 					>
 						<Sun v-if="isDark" class="w-4 h-4 shrink-0" />
 						<Moon v-else class="w-4 h-4 shrink-0" />
@@ -103,7 +103,7 @@
 
 					<button
 						@click="reloadApp"
-						class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-600 transition cursor-pointer"
+						class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-muted-foreground hover:text-foreground dark:hover:text-white hover:bg-muted dark:hover:bg-muted transition cursor-pointer"
 					>
 						<ArrowsClockwise class="w-4 h-4 shrink-0" />
 						{{ __("Reload app") }}
@@ -111,7 +111,7 @@
 
 					<button
 						@click="clearCacheAndReload"
-						class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-600 transition cursor-pointer"
+						class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-muted-foreground hover:text-foreground dark:hover:text-white hover:bg-muted dark:hover:bg-muted transition cursor-pointer"
 					>
 						<Trash class="w-4 h-4 shrink-0" />
 						{{ __("Clear cache and reload") }}
@@ -119,7 +119,7 @@
 
 					<button
 						@click="handleLogout"
-						class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-600 transition cursor-pointer"
+						class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-muted-foreground hover:text-foreground dark:hover:text-white hover:bg-muted dark:hover:bg-muted transition cursor-pointer"
 					>
 						<Logout class="w-4 h-4 shrink-0" />
 						{{ __("Logout") }}

@@ -1,18 +1,18 @@
 <template>
 	<div
-		class="child-table-enhanced border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-slate-900"
+		class="child-table-enhanced border border-border rounded-lg overflow-hidden bg-background"
 	>
 		<!-- Header -->
 		<div
-			class="flex items-center justify-between px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700"
+			class="flex items-center justify-between px-3 py-2 bg-secondary/50 border-b border-border"
 		>
 			<div class="flex items-center gap-2">
-				<span class="text-sm font-semibold text-slate-800 dark:text-slate-200">
+				<span class="text-sm font-semibold text-foreground">
 					{{ fieldLabel }}
 				</span>
 				<span v-if="reqd" class="text-red-500 ml-1">*</span>
 				<span
-					class="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-200/60 dark:bg-slate-700 px-1.5 py-0.5 rounded-full"
+					class="text-[11px] text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded-full"
 				>
 					{{ rows.length }}
 				</span>
@@ -33,13 +33,13 @@
 					</button>
 					<button
 						type="button"
-						class="btn-icon-sm text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+						class="btn-icon-sm text-muted-foreground hover:bg-muted dark:hover:bg-secondary"
 						title="Deselect all"
 						@click="selectedIndices.clear()"
 					>
 						<Close class="w-4 h-4" />
 					</button>
-					<div class="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-0.5" />
+					<div class="w-px h-4 bg-muted mx-0.5" />
 				</template>
 
 				<button
@@ -61,9 +61,7 @@
 		<div class="scroll-area overflow-x-auto">
 			<table class="w-full text-sm">
 				<thead>
-					<tr
-						class="border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30"
-					>
+					<tr class="border-b border-border bg-secondary/50/30">
 						<!-- Select all -->
 						<th class="w-8 px-2 py-2">
 							<input
@@ -71,12 +69,12 @@
 								:checked="isAllRowsSelected"
 								:indeterminate="isPartialSelect"
 								@change="toggleSelectAll"
-								class="w-3.5 h-3.5 rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 cursor-pointer"
+								class="w-3.5 h-3.5 rounded border-border text-blue-600 focus:ring-ring cursor-pointer"
 							/>
 						</th>
 						<!-- Row # -->
 						<th
-							class="w-10 px-2 py-2 text-center text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase"
+							class="w-10 px-2 py-2 text-center text-[10px] font-semibold text-muted-foreground uppercase"
 						>
 							#
 						</th>
@@ -84,7 +82,7 @@
 						<th
 							v-for="col in displayColumns"
 							:key="col.fieldname"
-							class="px-2.5 py-2 text-left text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap"
+							class="px-2.5 py-2 text-left text-[10px] font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap"
 							:class="{ 'text-right': isNumericFieldtype(col.fieldtype) }"
 						>
 							{{ col.label || col.fieldname }}
@@ -92,7 +90,7 @@
 						</th>
 						<!-- Actions -->
 						<th
-							class="w-20 px-2 py-2 text-center text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase"
+							class="w-20 px-2 py-2 text-center text-[10px] font-semibold text-muted-foreground uppercase"
 						>
 							{{ __("Actions") }}
 						</th>
@@ -102,12 +100,12 @@
 					<tr
 						v-for="(row, index) in rows"
 						:key="row.name || row.idx || index"
-						class="border-b border-slate-100 dark:border-slate-800 transition-colors group"
+						class="border-b border-border transition-colors group"
 						:class="{
 							'bg-blue-50/40 dark:bg-blue-900/10': selectedIndices.has(index),
 							'bg-yellow-50/30 dark:bg-yellow-900/10':
 								editingCell?.rowIndex === index,
-							'hover:bg-slate-50 dark:hover:bg-slate-800/50':
+							'hover:bg-secondary dark:hover:bg-secondary/50':
 								!selectedIndices.has(index),
 						}"
 					>
@@ -117,13 +115,13 @@
 								type="checkbox"
 								:checked="selectedIndices.has(index)"
 								@change="toggleRowSelect(index)"
-								class="w-3.5 h-3.5 rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 cursor-pointer"
+								class="w-3.5 h-3.5 rounded border-border text-blue-600 focus:ring-ring cursor-pointer"
 							/>
 						</td>
 
 						<!-- Row # -->
 						<td
-							class="px-2 py-1.5 text-center text-xs text-slate-400 dark:text-slate-500 tabular-nums"
+							class="px-2 py-1.5 text-center text-xs text-muted-foreground tabular-nums"
 						>
 							{{ index + 1 }}
 						</td>
@@ -132,7 +130,7 @@
 						<td
 							v-for="col in displayColumns"
 							:key="`${index}-${col.fieldname}`"
-							class="px-2.5 py-1.5 cursor-pointer dark:text-gray-300"
+							class="px-2.5 py-1.5 cursor-pointer"
 							:class="{ 'text-right': isNumericFieldtype(col.fieldtype) }"
 							@dblclick="startInlineEdit(index, col.fieldname)"
 							@click="selectCellRow(index)"
@@ -215,9 +213,7 @@
 					<!-- Empty state -->
 					<tr v-if="rows.length === 0">
 						<td :colspan="displayColumns.length + 3" class="py-8 text-center">
-							<div
-								class="flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500"
-							>
+							<div class="flex flex-col items-center gap-2 text-muted-foreground">
 								<svg
 									class="w-10 h-10"
 									fill="none"
@@ -246,9 +242,9 @@
 		<!-- Keyboard shortcut hint -->
 		<div
 			v-if="rows.length > 0"
-			class="flex items-center justify-between px-3 py-1.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20"
+			class="flex items-center justify-between px-3 py-1.5 border-t border-border bg-secondary/30/20"
 		>
-			<span class="text-[10px] text-slate-400 dark:text-slate-500">
+			<span class="text-[10px] text-muted-foreground">
 				{{ __("Double-click to edit") }} &middot; {{ __("Ctrl+D to duplicate") }} &middot;
 				{{ __("Del to delete") }}
 			</span>
@@ -270,14 +266,12 @@
 					@click.self="closeRowModal"
 				>
 					<div class="absolute inset-0 bg-black/50" />
-					<div
-						class="relative bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden"
-					>
+					<div class="relative bg-background">
 						<!-- Modal header -->
 						<div
-							class="flex items-center justify-between px-5 py-3.5 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50"
+							class="flex items-center justify-between px-5 py-3.5 border-b border-border bg-secondary/50"
 						>
-							<h3 class="text-sm font-semibold text-slate-900 dark:text-white">
+							<h3 class="text-sm font-semibold text-foreground">
 								{{
 									editingRowIndex >= 0
 										? `Edit Row ${editingRowIndex + 1}`
@@ -295,7 +289,7 @@
 								>
 									<ChevronLeft class="w-4 h-4" />
 								</button>
-								<span class="text-xs text-slate-500 dark:text-slate-400"
+								<span class="text-xs text-muted-foreground"
 									>{{ editingRowIndex + 1 }} / {{ rows.length }}</span
 								>
 								<button
@@ -307,7 +301,7 @@
 								>
 									<ChevronRight class="w-4 h-4" />
 								</button>
-								<div class="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-1" />
+								<div class="w-px h-4 bg-muted mx-1" />
 								<button
 									type="button"
 									class="btn-icon-sm"
@@ -324,7 +318,7 @@
 							<!-- Tabs -->
 							<div v-if="formLayout.tabs.length > 1" class="mb-4">
 								<div
-									class="flex gap-0.5 border-b border-slate-200 dark:border-slate-700 -mx-5 px-5 bg-slate-50/50 dark:bg-slate-800/30"
+									class="flex gap-0.5 border-b border-border -mx-5 px-5 bg-secondary/50/30"
 								>
 									<button
 										v-for="(tab, idx) in formLayout.tabs"
@@ -334,7 +328,7 @@
 										:class="
 											activeTab === idx
 												? 'text-blue-600 dark:text-blue-400'
-												: 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+												: 'text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground'
 										"
 										@click="activeTab = idx"
 									>
@@ -369,11 +363,11 @@
 
 						<!-- Modal footer -->
 						<div
-							class="flex items-center justify-end gap-2 px-5 py-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30"
+							class="flex items-center justify-end gap-2 px-5 py-3 border-t border-border bg-secondary/30"
 						>
 							<button
 								type="button"
-								class="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+								class="px-4 py-2 text-sm font-medium text-foreground hover:bg-muted dark:hover:bg-secondary rounded-lg transition-colors"
 								@click="closeRowModal"
 							>
 								Cancel
@@ -400,15 +394,11 @@
 					@click.self="showColumnSettings = false"
 				>
 					<div class="absolute inset-0 bg-black/50" />
-					<div
-						class="relative bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-sm max-h-[70vh] flex flex-col overflow-hidden"
-					>
+					<div class="relative bg-background">
 						<div
-							class="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700"
+							class="flex items-center justify-between px-4 py-3 border-b border-border"
 						>
-							<h3 class="text-sm font-semibold text-slate-900 dark:text-white">
-								Column Settings
-							</h3>
+							<h3 class="text-sm font-semibold text-foreground">Column Settings</h3>
 							<button
 								type="button"
 								class="btn-icon-sm"
@@ -421,15 +411,15 @@
 							<label
 								v-for="field in allTableFields"
 								:key="field.fieldname"
-								class="flex items-center gap-2.5 px-3 py-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+								class="flex items-center gap-2.5 px-3 py-2 rounded-md hover:bg-secondary dark:hover:bg-secondary cursor-pointer transition-colors"
 							>
 								<input
 									type="checkbox"
 									:checked="visibleColumnNames.includes(field.fieldname)"
 									@change="toggleColumn(field.fieldname)"
-									class="w-3.5 h-3.5 rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 cursor-pointer"
+									class="w-3.5 h-3.5 rounded border-border text-blue-600 focus:ring-ring cursor-pointer"
 								/>
-								<span class="text-sm text-slate-700 dark:text-slate-300 flex-1">{{
+								<span class="text-sm text-foreground flex-1">{{
 									field.label || field.fieldname
 								}}</span>
 								<span
@@ -440,11 +430,11 @@
 							</label>
 						</div>
 						<div
-							class="flex items-center justify-end gap-2 px-4 py-3 border-t border-slate-200 dark:border-slate-700"
+							class="flex items-center justify-end gap-2 px-4 py-3 border-t border-border"
 						>
 							<button
 								type="button"
-								class="px-3 py-1.5 text-xs text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md"
+								class="px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted dark:hover:bg-secondary rounded-md"
 								@click="resetColumns"
 							>
 								Reset

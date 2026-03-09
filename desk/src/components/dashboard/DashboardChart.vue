@@ -1,17 +1,14 @@
 <template>
-	<div
-		class="w-full bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
-		:style="{ minHeight: `${chartHeight}px` }"
-	>
+	<div class="w-full bg-background" :style="{ minHeight: `${chartHeight}px` }">
 		<!-- Header -->
 		<div
-			class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800"
+			class="flex items-center justify-between px-6 py-4 border-b border-border bg-secondary"
 		>
 			<div>
-				<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
+				<h3 class="text-lg font-semibold text-foreground">
 					{{ chart?.chart_name || title }}
 				</h3>
-				<p v-if="subtitle" class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+				<p v-if="subtitle" class="text-sm text-muted-foreground mt-1">
 					{{ subtitle }}
 				</p>
 			</div>
@@ -22,7 +19,7 @@
 					v-tooltip="'Refresh'"
 					@click="refresh"
 					:disabled="loading"
-					class="p-2 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50"
+					class="p-2 text-muted-foreground hover:bg-background dark:hover:bg-secondary rounded-lg transition-colors disabled:opacity-50"
 				>
 					<RefreshCwIcon :class="{ 'animate-spin': loading, 'w-5 h-5': true }" />
 				</button>
@@ -30,7 +27,7 @@
 				<button
 					v-tooltip="'Download'"
 					@click="downloadChart"
-					class="p-2 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-colors"
+					class="p-2 text-muted-foreground hover:bg-background dark:hover:bg-secondary rounded-lg transition-colors"
 				>
 					<DownloadIcon class="w-5 h-5" />
 				</button>
@@ -38,7 +35,7 @@
 				<button
 					v-tooltip="'Fullscreen'"
 					@click="toggleFullscreen"
-					class="p-2 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-colors"
+					class="p-2 text-muted-foreground hover:bg-background dark:hover:bg-secondary rounded-lg transition-colors"
 				>
 					<Minimize2Icon v-if="isFullscreen" class="w-5 h-5" />
 					<Maximize2Icon v-else class="w-5 h-5" />
@@ -54,7 +51,7 @@
 					<div class="animate-spin">
 						<LoaderCircleIcon class="w-8 h-8 text-blue-600" />
 					</div>
-					<p class="text-sm text-slate-500 dark:text-slate-400">Loading chart data...</p>
+					<p class="text-sm text-muted-foreground">Loading chart data...</p>
 				</div>
 			</div>
 
@@ -62,10 +59,8 @@
 			<div v-else-if="error" class="flex items-center justify-center h-96">
 				<div class="text-center">
 					<AlertCircleIcon class="w-12 h-12 text-red-500 mx-auto mb-3" />
-					<h4 class="text-sm font-medium text-slate-600 dark:text-slate-400">
-						Error Loading Chart
-					</h4>
-					<p class="text-sm text-slate-500 dark:text-slate-400 mb-4">{{ error }}</p>
+					<h4 class="text-sm font-medium text-muted-foreground">Error Loading Chart</h4>
+					<p class="text-sm text-muted-foreground mb-4">{{ error }}</p>
 					<button @click="refresh">Retry</button>
 				</div>
 			</div>
@@ -83,13 +78,9 @@
 			<!-- No Data State -->
 			<div v-else class="flex items-center justify-center h-96">
 				<div class="text-center">
-					<DatabaseIcon
-						class="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3"
-					/>
-					<h4 class="text-sm font-medium text-slate-600 dark:text-slate-400">
-						No Data Available
-					</h4>
-					<p class="text-sm text-slate-500 dark:text-slate-500 mt-1">
+					<DatabaseIcon class="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+					<h4 class="text-sm font-medium text-muted-foreground">No Data Available</h4>
+					<p class="text-sm text-muted-foreground mt-1">
 						No data to display for this chart
 					</p>
 				</div>
@@ -97,25 +88,18 @@
 		</div>
 
 		<!-- Footer with Metrics -->
-		<div
-			v-if="showMetrics && metrics"
-			class="px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800"
-		>
+		<div v-if="showMetrics && metrics" class="px-6 py-4 border-t border-border bg-secondary">
 			<div class="grid grid-cols-3 gap-4">
 				<div>
-					<p
-						class="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide"
-					>
+					<p class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
 						Total
 					</p>
-					<p class="text-xl font-bold text-slate-900 dark:text-white mt-1">
+					<p class="text-xl font-bold text-foreground mt-1">
 						{{ formatNumber(metrics.total) }}
 					</p>
 				</div>
 				<div>
-					<p
-						class="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide"
-					>
+					<p class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
 						Growth
 					</p>
 					<div class="flex items-center gap-2 mt-1">
@@ -133,12 +117,10 @@
 					</div>
 				</div>
 				<div>
-					<p
-						class="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide"
-					>
+					<p class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
 						Last Updated
 					</p>
-					<p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+					<p class="text-sm text-muted-foreground mt-1">
 						{{ formatChartDate(metrics.lastUpdated) }}
 					</p>
 				</div>

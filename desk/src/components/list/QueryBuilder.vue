@@ -3,17 +3,13 @@
 		<Transition name="qb-overlay">
 			<div v-if="show" class="fixed inset-0 z-50" @click="close">
 				<div class="absolute inset-0 bg-black/20 dark:bg-black/40" />
-				<div
-					class="absolute z-50 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl"
-					:style="popoverStyle"
-					@click.stop
-				>
+				<div class="absolute z-50 bg-background" :style="popoverStyle" @click.stop>
 					<!-- Header -->
 					<div
-						class="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700"
+						class="flex items-center justify-between px-4 py-3 border-b border-border"
 					>
 						<span
-							class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
+							class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
 						>
 							{{ __("Filters") }}
 						</span>
@@ -29,22 +25,22 @@
 					<!-- Filter Rows -->
 					<div class="p-3 max-h-[60vh] overflow-y-auto scroll-area space-y-2.5">
 						<div v-if="filters.length === 0" class="text-center py-6">
-							<Filter
-								class="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-2"
-							/>
-							<p class="text-xs text-slate-400">{{ __("No filters applied") }}</p>
+							<Filter class="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+							<p class="text-xs text-muted-foreground">
+								{{ __("No filters applied") }}
+							</p>
 						</div>
 
 						<div
 							v-for="row in filters"
 							:key="row.id"
-							class="flex items-start gap-2 p-2.5 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700/50"
+							class="flex items-start gap-2 p-2.5 bg-secondary/50 rounded-lg border border-border/50"
 						>
 							<div class="flex-1 grid grid-cols-3 gap-2">
 								<!-- Field -->
 								<select
 									v-model="row.fieldname"
-									class="text-sm px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+									class="text-sm px-2 py-1.5 border border-border rounded-md bg-background"
 									@change="onFieldChange(row)"
 								>
 									<option value="">{{ __("Field...") }}</option>
@@ -60,7 +56,7 @@
 								<!-- Operator -->
 								<select
 									v-model="row.operator"
-									class="text-sm px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+									class="text-sm px-2 py-1.5 border border-border rounded-md bg-background"
 									@change="$emit('apply')"
 								>
 									<option
@@ -79,14 +75,14 @@
 											v-model="row.value.from"
 											:type="getInputType(row)"
 											placeholder="From"
-											class="w-1/2 text-sm px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+											class="w-1/2 text-sm px-2 py-1.5 border border-border rounded-md bg-background"
 											@change="$emit('apply')"
 										/>
 										<input
 											v-model="row.value.to"
 											:type="getInputType(row)"
 											placeholder="To"
-											class="w-1/2 text-sm px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+											class="w-1/2 text-sm px-2 py-1.5 border border-border rounded-md bg-background"
 											@change="$emit('apply')"
 										/>
 									</template>
@@ -95,7 +91,7 @@
 									>
 										<select
 											v-model="row.value"
-											class="w-full text-sm px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+											class="w-full text-sm px-2 py-1.5 border border-border rounded-md bg-background"
 											@change="$emit('apply')"
 										>
 											<option value="">Any</option>
@@ -111,7 +107,7 @@
 									<template v-else-if="getFieldMeta(row)?.fieldtype === 'Check'">
 										<select
 											v-model="row.value"
-											class="w-full text-sm px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+											class="w-full text-sm px-2 py-1.5 border border-border rounded-md bg-background"
 											@change="$emit('apply')"
 										>
 											<option value="">Any</option>
@@ -124,7 +120,7 @@
 											v-model="row.value"
 											:type="getInputType(row)"
 											:placeholder="getPlaceholder(row)"
-											class="w-full text-sm px-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+											class="w-full text-sm px-2 py-1.5 border border-border rounded-md bg-background"
 											@keydown.enter="$emit('apply')"
 											@change="$emit('apply')"
 										/>
@@ -135,7 +131,7 @@
 							<!-- Remove -->
 							<button
 								type="button"
-								class="mt-1 p-1 text-slate-400 hover:text-red-500 dark:hover:text-red-400 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+								class="mt-1 p-1 text-muted-foreground hover:text-red-500 dark:hover:text-red-400 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
 								@click="removeRow(row.id)"
 							>
 								<Trash class="w-4 h-4" />
@@ -145,11 +141,11 @@
 
 					<!-- Footer -->
 					<div
-						class="flex items-center justify-between px-4 py-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30 rounded-b-xl"
+						class="flex items-center justify-between px-4 py-3 border-t border-border bg-secondary/30 rounded-b-xl"
 					>
 						<button
 							type="button"
-							class="px-3 py-1.5 text-xs text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors"
+							class="px-3 py-1.5 text-xs text-muted-foreground hover:text-red-600 dark:hover:text-red-400 hover:bg-muted dark:hover:bg-secondary rounded-md transition-colors"
 							@click="$emit('clear-all')"
 						>
 							{{ __("Clear All") }}

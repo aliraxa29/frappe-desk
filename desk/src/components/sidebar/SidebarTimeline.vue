@@ -1,10 +1,7 @@
 <template>
 	<div class="flex flex-col h-full">
 		<!-- Loading -->
-		<div
-			v-if="loading"
-			class="flex items-center justify-center py-12 text-slate-300 dark:text-slate-600"
-		>
+		<div v-if="loading" class="flex items-center justify-center py-12 text-muted-foreground">
 			<svg
 				class="animate-spin h-5 w-5"
 				xmlns="http://www.w3.org/2000/svg"
@@ -26,7 +23,7 @@
 		<!-- Empty state -->
 		<div
 			v-else-if="timeline.length === 0"
-			class="flex flex-col items-center justify-center py-12 gap-3 text-slate-300 dark:text-slate-600 select-none"
+			class="flex flex-col items-center justify-center py-12 gap-3 text-muted-foreground select-none"
 		>
 			<svg
 				class="h-10 w-10"
@@ -50,7 +47,7 @@
 				<!-- Connecting line -->
 				<div
 					v-if="idx < timeline.length - 1"
-					class="absolute left-3.75 top-8 bottom-0 w-px bg-slate-200 dark:bg-slate-700"
+					class="absolute left-3.75 top-8 bottom-0 w-px bg-muted"
 				/>
 
 				<!-- Avatar -->
@@ -58,7 +55,7 @@
 					@click="navigateToUser(entry.by)"
 					:title="entry.by"
 					:class="[
-						'relative z-10 h-8 w-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold shrink-0 ring-2 ring-white dark:ring-slate-900 transition-opacity hover:opacity-80 cursor-pointer',
+						'relative z-10 h-8 w-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold shrink-0 ring-2 ring-white  transition-opacity hover:opacity-80 cursor-pointer',
 						entry.type === 'created'
 							? 'bg-linear-to-br from-green-400 to-emerald-600'
 							: entry.type === 'comment'
@@ -75,12 +72,11 @@
 				<div class="flex-1 min-w-0">
 					<!-- Header -->
 					<div class="flex items-baseline gap-1.5 flex-wrap mb-1">
+						<span class="text-xs font-semibold text-foreground leading-tight">{{
+							shortName(entry.by)
+						}}</span>
 						<span
-							class="text-xs font-semibold text-slate-800 dark:text-slate-100 leading-tight"
-							>{{ shortName(entry.by) }}</span
-						>
-						<span
-							class="text-[10px] text-slate-400"
+							class="text-[10px] text-muted-foreground"
 							:title="formatFullDate(entry.creation)"
 							>{{ formatRelativeTime(entry.creation) }}</span
 						>
@@ -110,7 +106,7 @@
 					<!-- Comment bubble -->
 					<div
 						v-else-if="entry.type === 'comment'"
-						class="text-xs text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 rounded-xl rounded-tl-none px-3 py-2 border border-slate-200 dark:border-slate-700 shadow-sm whitespace-pre-wrap wrap-break-word"
+						class="text-xs text-foreground bg-background"
 					>
 						{{ entry.content }}
 					</div>
@@ -137,7 +133,7 @@
 						</div>
 						<p
 							v-if="entry.content"
-							class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2"
+							class="text-[11px] text-muted-foreground line-clamp-2"
 						>
 							{{ entry.content }}
 						</p>
@@ -151,18 +147,16 @@
 						<div
 							v-for="change in entry.changes"
 							:key="change.field"
-							class="flex items-start gap-1.5 text-[11px] text-slate-600 dark:text-slate-400"
+							class="flex items-start gap-1.5 text-[11px] text-muted-foreground"
 						>
 							<span
-								class="shrink-0 font-semibold text-slate-700 dark:text-slate-300 max-w-20 truncate"
+								class="shrink-0 font-semibold text-foreground max-w-20 truncate"
 								:title="change.field"
 								>{{ change.field }}</span
 							>
-							<span class="shrink-0 text-slate-300 dark:text-slate-600 mt-px"
-								>→</span
-							>
+							<span class="shrink-0 text-muted-foreground mt-px">→</span>
 							<span
-								class="text-slate-500 dark:text-slate-400 truncate"
+								class="text-muted-foreground truncate"
 								:title="String(change.new_value ?? '')"
 								>{{ truncate(change.new_value) || __("(empty)") }}</span
 							>
@@ -170,7 +164,7 @@
 					</div>
 
 					<!-- Fallback -->
-					<div v-else class="text-[11px] text-slate-400 italic">
+					<div v-else class="text-[11px] text-muted-foreground italic">
 						{{ __("Document updated") }}
 					</div>
 				</div>

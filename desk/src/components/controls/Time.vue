@@ -3,7 +3,7 @@
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
-			class="font-medium mb-2 text-sm text-slate-700 dark:text-slate-200"
+			class="font-medium mb-2 text-sm text-foreground"
 		>
 			{{ field.label }}
 			<span v-if="field.reqd" class="text-red-500 ml-1">*</span>
@@ -17,7 +17,7 @@
 			:disabled="field.read_only"
 			type="text"
 			readonly
-			class="w-full px-3 py-2.5 border border-[#ddd] dark:border-slate-700 rounded focus:outline-none focus:border-[#0066cc] focus:shadow-[0_0_0_3px_rgba(0,102,204,0.1)] disabled:bg-gray-100 disabled:dark:bg-slate-700 disabled:cursor-not-allowed text-sm transition-colors duration-200 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+			class="w-full px-3 py-2.5 border border-input rounded focus:outline-none focus:border-ring focus-visible:ring-2 focus-visible:ring-ring disabled:bg-muted disabled:disabled:cursor-not-allowed text-sm transition-colors duration-200 bg-background"
 			@focus="showPicker = true"
 		/>
 
@@ -25,14 +25,12 @@
 			<div
 				v-if="showPicker"
 				ref="pickerRef"
-				class="absolute top-full left-0 mt-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg shadow-lg p-4 z-200"
+				class="absolute top-full left-0 mt-2 z-50 bg-popover text-popover-foreground border border-border rounded-lg shadow-lg p-4"
 				style="width: 260px"
 			>
 				<div class="space-y-3">
 					<div>
-						<label class="text-xs text-slate-500 dark:text-slate-400">{{
-							__("Hour")
-						}}</label>
+						<label class="text-xs text-muted-foreground">{{ __("Hour") }}</label>
 						<input
 							type="range"
 							min="0"
@@ -43,9 +41,7 @@
 						<div class="text-center text-sm font-mono">{{ pad(hour) }}</div>
 					</div>
 					<div>
-						<label class="text-xs text-slate-500 dark:text-slate-400">{{
-							__("Minute")
-						}}</label>
+						<label class="text-xs text-muted-foreground">{{ __("Minute") }}</label>
 						<input
 							type="range"
 							min="0"
@@ -56,9 +52,7 @@
 						<div class="text-center text-sm font-mono">{{ pad(minute) }}</div>
 					</div>
 					<div>
-						<label class="text-xs text-slate-500 dark:text-slate-400">{{
-							__("Second")
-						}}</label>
+						<label class="text-xs text-muted-foreground">{{ __("Second") }}</label>
 						<input
 							type="range"
 							min="0"
@@ -69,7 +63,7 @@
 						<div class="text-center text-sm font-mono">{{ pad(second) }}</div>
 					</div>
 				</div>
-				<div class="border-t border-gray-200 dark:border-slate-700 pt-3 mt-3 flex gap-2">
+				<div class="border-t border-border pt-3 mt-3 flex gap-2">
 					<button
 						@click="setNow"
 						class="flex-1 px-3 py-1.5 bg-blue-600 text-white rounded font-medium text-xs hover:bg-blue-700"
@@ -84,7 +78,7 @@
 					</button>
 					<button
 						@click="clearTime"
-						class="flex-1 px-3 py-1.5 bg-gray-400 text-white rounded font-medium text-xs hover:bg-gray-500"
+						class="flex-1 px-3 py-1.5 bg-muted text-white rounded font-medium text-xs hover:bg-muted"
 					>
 						{{ __("Clear") }}
 					</button>
@@ -97,6 +91,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import type { Field } from "../../types";
+import { __ } from "../../utils/translate";
 
 const props = defineProps<{
 	field: Field;

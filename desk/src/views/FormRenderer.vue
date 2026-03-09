@@ -1,5 +1,8 @@
 <template>
-	<div v-if="loading" class="flex justify-center items-center h-96 text-gray-600 text-base">
+	<div
+		v-if="loading"
+		class="flex justify-center items-center h-96 text-muted-foreground text-base"
+	>
 		{{ __(`Loading ${doctype}...`) }}
 	</div>
 

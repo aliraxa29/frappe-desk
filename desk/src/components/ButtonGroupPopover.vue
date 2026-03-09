@@ -35,14 +35,11 @@
 			leave-from-class="transform opacity-100 scale-100"
 			leave-to-class="transform opacity-0 scale-95"
 		>
-			<div
-				v-if="isOpen"
-				class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 py-1"
-			>
+			<div v-if="isOpen" class="absolute right-0 mt-2 w-56 bg-background">
 				<button
 					v-for="button in buttons"
 					:key="button.name"
-					class="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-2 cursor-pointer"
+					class="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-muted dark:hover:bg-secondary transition flex items-center gap-2 cursor-pointer"
 					:class="{
 						'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30':
 							button.className?.includes('red'),
@@ -85,8 +82,8 @@ const buttonClasses = computed(() => {
 	const isPrimaryStyle = props.isPrimary || props.variant === "primary";
 
 	return isPrimaryStyle
-		? "bg-gray-800 hover:bg-gray-900 text-white dark:bg-gray-200 dark:hover:bg-gray-100 dark:text-gray-900"
-		: "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 dark:border-gray-600";
+		? "bg-secondary hover:bg-foreground text-white dark:hover:bg-muted"
+		: "bg-muted hover:bg-muted text-foreground border border-border dark:hover:bg-muted";
 });
 
 function togglePopover() {

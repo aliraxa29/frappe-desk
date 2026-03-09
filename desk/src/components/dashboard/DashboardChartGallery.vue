@@ -3,9 +3,9 @@
 <template>
 	<div class="space-y-8">
 		<!-- Header -->
-		<div class="border-b border-slate-200 dark:border-slate-800 pb-6">
-			<h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Chart Gallery</h2>
-			<p class="text-slate-600 dark:text-slate-400">
+		<div class="border-b border-border pb-6">
+			<h2 class="text-2xl font-bold text-foreground mb-2">Chart Gallery</h2>
+			<p class="text-muted-foreground">
 				Explore different chart types available in ApexCharts
 			</p>
 		</div>
@@ -16,16 +16,10 @@
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
 					<TrendingUpIcon class="w-6 h-6 text-blue-600" />
-					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
-						Line Chart
-					</h3>
+					<h3 class="text-lg font-semibold text-foreground">Line Chart</h3>
 				</div>
-				<p class="text-sm text-slate-600 dark:text-slate-400">
-					Perfect for showing trends over time
-				</p>
-				<div
-					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
-				>
+				<p class="text-sm text-muted-foreground">Perfect for showing trends over time</p>
+				<div class="bg-background">
 					<ApexChart
 						type="line"
 						:options="lineChartOptions"
@@ -39,16 +33,12 @@
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
 					<AreaChartIcon class="w-6 h-6 text-green-600" />
-					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
-						Area Chart
-					</h3>
+					<h3 class="text-lg font-semibold text-foreground">Area Chart</h3>
 				</div>
-				<p class="text-sm text-slate-600 dark:text-slate-400">
+				<p class="text-sm text-muted-foreground">
 					Shows cumulative distribution and trends
 				</p>
-				<div
-					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
-				>
+				<div class="bg-background">
 					<ApexChart
 						type="area"
 						:options="areaChartOptions"
@@ -62,14 +52,10 @@
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
 					<BarChartIcon class="w-6 h-6 text-purple-600" />
-					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">Bar Chart</h3>
+					<h3 class="text-lg font-semibold text-foreground">Bar Chart</h3>
 				</div>
-				<p class="text-sm text-slate-600 dark:text-slate-400">
-					Compare categories side by side
-				</p>
-				<div
-					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
-				>
+				<p class="text-sm text-muted-foreground">Compare categories side by side</p>
+				<div class="bg-background">
 					<ApexChart
 						type="bar"
 						:options="barChartOptions"
@@ -83,14 +69,10 @@
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
 					<PieChartIcon class="w-6 h-6 text-orange-600" />
-					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">Pie Chart</h3>
+					<h3 class="text-lg font-semibold text-foreground">Pie Chart</h3>
 				</div>
-				<p class="text-sm text-slate-600 dark:text-slate-400">
-					Shows composition and proportions
-				</p>
-				<div
-					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
-				>
+				<p class="text-sm text-muted-foreground">Shows composition and proportions</p>
+				<div class="bg-background">
 					<ApexChart
 						type="pie"
 						:options="pieChartOptions"
@@ -104,16 +86,10 @@
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
 					<DonutIcon class="w-6 h-6 text-red-600" />
-					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
-						Donut Chart
-					</h3>
+					<h3 class="text-lg font-semibold text-foreground">Donut Chart</h3>
 				</div>
-				<p class="text-sm text-slate-600 dark:text-slate-400">
-					Like pie chart with space in center
-				</p>
-				<div
-					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
-				>
+				<p class="text-sm text-muted-foreground">Like pie chart with space in center</p>
+				<div class="bg-background">
 					<ApexChart
 						type="donut"
 						:options="donutChartOptions"
@@ -127,16 +103,12 @@
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
 					<RadarIcon class="w-6 h-6 text-indigo-600" />
-					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
-						Radar Chart
-					</h3>
+					<h3 class="text-lg font-semibold text-foreground">Radar Chart</h3>
 				</div>
-				<p class="text-sm text-slate-600 dark:text-slate-400">
+				<p class="text-sm text-muted-foreground">
 					Compare multiple variables across entities
 				</p>
-				<div
-					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
-				>
+				<div class="bg-background">
 					<ApexChart
 						type="radar"
 						:options="radarChartOptions"
@@ -150,16 +122,12 @@
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
 					<ScatterChartIcon class="w-6 h-6 text-cyan-600" />
-					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
-						Scatter Chart
-					</h3>
+					<h3 class="text-lg font-semibold text-foreground">Scatter Chart</h3>
 				</div>
-				<p class="text-sm text-slate-600 dark:text-slate-400">
+				<p class="text-sm text-muted-foreground">
 					Shows correlation between two variables
 				</p>
-				<div
-					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
-				>
+				<div class="bg-background">
 					<ApexChart
 						type="scatter"
 						:options="scatterChartOptions"
@@ -173,16 +141,12 @@
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
 					<BubbleChartIcon class="w-6 h-6 text-pink-600" />
-					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
-						Bubble Chart
-					</h3>
+					<h3 class="text-lg font-semibold text-foreground">Bubble Chart</h3>
 				</div>
-				<p class="text-sm text-slate-600 dark:text-slate-400">
+				<p class="text-sm text-muted-foreground">
 					Scatter chart with bubble size as third variable
 				</p>
-				<div
-					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
-				>
+				<div class="bg-background">
 					<ApexChart
 						type="bubble"
 						:options="bubbleChartOptions"
@@ -196,16 +160,10 @@
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
 					<HeatMapIcon class="w-6 h-6 text-amber-600" />
-					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
-						Heatmap Chart
-					</h3>
+					<h3 class="text-lg font-semibold text-foreground">Heatmap Chart</h3>
 				</div>
-				<p class="text-sm text-slate-600 dark:text-slate-400">
-					Shows intensity variation in data
-				</p>
-				<div
-					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
-				>
+				<p class="text-sm text-muted-foreground">Shows intensity variation in data</p>
+				<div class="bg-background">
 					<ApexChart
 						type="heatmap"
 						:options="heatmapChartOptions"
@@ -219,16 +177,10 @@
 			<div class="space-y-3">
 				<div class="flex items-center gap-3">
 					<RadialChartIcon class="w-6 h-6 text-lime-600" />
-					<h3 class="text-lg font-semibold text-slate-900 dark:text-white">
-						Radial Bar Chart
-					</h3>
+					<h3 class="text-lg font-semibold text-foreground">Radial Bar Chart</h3>
 				</div>
-				<p class="text-sm text-slate-600 dark:text-slate-400">
-					Circular bar chart for metrics
-				</p>
-				<div
-					class="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700"
-				>
+				<p class="text-sm text-muted-foreground">Circular bar chart for metrics</p>
+				<div class="bg-background">
 					<ApexChart
 						type="radialBar"
 						:options="radialBarChartOptions"

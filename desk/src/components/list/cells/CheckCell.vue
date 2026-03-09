@@ -16,7 +16,7 @@
 		</svg>
 		<svg
 			v-else
-			class="w-5 h-5 text-slate-300"
+			class="w-5 h-5 text-muted-foreground"
 			fill="none"
 			stroke="currentColor"
 			viewBox="0 0 24 24"

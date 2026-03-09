@@ -3,11 +3,11 @@
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
-			class="font-medium text-sm text-slate-700 dark:text-white"
+			class="font-medium text-sm text-foreground"
 		>
 			{{ field.label }}
 		</label>
-		<h4 class="text-base font-semibold text-slate-800 dark:text-slate-200 m-0">
+		<h4 class="text-base font-semibold text-foreground m-0">
 			{{ field.label }}
 		</h4>
 	</div>

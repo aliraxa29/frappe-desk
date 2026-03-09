@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col">
 		<div
-			class="sticky top-0 z-25 flex gap-1 border-b border-slate-200 dark:border-slate-700 px-2 bg-slate-50 dark:bg-slate-800 overflow-x-auto scroll-area scrollbar-hide"
+			class="sticky top-0 z-25 flex gap-1 border-b border-border px-2 bg-secondary overflow-x-auto scroll-area scrollbar-hide"
 			role="tablist"
 		>
 			<button
@@ -12,7 +12,7 @@
 				:class="[
 					activeTab === idx
 						? 'text-blue-600 dark:text-blue-400 after:absolute after:-bottom-px after:left-0 after:right-0 after:h-0.5 after:bg-blue-600 dark:after:bg-blue-400 after:rounded-t'
-						: 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200',
+						: 'text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground',
 				]"
 				role="tab"
 				:aria-selected="activeTab === idx"

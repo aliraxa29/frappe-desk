@@ -3,7 +3,7 @@
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
-			class="font-medium text-[0.95rem] text-slate-700 dark:text-slate-300"
+			class="font-medium text-[0.95rem] text-foreground"
 		>
 			{{ field.label }}
 			<span v-if="field.reqd" class="text-red-600 dark:text-red-500 ml-1">*</span>
@@ -16,7 +16,7 @@
 			type="text"
 			inputmode="decimal"
 			:class="[
-				'px-3 py-2.5 border border-slate-300 dark:border-slate-600 rounded text-[0.95rem] transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-600 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-600/10 dark:focus:ring-blue-500/20 read-only:bg-slate-50 dark:read-only:bg-slate-900/50 read-only:cursor-not-allowed disabled:opacity-50',
+				'px-3 py-2.5 border border-border rounded text-[0.95rem] transition-colors bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring focus:ring-1 focus:ring-ring/20 read-only:bg-muted read-only:cursor-not-allowed disabled:opacity-50',
 				align === 'left' ? 'text-left' : 'text-right',
 			]"
 			@input="onInput"
@@ -26,7 +26,7 @@
 		/>
 		<small
 			v-if="field.description"
-			class="block text-slate-600 dark:text-slate-400 text-[0.85rem] leading-relaxed"
+			class="block text-muted-foreground text-[0.85rem] leading-relaxed"
 		>
 			{{ field.description }}
 		</small>

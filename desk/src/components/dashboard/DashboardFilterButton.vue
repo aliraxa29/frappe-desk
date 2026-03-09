@@ -1,9 +1,7 @@
 <template>
 	<div class="flex items-center gap-3 flex-wrap">
 		<!-- Filter Label -->
-		<div v-if="label" class="text-sm font-medium text-slate-700 dark:text-slate-300">
-			{{ label }}:
-		</div>
+		<div v-if="label" class="text-sm font-medium text-foreground">{{ label }}:</div>
 
 		<!-- Filter Items -->
 		<div class="flex items-center gap-2 flex-wrap">
@@ -15,7 +13,7 @@
 					'px-4 py-2 rounded-lg border font-medium text-sm transition-all duration-200',
 					isSelected(item.value)
 						? 'border-blue-500 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-						: 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500',
+						: 'border-border bg-background text-foreground hover:border-border dark:hover:border-border',
 				]"
 			>
 				{{ item.label }}
@@ -25,7 +23,7 @@
 			<button
 				v-if="selectedValues.length > 0 && clearable"
 				@click="clear"
-				class="px-3 py-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 text-sm font-medium transition-colors"
+				class="px-3 py-2 text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground text-sm font-medium transition-colors"
 			>
 				Clear
 			</button>

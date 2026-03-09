@@ -3,7 +3,7 @@
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
-			class="font-medium text-sm text-slate-700 dark:text-slate-300"
+			class="font-medium text-sm text-foreground"
 		>
 			{{ field.label }}
 			<span v-if="field.reqd" class="text-red-500 ml-1">*</span>
@@ -13,12 +13,12 @@
 			:value="modelValue"
 			:readonly="field.read_only"
 			type="file"
-			class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded text-[0.95rem] bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-sm file:bg-slate-100 file:dark:bg-slate-700 file:text-slate-700 file:dark:text-slate-200 file:cursor-pointer hover:file:bg-slate-200 dark:hover:file:bg-slate-600 transition-colors"
+			class="w-full px-3 py-2 border border-border rounded text-[0.95rem] bg-background"
 			@change="onFileChange"
 		/>
 		<small
 			v-if="field.description"
-			class="block text-slate-600 dark:text-slate-400 text-[0.85rem] leading-relaxed"
+			class="block text-muted-foreground text-[0.85rem] leading-relaxed"
 		>
 			{{ field.description }}
 		</small>

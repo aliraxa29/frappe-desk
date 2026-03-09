@@ -1,9 +1,7 @@
 <template>
 	<div class="filter-area">
 		<!-- Active Filter Pills + Quick Filters -->
-		<div
-			class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-slate-200 dark:border-slate-800 min-h-11"
-		>
+		<div class="flex flex-wrap items-center gap-2 px-4 py-2.5 border-b border-border min-h-11">
 			<!-- Applied filter pills -->
 			<TransitionGroup name="pill">
 				<div
@@ -29,7 +27,7 @@
 			<div class="relative" ref="addFilterRef">
 				<button
 					type="button"
-					class="inline-flex items-center gap-1 px-2 py-1 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors"
+					class="inline-flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground hover:bg-muted dark:hover:bg-secondary rounded-md transition-colors"
 					@click="showFilterPicker = !showFilterPicker"
 				>
 					<Filter class="w-3.5 h-3.5" />
@@ -42,7 +40,7 @@
 				<button
 					v-if="hasActiveFilters"
 					type="button"
-					class="text-xs text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 transition-colors"
+					class="text-xs text-muted-foreground hover:text-red-600 dark:hover:text-red-400 transition-colors"
 					@click="clearAllFilters"
 				>
 					Clear All
@@ -50,7 +48,7 @@
 
 				<button
 					type="button"
-					class="inline-flex items-center gap-1 px-2 py-1 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors"
+					class="inline-flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground dark:hover:text-muted-foreground hover:bg-muted dark:hover:bg-secondary rounded-md transition-colors"
 					@click="$emit('toggle-query-builder')"
 				>
 					<Settings class="w-3.5 h-3.5" />
@@ -67,18 +65,14 @@
 					class="fixed inset-0 z-50"
 					@click="showFilterPicker = false"
 				>
-					<div
-						class="absolute z-50 w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl overflow-hidden"
-						:style="pickerStyle"
-						@click.stop
-					>
+					<div class="absolute z-50 w-72 bg-background" :style="pickerStyle" @click.stop>
 						<!-- Search -->
-						<div class="p-2 border-b border-slate-200 dark:border-slate-700">
+						<div class="p-2 border-b border-border">
 							<input
 								v-model="fieldSearch"
 								type="text"
 								placeholder="Search fields..."
-								class="w-full px-2.5 py-1.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+								class="w-full px-2.5 py-1.5 text-sm bg-secondary border border-border rounded-md text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
 								ref="fieldSearchInput"
 								@keydown.escape="showFilterPicker = false"
 							/>
@@ -89,17 +83,17 @@
 								v-for="f in filteredFieldOptions"
 								:key="f.fieldname"
 								type="button"
-								class="w-full flex items-center gap-2 px-3 py-2 text-sm text-left text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+								class="w-full flex items-center gap-2 px-3 py-2 text-sm text-left text-foreground hover:bg-muted dark:hover:bg-secondary transition-colors"
 								@click="addFilterFromPicker(f)"
 							>
 								<span class="flex-1 truncate">{{ f.label || f.fieldname }}</span>
-								<span class="text-[10px] text-slate-400 uppercase">{{
+								<span class="text-[10px] text-muted-foreground uppercase">{{
 									f.fieldtype
 								}}</span>
 							</button>
 							<div
 								v-if="filteredFieldOptions.length === 0"
-								class="px-3 py-4 text-center text-xs text-slate-400"
+								class="px-3 py-4 text-center text-xs text-muted-foreground"
 							>
 								No matching fields
 							</div>

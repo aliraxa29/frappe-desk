@@ -1,16 +1,14 @@
 <template>
-	<div
-		class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200"
-	>
+	<div class="bg-background">
 		<!-- Metric Card Content -->
 		<div class="p-6">
 			<!-- Header -->
 			<div class="flex items-start justify-between mb-4">
 				<div>
-					<p class="text-sm font-medium text-slate-600 dark:text-slate-400">
+					<p class="text-sm font-medium text-muted-foreground">
 						{{ label }}
 					</p>
-					<h3 class="text-3xl font-bold text-slate-900 dark:text-white mt-2">
+					<h3 class="text-3xl font-bold text-foreground mt-2">
 						{{ formattedValue }}
 					</h3>
 				</div>
@@ -35,7 +33,7 @@
 				>
 					{{ change >= 0 ? "+" : "" }}{{ change }}%
 				</span>
-				<span class="text-slate-500 dark:text-slate-400 text-sm">
+				<span class="text-muted-foreground text-sm">
 					vs {{ compareLabel || "last period" }}
 				</span>
 			</div>
@@ -51,8 +49,8 @@
 			</div>
 
 			<!-- Footer -->
-			<div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-				<p class="text-xs text-slate-500 dark:text-slate-400">
+			<div class="mt-4 pt-4 border-t border-border">
+				<p class="text-xs text-muted-foreground">
 					{{ description }}
 				</p>
 			</div>
@@ -61,7 +59,7 @@
 		<!-- Click Action -->
 		<div
 			v-if="clickable"
-			class="bg-slate-50 dark:bg-slate-800 px-6 py-3 border-t border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+			class="bg-secondary px-6 py-3 border-t border-border cursor-pointer hover:bg-muted dark:hover:bg-secondary transition-colors"
 			@click="navigate"
 		>
 			<button
@@ -124,7 +122,7 @@ const iconBackgroundClass = computed(() => {
 		red: "bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-200",
 		yellow: "bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-200",
 		purple: "bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-200",
-		gray: "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200",
+		gray: "bg-muted text-muted-foreground",
 	};
 
 	return colorMap[props.iconColor] || colorMap.blue;

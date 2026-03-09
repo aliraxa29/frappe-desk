@@ -6,7 +6,7 @@
 	>
 		{{ formattedValue }}
 	</span>
-	<span v-else class="text-slate-400">—</span>
+	<span v-else class="text-muted-foreground">—</span>
 </template>
 
 <script setup lang="ts">
@@ -58,7 +58,7 @@ const valueClass = computed(() => {
 	if (isNaN(num)) return "";
 
 	if (num < 0) return "text-red-600";
-	if (num > 0 && props.field.fieldtype === "Currency") return "text-slate-900";
+	if (num > 0 && props.field.fieldtype === "Currency") return "text-foreground";
 	return "";
 });
 </script>

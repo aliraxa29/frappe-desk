@@ -3,7 +3,7 @@
 		<template #header>
 			<div class="flex items-center justify-between gap-4 w-full my-3">
 				<div class="flex items-center gap-3">
-					<h2 class="text-lg font-semibold text-slate-800 dark:text-white">
+					<h2 class="text-lg font-semibold text-foreground">
 						{{ reportName }}
 					</h2>
 					<span
@@ -13,7 +13,7 @@
 					</span>
 					<span
 						v-if="reportMeta?.report_type"
-						class="px-2 py-0.5 text-[10px] font-medium bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 rounded"
+						class="px-2 py-0.5 text-[10px] font-medium bg-muted text-muted-foreground rounded"
 					>
 						{{ reportMeta.report_type }}
 					</span>
@@ -30,12 +30,12 @@
 						</Button>
 						<div
 							v-if="showExportMenu"
-							class="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-lg z-20 py-1"
+							class="absolute right-0 top-full mt-1 w-40 bg-background"
 						>
 							<button
 								v-for="fmt in exportFormats"
 								:key="fmt.value"
-								class="w-full px-3 py-1.5 text-sm text-left hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
+								class="w-full px-3 py-1.5 text-sm text-left hover:bg-secondary dark:hover:bg-secondary text-foreground"
 								@click="handleExport(fmt.value)"
 							>
 								{{ fmt.label }}
@@ -59,10 +59,7 @@
 		<template #content>
 			<div class="space-y-4 m-2">
 				<!-- Filters Bar -->
-				<div
-					v-if="reportFilters.length > 0"
-					class="bg-white dark:bg-gray-950 rounded-xl border border-slate-200 dark:border-slate-800 p-4"
-				>
+				<div v-if="reportFilters.length > 0" class="bg-background">
 					<div class="flex flex-wrap items-end gap-3">
 						<div
 							v-for="filter in reportFilters"
@@ -71,7 +68,7 @@
 							:style="{ width: filter.width || '200px' }"
 						>
 							<label
-								class="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
+								class="text-[11px] font-medium text-muted-foreground uppercase tracking-wider"
 							>
 								{{ __(filter.label) }}
 								<span v-if="filter.reqd" class="text-red-500">*</span>
@@ -81,7 +78,7 @@
 							<select
 								v-if="filter.fieldtype === 'Select'"
 								v-model="filterValues[filter.fieldname]"
-								class="w-full text-sm rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 px-2.5 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+								class="w-full text-sm rounded-md border border-border bg-background"
 								@change="onFilterChange(filter)"
 							>
 								<option value="">{{ __("Select...") }}</option>
@@ -102,7 +99,7 @@
 								<input
 									type="checkbox"
 									v-model="filterValues[filter.fieldname]"
-									class="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-blue-600"
+									class="w-4 h-4 rounded border-border text-blue-600"
 									@change="onFilterChange(filter)"
 								/>
 							</label>
@@ -112,7 +109,7 @@
 								v-else-if="filter.fieldtype === 'Date'"
 								type="date"
 								v-model="filterValues[filter.fieldname]"
-								class="w-full text-sm rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 px-2.5 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+								class="w-full text-sm rounded-md border border-border bg-background"
 								@change="onFilterChange(filter)"
 							/>
 
@@ -122,7 +119,7 @@
 								type="text"
 								v-model="filterValues[filter.fieldname]"
 								:placeholder="__(filter.label)"
-								class="w-full text-sm rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 px-2.5 py-1.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+								class="w-full text-sm rounded-md border border-border bg-background"
 								@change="onFilterChange(filter)"
 							/>
 						</div>
@@ -143,13 +140,9 @@
 
 				<!-- Report Summary -->
 				<div v-if="reportSummary.length > 0" class="flex flex-wrap gap-4">
-					<div
-						v-for="item in reportSummary"
-						:key="item.label"
-						class="bg-white dark:bg-gray-950 rounded-xl border border-slate-200 dark:border-slate-800 px-5 py-3 flex flex-col gap-0.5"
-					>
+					<div v-for="item in reportSummary" :key="item.label" class="bg-background">
 						<span
-							class="text-[11px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
+							class="text-[11px] font-medium text-muted-foreground uppercase tracking-wider"
 						>
 							{{ __(item.label) }}
 						</span>
@@ -160,10 +153,7 @@
 				</div>
 
 				<!-- Chart -->
-				<div
-					v-if="showChart && chartConfig"
-					class="bg-white dark:bg-gray-950 rounded-xl border border-slate-200 dark:border-slate-800 p-4"
-				>
+				<div v-if="showChart && chartConfig" class="bg-background">
 					<apexchart
 						:type="chartConfig.type || 'bar'"
 						:options="apexChartOptions"
@@ -176,9 +166,9 @@
 				<div v-if="loading" class="flex items-center justify-center h-64">
 					<div class="flex flex-col items-center gap-3">
 						<div
-							class="w-8 h-8 border-2 border-slate-200 dark:border-slate-700 border-t-blue-600 rounded-full animate-spin"
+							class="w-8 h-8 border-2 border-border border-t-blue-600 rounded-full animate-spin"
 						></div>
-						<span class="text-sm text-slate-500 dark:text-slate-400">
+						<span class="text-sm text-muted-foreground">
 							{{ __("Loading report...") }}
 						</span>
 					</div>
@@ -213,29 +203,23 @@
 				/>
 
 				<!-- Empty State -->
-				<div
-					v-else-if="!loading && !error && hasExecuted"
-					class="bg-white dark:bg-gray-950 rounded-xl border border-slate-200 dark:border-slate-800 p-12 text-center"
-				>
+				<div v-else-if="!loading && !error && hasExecuted" class="bg-background">
 					<div class="text-5xl mb-4">📊</div>
-					<h3 class="text-lg font-semibold text-slate-700 dark:text-slate-100">
+					<h3 class="text-lg font-semibold text-foreground">
 						{{ __("No data") }}
 					</h3>
-					<p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
+					<p class="text-sm text-muted-foreground mt-2">
 						{{ __("No results found for the current filters.") }}
 					</p>
 				</div>
 
 				<!-- Initial State (before first run) -->
-				<div
-					v-else-if="!loading && !error && !hasExecuted"
-					class="bg-white dark:bg-gray-950 rounded-xl border border-slate-200 dark:border-slate-800 p-12 text-center"
-				>
+				<div v-else-if="!loading && !error && !hasExecuted" class="bg-background">
 					<div class="text-5xl mb-4">📊</div>
-					<h3 class="text-lg font-semibold text-slate-700 dark:text-slate-100">
+					<h3 class="text-lg font-semibold text-foreground">
 						{{ reportName }}
 					</h3>
-					<p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
+					<p class="text-sm text-muted-foreground mt-2">
 						{{ __("Set your filters and click Refresh to generate the report.") }}
 					</p>
 					<Button variant="primary" size="sm" @click="refreshReport" class="mt-4">
@@ -385,7 +369,7 @@ function getSummaryColor(indicator?: string): string {
 		orange: "text-orange-600 dark:text-orange-400",
 		yellow: "text-yellow-600 dark:text-yellow-400",
 	};
-	return colors[indicator || ""] || "text-slate-800 dark:text-slate-100";
+	return colors[indicator || ""] || "text-foreground";
 }
 
 // ── Report Lifecycle ───────────────────────────────────────────────

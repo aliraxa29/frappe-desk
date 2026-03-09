@@ -3,7 +3,7 @@
 		<template #header>
 			<div class="flex items-center justify-between gap-4 w-full my-3">
 				<div class="flex items-center gap-3">
-					<h2 class="text-lg font-semibold text-slate-800 dark:text-white">
+					<h2 class="text-lg font-semibold text-foreground">
 						{{ doctypeLabel }}
 					</h2>
 					<span
@@ -28,9 +28,7 @@
 		</template>
 
 		<template #content>
-			<div
-				class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-gray-950 overflow-hidden m-2"
-			>
+			<div class="rounded-xl border border-border bg-background">
 				<ListView ref="listViewRef" :doctype="doctype" @select="handleSelect" />
 			</div>
 		</template>

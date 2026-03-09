@@ -24,7 +24,7 @@ const displayStatus = computed(() => {
 });
 
 const statusColorMap: Record<string, { dot: string; text: string }> = {
-	draft: { dot: "bg-slate-400", text: "text-slate-600 dark:text-slate-400" },
+	draft: { dot: "bg-muted", text: "text-muted-foreground" },
 	open: { dot: "bg-orange-500", text: "text-orange-700 dark:text-orange-300" },
 	pending: { dot: "bg-yellow-500", text: "text-yellow-700 dark:text-yellow-300" },
 	submitted: { dot: "bg-blue-500", text: "text-blue-700 dark:text-blue-300" },
@@ -33,17 +33,17 @@ const statusColorMap: Record<string, { dot: string; text: string }> = {
 	unpaid: { dot: "bg-orange-500", text: "text-orange-700 dark:text-orange-300" },
 	overdue: { dot: "bg-red-500", text: "text-red-700 dark:text-red-300" },
 	cancelled: { dot: "bg-red-500", text: "text-red-700 dark:text-red-300" },
-	closed: { dot: "bg-slate-500", text: "text-slate-600 dark:text-slate-400" },
+	closed: { dot: "bg-muted", text: "text-muted-foreground" },
 	active: { dot: "bg-green-500", text: "text-green-700 dark:text-green-300" },
-	inactive: { dot: "bg-slate-400", text: "text-slate-600 dark:text-slate-400" },
+	inactive: { dot: "bg-muted", text: "text-muted-foreground" },
 	enabled: { dot: "bg-green-500", text: "text-green-700 dark:text-green-300" },
-	disabled: { dot: "bg-slate-400", text: "text-slate-600 dark:text-slate-400" },
+	disabled: { dot: "bg-muted", text: "text-muted-foreground" },
 	working: { dot: "bg-blue-500", text: "text-blue-700 dark:text-blue-300" },
 	queued: { dot: "bg-yellow-500", text: "text-yellow-700 dark:text-yellow-300" },
 	error: { dot: "bg-red-500", text: "text-red-700 dark:text-red-300" },
 	rejected: { dot: "bg-red-500", text: "text-red-700 dark:text-red-300" },
 	approved: { dot: "bg-green-500", text: "text-green-700 dark:text-green-300" },
-	"not started": { dot: "bg-slate-400", text: "text-slate-600 dark:text-slate-400" },
+	"not started": { dot: "bg-muted", text: "text-muted-foreground" },
 	"in progress": { dot: "bg-blue-500", text: "text-blue-700 dark:text-blue-300" },
 	"on hold": { dot: "bg-yellow-500", text: "text-yellow-700 dark:text-yellow-300" },
 	"partially paid": { dot: "bg-yellow-500", text: "text-yellow-700 dark:text-yellow-300" },
@@ -52,11 +52,11 @@ const statusColorMap: Record<string, { dot: string; text: string }> = {
 
 const dotClass = computed(() => {
 	const s = displayStatus.value.toLowerCase();
-	return statusColorMap[s]?.dot || "bg-slate-400";
+	return statusColorMap[s]?.dot || "bg-muted";
 });
 
 const textClass = computed(() => {
 	const s = displayStatus.value.toLowerCase();
-	return statusColorMap[s]?.text || "text-slate-600 dark:text-slate-400";
+	return statusColorMap[s]?.text || "text-muted-foreground";
 });
 </script>

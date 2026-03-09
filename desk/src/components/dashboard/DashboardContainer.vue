@@ -1,14 +1,12 @@
 <template>
 	<div class="w-full space-y-6">
 		<!-- Dashboard Header -->
-		<div
-			class="flex items-center justify-between gap-4 py-4 border-b border-slate-200 dark:border-slate-800"
-		>
+		<div class="flex items-center justify-between gap-4 py-4 border-b border-border">
 			<div>
-				<h1 class="text-2xl font-bold text-slate-900 dark:text-white">
+				<h1 class="text-2xl font-bold text-foreground">
 					{{ title }}
 				</h1>
-				<p v-if="description" class="text-slate-600 dark:text-slate-400 text-sm mt-1">
+				<p v-if="description" class="text-muted-foreground text-sm mt-1">
 					{{ description }}
 				</p>
 			</div>
@@ -19,7 +17,7 @@
 					v-if="showRefresh"
 					@click="refreshAll"
 					:disabled="isRefreshing"
-					class="px-4 py-2 flex items-center gap-2 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+					class="px-4 py-2 flex items-center gap-2 text-foreground bg-background"
 				>
 					<RefreshCwIcon :class="{ 'animate-spin': isRefreshing, 'w-4 h-4': true }" />
 					<span class="text-sm font-medium">Refresh</span>
@@ -28,7 +26,7 @@
 				<button
 					v-if="showSettings"
 					@click="openSettings"
-					class="px-4 py-2 flex items-center gap-2 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+					class="px-4 py-2 flex items-center gap-2 text-foreground bg-background"
 				>
 					<SettingsIcon class="w-4 h-4" />
 					<span class="text-sm font-medium">Settings</span>
@@ -37,7 +35,7 @@
 				<button
 					v-if="showExport"
 					@click="exportData"
-					class="px-4 py-2 flex items-center gap-2 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+					class="px-4 py-2 flex items-center gap-2 text-foreground bg-background"
 				>
 					<DownloadIcon class="w-4 h-4" />
 					<span class="text-sm font-medium">Export</span>
@@ -48,7 +46,7 @@
 		<!-- Filters -->
 		<div v-if="showFilters && filters.length > 0" class="space-y-4">
 			<div class="flex items-center justify-between">
-				<h3 class="text-sm font-semibold text-slate-900 dark:text-white">Filters</h3>
+				<h3 class="text-sm font-semibold text-foreground">Filters</h3>
 				<button
 					v-if="activeFiltersCount > 0"
 					@click="clearAllFilters"
@@ -60,7 +58,7 @@
 
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 				<div v-for="filter in filters" :key="filter.name" class="space-y-2">
-					<label class="text-sm font-medium text-slate-700 dark:text-slate-300">
+					<label class="text-sm font-medium text-foreground">
 						{{ filter.label }}
 					</label>
 
@@ -68,7 +66,7 @@
 						v-if="filter.type === 'select'"
 						v-model="filterValues[filter.name]"
 						@change="applyFilters"
-						class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full px-3 py-2 border border-border rounded-lg bg-background"
 					>
 						<option value="">All</option>
 						<option v-for="opt in filter.options" :key="opt.value" :value="opt.value">
@@ -81,7 +79,7 @@
 						v-model="filterValues[filter.name]"
 						type="date"
 						@change="applyFilters"
-						class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full px-3 py-2 border border-border rounded-lg bg-background"
 					/>
 
 					<input
@@ -90,7 +88,7 @@
 						type="number"
 						:placeholder="filter.label"
 						@change="applyFilters"
-						class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full px-3 py-2 border border-border rounded-lg bg-background"
 					/>
 
 					<input
@@ -99,7 +97,7 @@
 						type="text"
 						:placeholder="filter.label"
 						@change="applyFilters"
-						class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full px-3 py-2 border border-border rounded-lg bg-background"
 					/>
 				</div>
 			</div>
@@ -140,14 +138,10 @@
 			<div class="text-center">
 				<Icon
 					icon="lucide:chart-line"
-					class="w-16 h-16 text-slate-300 dark:text-slate-600 mx-auto mb-4"
+					class="w-16 h-16 text-muted-foreground mx-auto mb-4"
 				/>
-				<h3 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">
-					No Charts Configured
-				</h3>
-				<p class="text-slate-500 dark:text-slate-400">
-					Add dashboard charts to display them here
-				</p>
+				<h3 class="text-lg font-semibold text-foreground mb-2">No Charts Configured</h3>
+				<p class="text-muted-foreground">Add dashboard charts to display them here</p>
 			</div>
 		</div>
 	</div>

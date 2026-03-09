@@ -1,44 +1,101 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
 
-.scroll-area {
-	overflow: auto;
+/* ============ Tailwind v4 Theme ============ */
+@theme {
+	/* Colors — mapped to CSS variables set in :root / .dark */
+	--color-border: hsl(var(--border));
+	--color-input: hsl(var(--input));
+	--color-ring: hsl(var(--ring));
+	--color-background: hsl(var(--background));
+	--color-foreground: hsl(var(--foreground));
+
+	--color-primary: hsl(var(--primary));
+	--color-primary-foreground: hsl(var(--primary-foreground));
+
+	--color-secondary: hsl(var(--secondary));
+	--color-secondary-foreground: hsl(var(--secondary-foreground));
+
+	--color-destructive: hsl(var(--destructive));
+	--color-destructive-foreground: hsl(var(--destructive-foreground));
+
+	--color-muted: hsl(var(--muted));
+	--color-muted-foreground: hsl(var(--muted-foreground));
+
+	--color-accent: hsl(var(--accent));
+	--color-accent-foreground: hsl(var(--accent-foreground));
+
+	--color-popover: hsl(var(--popover));
+	--color-popover-foreground: hsl(var(--popover-foreground));
+
+	--color-card: hsl(var(--card));
+	--color-card-foreground: hsl(var(--card-foreground));
+
+	/* Font families */
+	--font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+		sans-serif;
+	--font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+	/* Border radius */
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+
+	/* Shadows */
+	--shadow-soft: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+
+	/* Animations */
+	--animate-accordion-down: accordion-down 0.2s ease-out;
+	--animate-accordion-up: accordion-up 0.2s ease-out;
+
+	@keyframes accordion-down {
+		from {
+			height: 0;
+		}
+		to {
+			height: var(--radix-accordion-content-height);
+		}
+	}
+
+	@keyframes accordion-up {
+		from {
+			height: var(--radix-accordion-content-height);
+		}
+		to {
+			height: 0;
+		}
+	}
 }
 
-/* Webkit browsers */
-.scroll-area::-webkit-scrollbar {
-	width: 4px;
-	height: 4px;
-}
-
-.scroll-area::-webkit-scrollbar-thumb {
-	background: #cbd5e1;
-	border-radius: 4px;
-}
-
-.scroll-area::-webkit-scrollbar-track {
-	background: transparent;
-}
-
+/* ============ Dark mode variant ============ */
 @custom-variant dark (&:where(.dark, .dark *));
 
-* {
-	box-sizing: border-box;
-}
-
-html,
-body,
-#app {
-	margin: 0;
-	padding: 0;
-	height: 100%;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-		"Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-}
-
-/* Light mode (default) */
+/* ============ CSS Variables (shadcn-vue pattern) ============ */
 :root {
+	--background: 0 0% 100%;
+	--foreground: 222.2 84% 4.9%;
+	--card: 0 0% 100%;
+	--card-foreground: 222.2 84% 4.9%;
+	--popover: 0 0% 100%;
+	--popover-foreground: 222.2 84% 4.9%;
+	--primary: 243 75% 59%;
+	--primary-foreground: 210 40% 98%;
+	--secondary: 210 40% 96.1%;
+	--secondary-foreground: 222.2 47.4% 11.2%;
+	--muted: 210 40% 96.1%;
+	--muted-foreground: 215.4 16.3% 46.9%;
+	--accent: 210 40% 96.1%;
+	--accent-foreground: 222.2 47.4% 11.2%;
+	--destructive: 0 84.2% 60.2%;
+	--destructive-foreground: 210 40% 98%;
+	--border: 214.3 31.8% 91.4%;
+	--input: 214.3 31.8% 91.4%;
+	--ring: 243 75% 59%;
+	--radius: 0.625rem;
+
+	/* Legacy desktop variables */
 	--bg-primary: #ffffff;
 	--bg-secondary: #f8fafc;
 	--bg-tertiary: #f1f5f9;
@@ -47,9 +104,6 @@ body,
 	--text-primary: #0f172a;
 	--text-secondary: #475569;
 	--text-tertiary: #64748b;
-
-	--border: #e2e8f0;
-	--border-light: #f1f5f9;
 
 	--navbar-bg: #1e293b;
 	--navbar-border: #334155;
@@ -79,8 +133,28 @@ html.light {
 	color: var(--text-primary);
 }
 
-/* Dark mode */
-html.dark {
+.dark {
+	--background: 224 71% 4%;
+	--foreground: 210 40% 98%;
+	--card: 224 50% 10%;
+	--card-foreground: 210 40% 98%;
+	--popover: 224 50% 10%;
+	--popover-foreground: 210 40% 98%;
+	--primary: 243 75% 65%;
+	--primary-foreground: 210 40% 98%;
+	--secondary: 217 33% 17.5%;
+	--secondary-foreground: 210 40% 98%;
+	--muted: 217 33% 15%;
+	--muted-foreground: 215 20% 70%;
+	--accent: 217 33% 20%;
+	--accent-foreground: 210 40% 98%;
+	--destructive: 0 62.8% 55%;
+	--destructive-foreground: 210 40% 98%;
+	--border: 215 25% 27%;
+	--input: 215 25% 27%;
+	--ring: 243 75% 65%;
+
+	/* Legacy desktop dark variables */
 	--bg-primary: #0f172a;
 	--bg-secondary: #1e293b;
 	--bg-tertiary: #334155;
@@ -89,9 +163,6 @@ html.dark {
 	--text-primary: #f1f5f9;
 	--text-secondary: #cbd5e1;
 	--text-tertiary: #94a3b8;
-
-	--border: #334155;
-	--border-light: #1e293b;
 
 	--navbar-bg: #1e293b;
 	--navbar-border: #334155;
@@ -116,4 +187,175 @@ html.dark {
 	color-scheme: dark;
 	background-color: var(--bg-primary);
 	color: var(--text-primary);
+}
+
+/* ============ Base Styles ============ */
+* {
+	border-color: hsl(var(--border));
+}
+
+body {
+	background-color: hsl(var(--background));
+	color: hsl(var(--foreground));
+	font-family: var(--font-sans);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* ============ Scrollbar ============ */
+.scroll-area {
+	overflow: auto;
+}
+
+.scroll-area::-webkit-scrollbar {
+	width: 4px;
+	height: 4px;
+}
+
+.scroll-area::-webkit-scrollbar-thumb {
+	background: hsl(var(--border));
+	border-radius: 4px;
+}
+
+.scroll-area::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+*,
+.purchase-scroll {
+	scrollbar-width: thin;
+	scrollbar-color: hsl(var(--border)) transparent;
+}
+
+*::-webkit-scrollbar,
+.purchase-scroll::-webkit-scrollbar {
+	width: 4px;
+	height: 4px;
+}
+
+*::-webkit-scrollbar-track,
+.purchase-scroll::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+*::-webkit-scrollbar-thumb,
+.purchase-scroll::-webkit-scrollbar-thumb {
+	background-color: hsl(var(--border));
+	border-radius: 9999px;
+	transition: background-color 0.2s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover,
+.purchase-scroll::-webkit-scrollbar-thumb:hover {
+	background-color: hsl(var(--muted-foreground) / 0.5);
+}
+
+*::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+/* ============ Frappe Overrides ============ */
+.page-container[data-page-route="dashboard"] .page-head,
+.page-container[data-page-route="dashboard"] .page-title .title-area,
+body[data-route="dashboard"] .page-head {
+	display: none !important;
+}
+
+.page-container[data-page-route="dashboard"] .main-section {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.page-container[data-page-route="dashboard"] .page-body {
+	margin: 0 !important;
+}
+
+.dark .page-container[data-page-route="dashboard"],
+.dark .page-container[data-page-route="dashboard"] .main-section,
+.dark .page-container[data-page-route="dashboard"] .page-body,
+.dark .page-container[data-page-route="dashboard"] .layout-main,
+.dark .page-container[data-page-route="dashboard"] .container {
+	background-color: hsl(var(--background)) !important;
+}
+
+#app.dark {
+	background-color: hsl(var(--background));
+	color: hsl(var(--foreground));
+}
+
+/* ============ Vue Transitions ============ */
+.fade-enter-active,
+.fade-leave-active {
+	transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+	transition: all 0.3s ease-out;
+}
+
+.slide-up-enter-from,
+.slide-up-leave-to {
+	opacity: 0;
+	transform: translateY(10px);
+}
+
+.list-enter-active,
+.list-leave-active {
+	transition: all 0.3s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+	opacity: 0;
+	transform: translateX(-20px);
+}
+
+.list-move {
+	transition: transform 0.3s ease;
+}
+
+/* ============ Dialog/Modal Fix ============ */
+[data-radix-popper-content-wrapper] {
+	z-index: 9999 !important;
+}
+
+[data-state="open"][role="dialog"] ~ [data-aria-hidden="true"],
+body > [data-radix-portal] {
+	position: fixed !important;
+	inset: 0 !important;
+}
+
+/* ============ Skeleton ============ */
+.desk-skeleton {
+	background-color: hsl(var(--muted));
+	border-radius: var(--radius-lg);
+	animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
 }

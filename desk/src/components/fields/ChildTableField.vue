@@ -9,7 +9,7 @@
 			:parent-name="ctx.doc?.name"
 			@update:rows="updateRows"
 		/>
-		<p v-if="field.description" class="text-slate-500 mt-1 text-[0.8125rem]">
+		<p v-if="field.description" class="text-muted-foreground mt-1 text-[0.8125rem]">
 			{{ field.description }}
 		</p>
 	</div>

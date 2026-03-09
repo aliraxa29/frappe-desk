@@ -7,10 +7,10 @@
 					<button
 						v-if="selectedModule"
 						@click="selectedModule = null"
-						class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+						class="p-2 rounded-lg hover:bg-muted dark:hover:bg-secondary transition-colors"
 					>
 						<svg
-							class="w-5 h-5 text-slate-600 dark:text-slate-400"
+							class="w-5 h-5 text-muted-foreground"
 							fill="none"
 							stroke="currentColor"
 							viewBox="0 0 24 24"
@@ -23,7 +23,7 @@
 							/>
 						</svg>
 					</button>
-					<h2 class="text-lg font-semibold text-slate-800 dark:text-white">
+					<h2 class="text-lg font-semibold text-foreground">
 						{{
 							appInfoStore.currentAppTitle?.toLowerCase() ===
 							moduleName?.toLowerCase()
@@ -37,11 +37,11 @@
 					v-if="selectedModule"
 					@click="refreshWorkspace"
 					:disabled="workspaceLoading"
-					class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+					class="p-2 rounded-lg hover:bg-muted dark:hover:bg-secondary transition-colors disabled:opacity-50"
 					title="Refresh workspace data"
 				>
 					<svg
-						class="w-5 h-5 text-slate-600 dark:text-slate-400"
+						class="w-5 h-5 text-muted-foreground"
 						:class="{ 'animate-spin': workspaceLoading }"
 						fill="none"
 						stroke="currentColor"
@@ -65,9 +65,7 @@
 					<div
 						class="w-12 h-12 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin"
 					></div>
-					<div class="text-sm text-slate-500 dark:text-slate-400">
-						Loading modules...
-					</div>
+					<div class="text-sm text-muted-foreground">Loading modules...</div>
 				</div>
 			</div>
 
@@ -79,7 +77,7 @@
 				<div class="w-full max-w-5xl">
 					<!-- App Title -->
 					<div class="text-center mb-12">
-						<h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-2">
+						<h1 class="text-3xl font-bold text-foreground mb-2">
 							{{ appInfoStore.currentAppTitle || formatLabel(moduleName) }}
 						</h1>
 					</div>
@@ -87,13 +85,11 @@
 					<!-- Empty State -->
 					<div
 						v-if="modules.length === 0"
-						class="flex flex-col items-center justify-center text-center text-slate-900 dark:text-slate-100"
+						class="flex flex-col items-center justify-center text-center text-foreground"
 					>
 						<div class="text-6xl mb-6">📦</div>
-						<h3 class="text-xl font-semibold text-slate-700 dark:text-slate-100">
-							No Modules Found
-						</h3>
-						<p class="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-md">
+						<h3 class="text-xl font-semibold text-foreground">No Modules Found</h3>
+						<p class="text-sm text-muted-foreground mt-2 max-w-md">
 							This app has no modules available. Try installing some modules or check
 							your permissions.
 						</p>
@@ -108,7 +104,7 @@
 							v-for="module in modules"
 							:key="module.name"
 							@click="() => selectModule(module, false)"
-							class="group flex flex-col items-center gap-4 p-6 w-full max-w-40 rounded-2xl cursor-pointer bg-white dark:bg-slate-900 border-2 border-transparent hover:border-violet-400 hover:shadow-xl hover:shadow-violet-500/10 transition-all duration-300 hover:-translate-y-1"
+							class="group flex flex-col items-center gap-4 p-6 w-full max-w-40 rounded-2xl cursor-pointer bg-background"
 						>
 							<!-- Module Icon -->
 							<div class="relative">
@@ -131,7 +127,7 @@
 							</div>
 							<!-- Module Label -->
 							<span
-								class="text-sm font-semibold text-slate-700 dark:text-slate-200 text-center group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors"
+								class="text-sm font-semibold text-foreground text-center group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors"
 							>
 								{{ module.label || module.name }}
 							</span>
@@ -148,7 +144,7 @@
 						<div
 							class="w-10 h-10 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin"
 						></div>
-						<div class="text-sm text-slate-500">Loading workspace...</div>
+						<div class="text-sm text-muted-foreground">Loading workspace...</div>
 					</div>
 				</div>
 
@@ -176,9 +172,7 @@
 									/>
 								</svg>
 							</div>
-							<h3 class="text-base font-semibold text-slate-800 dark:text-white">
-								Quick Actions
-							</h3>
+							<h3 class="text-base font-semibold text-foreground">Quick Actions</h3>
 						</div>
 						<div
 							class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
@@ -187,7 +181,7 @@
 								v-for="shortcut in workspaceContent.shortcuts"
 								:key="shortcut.name"
 								@click="handleShortcutClick(shortcut)"
-								class="group relative overflow-hidden rounded-xl cursor-pointer bg-linear-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 border border-slate-200 dark:border-slate-700 hover:shadow-lg hover:shadow-violet-500/10 hover:border-violet-400 transition-all duration-300 hover:-translate-y-0.5"
+								class="group relative overflow-hidden rounded-xl cursor-pointer bg-linear-to-br from-background to-secondary dark:from-secondary dark:to-secondary border border-border hover:shadow-lg hover:shadow-violet-500/10 hover:border-violet-400 transition-all duration-300 hover:-translate-y-0.5"
 							>
 								<div class="p-4 flex flex-col items-center gap-3">
 									<div
@@ -202,7 +196,7 @@
 										<span class="text-2xl">{{ shortcut.icon || "⚡" }}</span>
 									</div>
 									<span
-										class="text-sm font-medium text-slate-700 dark:text-slate-200 text-center leading-tight group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors"
+										class="text-sm font-medium text-foreground text-center leading-tight group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors"
 									>
 										{{ shortcut.label || shortcut.name }}
 									</span>
@@ -241,9 +235,7 @@
 									/>
 								</svg>
 							</div>
-							<h3 class="text-base font-semibold text-slate-800 dark:text-white">
-								Key Metrics
-							</h3>
+							<h3 class="text-base font-semibold text-foreground">Key Metrics</h3>
 						</div>
 						<div
 							class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
@@ -251,18 +243,15 @@
 							<div
 								v-for="(card, index) in workspaceContent.number_cards"
 								:key="card.name"
-								class="relative overflow-hidden rounded-xl p-5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:shadow-md transition-all duration-300"
+								class="relative overflow-hidden rounded-xl p-5 bg-background"
 							>
 								<div class="flex flex-col">
 									<span
-										class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider"
+										class="text-xs font-medium text-muted-foreground uppercase tracking-wider"
 									>
 										{{ card.label || card.name }}
 									</span>
-									<span
-										class="text-2xl font-bold text-slate-800 dark:text-white mt-1"
-										>--</span
-									>
+									<span class="text-2xl font-bold text-foreground mt-1">--</span>
 								</div>
 								<!-- Decorative gradient corner -->
 								<div
@@ -300,23 +289,19 @@
 									/>
 								</svg>
 							</div>
-							<h3 class="text-base font-semibold text-slate-800 dark:text-white">
-								Modules
-							</h3>
+							<h3 class="text-base font-semibold text-foreground">Modules</h3>
 						</div>
 						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 							<div
 								v-for="card in workspaceContent.cards"
 								:key="card.label"
-								class="rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-lg transition-all duration-300"
+								class="rounded-xl bg-background"
 							>
 								<!-- Card Header -->
-								<div
-									class="px-5 py-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50"
-								>
+								<div class="px-5 py-4 border-b border-border bg-secondary/50">
 									<div class="flex items-center gap-3">
 										<span class="text-xl">{{ card.icon || "📁" }}</span>
-										<h4 class="font-semibold text-slate-800 dark:text-white">
+										<h4 class="font-semibold text-foreground">
 											{{ card.label }}
 										</h4>
 									</div>
@@ -328,16 +313,16 @@
 											v-for="link in card.links"
 											:key="link.name"
 											@click="handleCardLinkClick(link)"
-											class="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors group"
+											class="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer hover:bg-secondary dark:hover:bg-secondary/50 transition-colors group"
 										>
 											<span class="text-base">{{ link.icon || "📄" }}</span>
 											<span
-												class="text-sm text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
+												class="text-sm text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
 											>
 												{{ link.label || link.name }}
 											</span>
 											<svg
-												class="w-4 h-4 text-slate-400 ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
+												class="w-4 h-4 text-muted-foreground ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
 												fill="none"
 												stroke="currentColor"
 												viewBox="0 0 24 24"
@@ -385,7 +370,7 @@
 									/>
 								</svg>
 							</div>
-							<h3 class="text-base font-semibold text-slate-800 dark:text-white">
+							<h3 class="text-base font-semibold text-foreground">
 								Charts & Analytics
 							</h3>
 						</div>
@@ -393,22 +378,22 @@
 							<div
 								v-for="chart in workspaceContent.charts"
 								:key="chart.name"
-								class="rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 hover:shadow-md transition-all duration-300"
+								class="rounded-xl bg-background"
 							>
 								<div class="flex items-center justify-between mb-4">
-									<h4 class="font-medium text-slate-800 dark:text-white">
+									<h4 class="font-medium text-foreground">
 										{{ chart.label || chart.name }}
 									</h4>
 									<span
-										class="text-xs text-slate-500 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded"
+										class="text-xs text-muted-foreground bg-muted px-2 py-1 rounded"
 										>{{ chart.chart_name }}</span
 									>
 								</div>
 								<!-- Chart Placeholder -->
 								<div
-									class="h-40 bg-slate-50 dark:bg-slate-900 rounded-lg flex items-center justify-center border border-dashed border-slate-200 dark:border-slate-700"
+									class="h-40 bg-secondary rounded-lg flex items-center justify-center border border-dashed border-border"
 								>
-									<span class="text-sm text-slate-400"
+									<span class="text-sm text-muted-foreground"
 										>Chart: {{ chart.chart_name }}</span
 									>
 								</div>
@@ -441,16 +426,14 @@
 									/>
 								</svg>
 							</div>
-							<h3 class="text-base font-semibold text-slate-800 dark:text-white">
-								Quick Lists
-							</h3>
+							<h3 class="text-base font-semibold text-foreground">Quick Lists</h3>
 						</div>
 						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 							<div
 								v-for="list in workspaceContent.quick_lists"
 								:key="list.name"
 								@click="navigateToQuickList(list)"
-								class="group rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 hover:border-pink-400 hover:shadow-md transition-all duration-300 cursor-pointer"
+								class="group rounded-xl bg-background"
 							>
 								<div class="flex items-center gap-3">
 									<div
@@ -472,18 +455,16 @@
 									</div>
 									<div class="flex-1 min-w-0">
 										<h4
-											class="font-medium text-slate-800 dark:text-white truncate group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors"
+											class="font-medium text-foreground truncate group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors"
 										>
 											{{ list.label || list.name }}
 										</h4>
-										<p
-											class="text-xs text-slate-500 dark:text-slate-400 truncate"
-										>
+										<p class="text-xs text-muted-foreground truncate">
 											{{ list.document_type }}
 										</p>
 									</div>
 									<svg
-										class="w-5 h-5 text-slate-400 group-hover:text-pink-500 transition-colors"
+										class="w-5 h-5 text-muted-foreground group-hover:text-pink-500 transition-colors"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -520,16 +501,14 @@
 									/>
 								</svg>
 							</div>
-							<h3 class="text-base font-semibold text-slate-800 dark:text-white">
-								Document Types
-							</h3>
+							<h3 class="text-base font-semibold text-foreground">Document Types</h3>
 						</div>
 						<div class="space-y-2">
 							<div
 								v-for="item in filteredDoctypes"
 								:key="item.name"
 								@click="navigateToDoctype(item)"
-								class="group flex items-center gap-4 p-4 rounded-lg cursor-pointer bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-cyan-400 hover:bg-cyan-50 dark:hover:bg-slate-700/50 hover:shadow-sm transition-all duration-200"
+								class="group flex items-center gap-4 p-4 rounded-lg cursor-pointer bg-background"
 							>
 								<div
 									class="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center shrink-0"
@@ -538,13 +517,13 @@
 								</div>
 								<div class="flex-1 min-w-0">
 									<span
-										class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors"
+										class="text-sm font-medium text-foreground group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors"
 									>
 										{{ item.label || item.name }}
 									</span>
 								</div>
 								<svg
-									class="w-4 h-4 text-slate-400 group-hover:text-cyan-500 transition-colors shrink-0"
+									class="w-4 h-4 text-muted-foreground group-hover:text-cyan-500 transition-colors shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -580,16 +559,14 @@
 									/>
 								</svg>
 							</div>
-							<h3 class="text-base font-semibold text-slate-800 dark:text-white">
-								Reports
-							</h3>
+							<h3 class="text-base font-semibold text-foreground">Reports</h3>
 						</div>
 						<div class="space-y-2">
 							<router-link
 								v-for="item in filteredReports"
 								:key="item.name"
 								:to="getReportRoute(item)"
-								class="group flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-slate-700/50 hover:shadow-sm transition-all duration-200"
+								class="group flex items-center gap-4 p-4 rounded-lg bg-background"
 							>
 								<div
 									class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0"
@@ -598,13 +575,13 @@
 								</div>
 								<div class="flex-1 min-w-0">
 									<span
-										class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors"
+										class="text-sm font-medium text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors"
 									>
 										{{ item.label || item.name }}
 									</span>
 								</div>
 								<svg
-									class="w-4 h-4 text-slate-400 group-hover:text-purple-500 transition-colors shrink-0"
+									class="w-4 h-4 text-muted-foreground group-hover:text-purple-500 transition-colors shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -640,16 +617,14 @@
 									/>
 								</svg>
 							</div>
-							<h3 class="text-base font-semibold text-slate-800 dark:text-white">
-								Pages
-							</h3>
+							<h3 class="text-base font-semibold text-foreground">Pages</h3>
 						</div>
 						<div class="space-y-2">
 							<router-link
 								v-for="item in filteredPages"
 								:key="item.name"
 								:to="getPageRoute(item)"
-								class="group flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-green-400 hover:bg-green-50 dark:hover:bg-slate-700/50 hover:shadow-sm transition-all duration-200"
+								class="group flex items-center gap-4 p-4 rounded-lg bg-background"
 							>
 								<div
 									class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0"
@@ -658,13 +633,13 @@
 								</div>
 								<div class="flex-1 min-w-0">
 									<span
-										class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors"
+										class="text-sm font-medium text-foreground group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors"
 									>
 										{{ item.label || item.name }}
 									</span>
 								</div>
 								<svg
-									class="w-4 h-4 text-slate-400 group-hover:text-green-500 transition-colors shrink-0"
+									class="w-4 h-4 text-muted-foreground group-hover:text-green-500 transition-colors shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -700,16 +675,14 @@
 									/>
 								</svg>
 							</div>
-							<h3 class="text-base font-semibold text-slate-800 dark:text-white">
-								Dashboards
-							</h3>
+							<h3 class="text-base font-semibold text-foreground">Dashboards</h3>
 						</div>
 						<div class="space-y-2">
 							<router-link
 								v-for="item in filteredDashboards"
 								:key="item.name"
 								:to="getDashboardRoute(item)"
-								class="group flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-orange-400 hover:bg-orange-50 dark:hover:bg-slate-700/50 hover:shadow-sm transition-all duration-200"
+								class="group flex items-center gap-4 p-4 rounded-lg bg-background"
 							>
 								<div
 									class="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center shrink-0"
@@ -718,13 +691,13 @@
 								</div>
 								<div class="flex-1 min-w-0">
 									<span
-										class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors"
+										class="text-sm font-medium text-foreground group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors"
 									>
 										{{ item.label || item.name }}
 									</span>
 								</div>
 								<svg
-									class="w-4 h-4 text-slate-400 group-hover:text-orange-500 transition-colors shrink-0"
+									class="w-4 h-4 text-muted-foreground group-hover:text-orange-500 transition-colors shrink-0"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -746,10 +719,10 @@
 						class="flex flex-col items-center justify-center h-64 text-center"
 					>
 						<div
-							class="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4"
+							class="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4"
 						>
 							<svg
-								class="w-10 h-10 text-slate-400"
+								class="w-10 h-10 text-muted-foreground"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -762,10 +735,8 @@
 								/>
 							</svg>
 						</div>
-						<h3 class="text-lg font-semibold text-slate-700 dark:text-slate-100">
-							Empty Workspace
-						</h3>
-						<p class="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-md">
+						<h3 class="text-lg font-semibold text-foreground">Empty Workspace</h3>
+						<p class="text-sm text-muted-foreground mt-2 max-w-md">
 							This module has no items configured yet. Add shortcuts, doctypes, or
 							reports to get started.
 						</p>

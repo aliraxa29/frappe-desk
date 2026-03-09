@@ -3,7 +3,7 @@
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
-			class="font-medium mb-2 text-sm text-slate-700 dark:text-slate-200"
+			class="font-medium mb-2 text-sm text-foreground"
 		>
 			{{ field.label }}
 			<span v-if="field.reqd" class="text-red-500 ml-1">*</span>
@@ -17,11 +17,11 @@
 			:disabled="field.read_only"
 			:required="field.reqd && !field.read_only"
 			type="text"
-			class="w-full px-3 py-2.5 border border-[#ddd] dark:border-slate-700 rounded focus:outline-none focus:border-[#0066cc] focus:shadow-[0_0_0_3px_rgba(0,102,204,0.1)] disabled:bg-gray-100 disabled:dark:bg-slate-700 disabled:cursor-not-allowed text-[0.95rem] transition-colors duration-200 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+			class="w-full px-3 py-2.5 border border-input rounded focus:outline-none focus:border-ring focus-visible:ring-2 focus-visible:ring-ring disabled:bg-muted disabled:disabled:cursor-not-allowed text-[0.95rem] transition-colors duration-200 bg-background"
 			readonly
 			@focus="showPicker = true"
 		/>
-		<small v-if="field.description" class="block text-gray-600 mt-1 text-[0.85rem]">{{
+		<small v-if="field.description" class="block text-muted-foreground mt-1 text-[0.85rem]">{{
 			field.description
 		}}</small>
 		<small v-if="error" class="text-red-500 block text-[0.85rem]">{{ error }}</small>
@@ -30,11 +30,11 @@
 			<div
 				v-if="showPicker"
 				ref="pickerRef"
-				class="absolute top-full left-0 mt-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg shadow-lg p-3 z-200"
+				class="absolute top-full left-0 mt-2 z-50 bg-popover text-popover-foreground border border-border rounded-lg shadow-lg p-4"
 				style="width: 320px"
 			>
-				<div class="text-center mb-3 pb-2 border-b border-gray-200">
-					<div class="text-sm font-semibold text-slate-900 dark:text-slate-100">
+				<div class="text-center mb-3 pb-2 border-b border-border">
+					<div class="text-sm font-semibold text-foreground">
 						{{ formatDate(year, month, day) }} {{ padTime(hour) }}:{{
 							padTime(minute)
 						}}:{{ padTime(second) }}
@@ -46,7 +46,7 @@
 						<Button variant="primary" size="sm" @click="prevMonth" class="px-3 py-1.5">
 							← Prev
 						</Button>
-						<span class="text-xs font-semibold text-slate-700 dark:text-slate-200"
+						<span class="text-xs font-semibold text-foreground"
 							>{{ getMonthName(month) }} {{ year }}</span
 						>
 						<Button variant="primary" size="sm" @click="nextMonth" class="px-3 py-1.5">
@@ -58,7 +58,7 @@
 						<div
 							v-for="dayLabel in ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']"
 							:key="dayLabel"
-							class="text-center text-xs font-semibold text-gray-500 dark:text-slate-400"
+							class="text-center text-xs font-semibold text-muted-foreground"
 						>
 							{{ dayLabel }}
 						</div>
@@ -72,21 +72,21 @@
 							:disabled="d === 0"
 							:class="getDayButtonClass(d)"
 							@click="selectDay(d)"
-							class="text-xs py-1 cursor-pointer rounded transition-colors disabled:cursor-default hover:bg-gray-300 dark:hover:bg-slate-700"
+							class="text-xs py-1 cursor-pointer rounded transition-colors disabled:cursor-default hover:bg-muted dark:hover:bg-secondary"
 						>
 							{{ d || "" }}
 						</button>
 					</div>
 				</div>
 
-				<div class="border-t border-gray-200 pt-3">
+				<div class="border-t border-border pt-3">
 					<div class="mb-2">
 						<div class="flex justify-between items-center mb-1">
 							<label
-								class="text-xs font-medium text-slate-600 dark:text-slate-300 uppercase tracking-wide text-[11px]"
+								class="text-xs font-medium text-muted-foreground uppercase tracking-wide text-[11px]"
 								>{{ __("Hour") }}</label
 							>
-							<span class="text-xs font-semibold text-slate-700 dark:text-slate-200">
+							<span class="text-xs font-semibold text-foreground">
 								{{ padTime(hour) }}
 							</span>
 						</div>
@@ -95,39 +95,38 @@
 							type="range"
 							min="0"
 							max="23"
-							class="w-full h-1.5 bg-gray-200 rounded appearance-none cursor-pointer slider dark-slider-bg"
+							class="w-full h-1.5 bg-muted rounded appearance-none cursor-pointer slider dark-slider-bg"
 							@input="emitValue"
 						/>
 					</div>
 					<div class="mb-2">
 						<div class="flex justify-between items-center mb-1">
 							<label
-								class="text-xs font-medium text-slate-600 dark:text-slate-300 uppercase tracking-wide text-[11px]"
+								class="text-xs font-medium text-muted-foreground uppercase tracking-wide text-[11px]"
 							>
 								{{ __("Minute") }}</label
 							>
-							<span
-								class="text-xs font-semibold text-slate-700 dark:text-slate-200"
-								>{{ padTime(minute) }}</span
-							>
+							<span class="text-xs font-semibold text-foreground">{{
+								padTime(minute)
+							}}</span>
 						</div>
 						<input
 							v-model.number="minute"
 							type="range"
 							min="0"
 							max="59"
-							class="w-full h-1.5 bg-gray-200 rounded appearance-none cursor-pointer slider"
+							class="w-full h-1.5 bg-muted rounded appearance-none cursor-pointer slider"
 							@input="emitValue"
 						/>
 					</div>
 					<div class="mb-3">
 						<div class="flex justify-between items-center mb-1">
 							<label
-								class="text-xs font-medium text-slate-600 dark:text-slate-300 uppercase tracking-wide text-[11px]"
+								class="text-xs font-medium text-muted-foreground uppercase tracking-wide text-[11px]"
 							>
 								{{ __("Second") }}
 							</label>
-							<span class="text-xs font-semibold text-slate-700 dark:text-slate-200">
+							<span class="text-xs font-semibold text-foreground">
 								{{ padTime(second) }}
 							</span>
 						</div>
@@ -136,7 +135,7 @@
 							type="range"
 							min="0"
 							max="59"
-							class="w-full h-1.5 bg-gray-200 rounded appearance-none cursor-pointer slider"
+							class="w-full h-1.5 bg-muted rounded appearance-none cursor-pointer slider"
 							@input="emitValue"
 						/>
 					</div>
@@ -154,6 +153,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import type { Field } from "../../types";
 import Button from "../Button.vue";
+import { __ } from "../../utils/translate";
 
 const props = defineProps<{
 	field: Field;
@@ -195,8 +195,8 @@ function getDayButtonClass(d: number): string {
 	const isToday =
 		d === now.getDate() && month.value === now.getMonth() && year.value === now.getFullYear();
 	if (isSelected) return "bg-blue-600 text-white font-semibold";
-	if (isToday) return "border border-blue-400 text-slate-900 dark:text-slate-100 font-medium";
-	return "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-gray-100 dark:hover:bg-slate-700";
+	if (isToday) return "border border-blue-400 text-foreground font-medium";
+	return "bg-background";
 }
 
 function selectDay(d: number) {

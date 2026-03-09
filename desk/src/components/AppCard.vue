@@ -2,7 +2,7 @@
 	<div @click="handleSelect" :class="containerClass">
 		<!-- Cover / Image -->
 		<div
-			class="relative h-28 bg-linear-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-950"
+			class="relative h-28 bg-linear-to-br from-secondary to-muted dark:from-secondary dark:to-background"
 		>
 			<img
 				:src="app.image || '/assets/desktop/images/no-image.png'"
@@ -20,15 +20,12 @@
 
 		<!-- Content -->
 		<div class="flex h-[calc(100%-7rem)] flex-col px-5 pb-5 pt-8">
-			<h3
-				class="truncate text-base font-semibold text-slate-900 dark:text-slate-100"
-				:title="app.title"
-			>
+			<h3 class="truncate text-base font-semibold text-foreground" :title="app.title">
 				{{ app.title }}
 			</h3>
 
 			<p
-				class="mt-1 line-clamp-3 text-sm text-slate-600 dark:text-slate-400"
+				class="mt-1 line-clamp-3 text-sm text-muted-foreground"
 				:title="app.description || __('No description available')"
 			>
 				{{ app.description || __("No description available") }}
@@ -120,7 +117,7 @@ const emit = defineEmits<{
 }>();
 
 const containerClass = computed(() => [
-	"group h-[300px] overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-all duration-300 flex flex-col",
+	"group h-[300px] overflow-hidden rounded-2xl border border-border bg-background",
 	props.selectable
 		? "cursor-pointer hover:-translate-y-1 hover:scale-[1.02] hover:border-violet-500 hover:shadow-2xl hover:shadow-violet-500/20"
 		: "cursor-default",

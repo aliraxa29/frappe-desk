@@ -2,20 +2,19 @@
 	<div
 		class="mb-6 last:mb-0"
 		:class="{
-			'border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden':
-				section.collapsible,
+			'border border-border rounded-lg overflow-hidden': section.collapsible,
 		}"
 	>
 		<!-- Collapsible section -->
-		<div v-if="section.collapsible" class="bg-white dark:bg-slate-900">
+		<div v-if="section.collapsible" class="bg-background">
 			<button
 				type="button"
-				class="flex items-center gap-2 w-full px-4 py-3.5 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer text-left transition-colors duration-200"
-				:class="{ 'border-b border-slate-200 dark:border-slate-700': isOpen }"
+				class="flex items-center gap-2 w-full px-4 py-3.5 bg-secondary hover:bg-muted dark:hover:bg-secondary cursor-pointer text-left transition-colors duration-200"
+				:class="{ 'border-b border-border': isOpen }"
 				@click="toggleSection"
 			>
 				<svg
-					class="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0 transition-transform duration-200"
+					class="w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-200"
 					:class="{ 'rotate-90': isOpen }"
 					fill="none"
 					stroke="currentColor"
@@ -28,16 +27,13 @@
 						d="M9 5l7 7-7 7"
 					/>
 				</svg>
-				<span class="text-[0.9375rem] font-semibold text-slate-800 dark:text-slate-200">{{
+				<span class="text-[0.9375rem] font-semibold text-foreground">{{
 					section.label || "Section"
 				}}</span>
 			</button>
 
 			<div v-if="isOpen" class="p-4">
-				<p
-					v-if="section.description"
-					class="text-[0.8125rem] text-slate-500 dark:text-slate-400 mb-4"
-				>
+				<p v-if="section.description" class="text-[0.8125rem] text-muted-foreground mb-4">
 					{{ section.description }}
 				</p>
 				<div class="flex gap-6 max-md:flex-col max-md:gap-4">
@@ -61,16 +57,13 @@
 
 		<!-- Non-collapsible section -->
 		<template v-else>
-			<div
-				v-if="section.label"
-				class="mb-4 pb-3 border-b border-slate-200 dark:border-slate-700"
-			>
-				<h3 class="text-[0.9375rem] font-semibold text-slate-800 dark:text-slate-200 m-0">
+			<div v-if="section.label" class="mb-4 pb-3 border-b border-border">
+				<h3 class="text-[0.9375rem] font-semibold text-foreground m-0">
 					{{ section.label }}
 				</h3>
 				<p
 					v-if="section.description"
-					class="text-[0.8125rem] text-slate-500 dark:text-slate-400 mt-1 mb-0"
+					class="text-[0.8125rem] text-muted-foreground mt-1 mb-0"
 				>
 					{{ section.description }}
 				</p>

@@ -1,8 +1,6 @@
 <template>
 	<div class="p-4 space-y-3">
-		<p
-			class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500"
-		>
+		<p class="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
 			{{ __("Tags") }}
 		</p>
 
@@ -11,18 +9,18 @@
 			<span
 				v-for="tag in tags"
 				:key="tag"
-				class="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs rounded-full border border-slate-200 dark:border-slate-700"
+				class="inline-flex items-center gap-1 pl-2.5 pr-1.5 py-0.5 bg-muted text-foreground text-xs rounded-full border border-border"
 			>
 				<span class="leading-none">{{ tag }}</span>
 				<button
 					@click="removeTag(tag)"
-					class="flex items-center justify-center w-3.5 h-3.5 rounded-full hover:bg-red-200 dark:hover:bg-red-800 text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+					class="flex items-center justify-center w-3.5 h-3.5 rounded-full hover:bg-red-200 dark:hover:bg-red-800 text-muted-foreground hover:text-red-600 dark:hover:text-red-400 transition-colors"
 					:aria-label="__('Remove tag')"
 				>
 					<X class="h-2.5 w-2.5" />
 				</button>
 			</span>
-			<span v-if="tags.length === 0" class="text-xs text-slate-400 italic">{{
+			<span v-if="tags.length === 0" class="text-xs text-muted-foreground italic">{{
 				__("No tags")
 			}}</span>
 		</div>
@@ -34,7 +32,7 @@
 				@keydown.enter.prevent="addTag"
 				type="text"
 				:placeholder="__('Add a tag...')"
-				class="flex-1 min-w-0 px-2.5 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+				class="flex-1 min-w-0 px-2.5 py-1.5 text-xs border border-border rounded-md bg-background"
 			/>
 			<button
 				@click="addTag"

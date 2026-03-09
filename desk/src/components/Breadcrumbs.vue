@@ -26,13 +26,13 @@
 				<!-- Dropdown menu -->
 				<div
 					v-if="showMiddleDropdown"
-					class="absolute left-0 top-full mt-1 py-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 min-w-40"
+					class="absolute left-0 top-full mt-1 py-1 bg-secondary border border-border rounded-lg shadow-xl z-50 min-w-40"
 				>
 					<router-link
 						v-for="(item, idx) in middleItems"
 						:key="idx"
 						:to="item.route || '#'"
-						class="block px-3 py-1.5 text-sm dark:hover:text-white hover:bg-gray-700 truncate"
+						class="block px-3 py-1.5 text-sm dark:hover:text-white hover:bg-secondary truncate"
 						@click="showMiddleDropdown = false"
 					>
 						{{ item.label }}

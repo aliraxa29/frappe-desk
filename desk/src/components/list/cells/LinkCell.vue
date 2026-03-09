@@ -7,7 +7,7 @@
 	>
 		{{ value }}
 	</span>
-	<span v-else class="text-slate-400">—</span>
+	<span v-else class="text-muted-foreground">—</span>
 </template>
 
 <script setup lang="ts">

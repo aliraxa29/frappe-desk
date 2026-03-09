@@ -16,15 +16,13 @@
 
 			<!-- Custom checkbox -->
 			<div
-				class="flex h-5 w-5 items-center justify-center rounded-md border transition-all duration-200 bg-white dark:bg-slate-800 shadow-sm focus-within:ring-2 focus-within:ring-slate-900 hover:bg-slate-50"
-				:class="
-					modelValue ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-300'
-				"
+				class="flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border border-primary shadow ring-offset-background transition-all duration-200 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
+				:class="modelValue ? 'bg-primary text-primary-foreground' : 'bg-background'"
 			>
 				<svg
 					v-if="modelValue"
 					xmlns="http://www.w3.org/2000/svg"
-					class="h-3.5 w-3.5"
+					class="h-3 w-3"
 					viewBox="0 0 20 20"
 					fill="currentColor"
 				>
@@ -36,15 +34,15 @@
 				</svg>
 			</div>
 
-			<!-- Label text (AFTER checkbox) -->
-			<span v-if="label" class="text-sm font-medium text-slate-700">
+			<!-- Label text -->
+			<span v-if="label" class="text-sm font-medium text-foreground">
 				{{ label }}
-				<span v-if="required" class="text-red-500 ml-0.5">*</span>
+				<span v-if="required" class="text-destructive ml-0.5">*</span>
 			</span>
 		</label>
 
 		<!-- Description -->
-		<p v-if="description" class="text-xs text-slate-500 leading-relaxed">
+		<p v-if="description" class="text-xs text-muted-foreground leading-relaxed">
 			{{ description }}
 		</p>
 	</div>

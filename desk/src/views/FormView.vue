@@ -3,13 +3,10 @@
 		<template #header>
 			<div class="flex flex-wrap items-center justify-between gap-4 w-full py-2">
 				<div class="flex flex-col gap-1 flex-1">
-					<h2 class="text-lg font-semibold text-slate-800 dark:text-white">
+					<h2 class="text-lg font-semibold text-foreground">
 						{{ doctype }}
 					</h2>
-					<p
-						v-if="!currentMeta?.issingle"
-						class="text-sm text-slate-600 dark:text-slate-400"
-					>
+					<p v-if="!currentMeta?.issingle" class="text-sm text-muted-foreground">
 						{{ isNewDocument ? __("New document") : documentName }}
 					</p>
 				</div>
@@ -27,10 +24,7 @@
 							aria-label="Previous document"
 							title="Previous (Shift+ArrowUp)"
 						>
-							<ChevronLeft
-								class="h-6 w-4 text-gray-800 dark:text-white"
-								aria-hidden="true"
-							/>
+							<ChevronLeft class="h-6 w-4 text-foreground" aria-hidden="true" />
 						</Button>
 						<Button
 							variant="secondary"
@@ -41,10 +35,7 @@
 							aria-label="Next document"
 							title="Next (Shift+ArrowDown)"
 						>
-							<ChevronRight
-								class="h-6 w-4 text-gray-800 dark:text-white"
-								aria-hidden="true"
-							/>
+							<ChevronRight class="h-6 w-4 text-foreground" aria-hidden="true" />
 						</Button>
 						<Button
 							v-if="!isNewDocument"
@@ -54,10 +45,7 @@
 							:aria-label="__('Toggle sidebar')"
 							:title="sidebarOpen ? __('Hide details') : __('Show details')"
 						>
-							<Menu
-								class="h-5 w-5 text-gray-800 dark:text-white"
-								aria-hidden="true"
-							/>
+							<Menu class="h-5 w-5 text-foreground" aria-hidden="true" />
 						</Button>
 					</div>
 				</div>

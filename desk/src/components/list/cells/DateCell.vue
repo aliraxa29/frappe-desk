@@ -1,8 +1,8 @@
 <template>
-	<span v-if="formattedDate" class="text-slate-600 whitespace-nowrap">
+	<span v-if="formattedDate" class="text-muted-foreground whitespace-nowrap">
 		{{ formattedDate }}
 	</span>
-	<span v-else class="text-slate-400">—</span>
+	<span v-else class="text-muted-foreground">—</span>
 </template>
 
 <script setup lang="ts">

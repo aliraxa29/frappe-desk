@@ -8,7 +8,7 @@
 				<div
 					v-for="toast in toasts"
 					:key="toast.id"
-					class="flex items-start gap-3 p-4 bg-white rounded-lg shadow-lg border-l-4 pointer-events-auto relative overflow-hidden w-[320px] max-w-[320px]"
+					class="flex items-start gap-3 p-4 bg-background rounded-lg shadow-lg border-l-4 pointer-events-auto relative overflow-hidden w-[320px] max-w-[320px]"
 					:class="{
 						'border-l-green-500': toast.type === 'success',
 						'border-l-red-500': toast.type === 'error',
@@ -33,12 +33,12 @@
 					</div>
 
 					<div class="flex-1 min-w-0">
-						<p class="text-sm font-semibold text-slate-800 m-0 leading-[1.4]">
+						<p class="text-sm font-semibold text-foreground m-0 leading-[1.4]">
 							{{ toast.title }}
 						</p>
 						<p
 							v-if="toast.message"
-							class="text-[0.8125rem] text-slate-500 mt-1 mb-0 leading-[1.4]"
+							class="text-[0.8125rem] text-muted-foreground mt-1 mb-0 leading-[1.4]"
 						>
 							{{ toast.message }}
 						</p>
@@ -52,7 +52,7 @@
 					</div>
 
 					<button
-						class="flex items-center justify-center w-6 h-6 p-0 bg-transparent border-none text-slate-400 cursor-pointer rounded shrink-0 transition-all duration-150 hover:text-slate-500 hover:bg-slate-100"
+						class="flex items-center justify-center w-6 h-6 p-0 bg-transparent border-none text-muted-foreground cursor-pointer rounded shrink-0 transition-all duration-150 hover:text-muted-foreground hover:bg-muted"
 						@click="remove(toast.id)"
 						aria-label="Close"
 					>

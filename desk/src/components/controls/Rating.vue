@@ -3,7 +3,7 @@
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
-			class="font-medium text-sm text-slate-700 dark:text-white"
+			class="font-medium text-sm text-foreground"
 		>
 			{{ field.label }}
 			<span v-if="field.reqd" class="text-red-500 ml-1">*</span>
@@ -18,7 +18,7 @@
 				:class="
 					star <= currentRating
 						? 'text-yellow-400'
-						: 'text-gray-300 dark:text-slate-600 hover:text-yellow-300'
+						: 'text-muted-foreground hover:text-yellow-300'
 				"
 				@click="setRating(star)"
 				@mouseenter="hoveredStar = star"
@@ -41,13 +41,13 @@
 					/>
 				</svg>
 			</button>
-			<span v-if="currentRating > 0" class="text-sm text-slate-500 dark:text-slate-400 ml-2">
+			<span v-if="currentRating > 0" class="text-sm text-muted-foreground ml-2">
 				{{ currentRating }}/{{ maxStars }}
 			</span>
 		</div>
 		<small
 			v-if="field.description"
-			class="block text-gray-600 text-[0.85rem] leading-relaxed"
+			class="block text-muted-foreground text-[0.85rem] leading-relaxed"
 			>{{ field.description }}</small
 		>
 		<small v-if="error" class="text-red-500 block text-[0.85rem]">{{ error }}</small>

@@ -10,7 +10,7 @@
 	<!-- Main container -->
 	<div
 		v-else
-		class="h-screen flex flex-col overflow-hidden dark:bg-gray-950 dark:bg-none bg-[linear-gradient(135deg,var(--bg-primary)_0%,var(--bg-secondary)_50%,var(--bg-tertiary)_100%)]"
+		class="h-screen flex flex-col overflow-hidden dark:bg-none bg-[linear-gradient(135deg,var(--bg-primary)_0%,var(--bg-secondary)_50%,var(--bg-tertiary)_100%)]"
 	>
 		<Navbar class="shrink-0" />
 
@@ -19,10 +19,10 @@
 			<!-- Installed apps -->
 			<div class="mb-10">
 				<div class="mb-6">
-					<h2 class="text-2xl font-bold text-[--text-primary] mb-2 dark:text-white">
+					<h2 class="text-2xl font-bold text-[--text-primary] mb-2">
 						{{ __("Installed Apps") }}
 					</h2>
-					<p class="text-[--text-secondary] dark:text-white">
+					<p class="text-[--text-secondary]">
 						{{ __("Click on any app to view and manage") }}
 					</p>
 				</div>
@@ -55,10 +55,10 @@
 			<!-- Available apps (bench) - System Manager only -->
 			<div v-if="isSystemUser" class="mb-10">
 				<div class="mb-6">
-					<h2 class="text-xl font-bold text-[--text-primary] mb-2 dark:text-white">
+					<h2 class="text-xl font-bold text-[--text-primary] mb-2">
 						{{ __("Available Apps (Not Installed)") }}
 					</h2>
-					<p class="text-[--text-secondary] dark:text-white">
+					<p class="text-[--text-secondary]">
 						{{ __("Apps available on the site can be installed here") }}
 					</p>
 				</div>
@@ -93,12 +93,10 @@
 						class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
 					>
 						<div>
-							<h2
-								class="text-xl font-bold text-[--text-primary] mb-2 dark:text-white"
-							>
+							<h2 class="text-xl font-bold text-[--text-primary] mb-2">
 								{{ __("Explore Marketplace") }}
 							</h2>
-							<p class="text-[--text-secondary] dark:text-white">
+							<p class="text-[--text-secondary]">
 								{{ __("Browse and install available apps from the marketplace") }}
 							</p>
 						</div>
@@ -112,10 +110,10 @@
 								v-model="marketplaceSearch"
 								type="text"
 								:placeholder="__('Search apps...')"
-								class="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+								class="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg bg-background"
 							/>
 							<svg
-								class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+								class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -132,7 +130,7 @@
 						<!-- Pricing filter -->
 						<select
 							v-model="marketplacePricingFilter"
-							class="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors cursor-pointer"
+							class="px-3 py-2 text-sm border border-border rounded-lg bg-background"
 						>
 							<option value="">{{ __("All Pricing") }}</option>
 							<option value="Free">{{ __("Free") }}</option>
@@ -144,7 +142,7 @@
 						<select
 							v-if="availableTags.length > 0"
 							v-model="marketplaceTagFilter"
-							class="px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors cursor-pointer"
+							class="px-3 py-2 text-sm border border-border rounded-lg bg-background"
 						>
 							<option value="">{{ __("All Categories") }}</option>
 							<option v-for="tag in availableTags" :key="tag" :value="tag">
@@ -160,7 +158,7 @@
 								marketplaceTagFilter
 							"
 							@click="clearMarketplaceFilters"
-							class="px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+							class="px-3 py-2 text-sm text-muted-foreground hover:text-foreground dark:hover:text-white border border-border rounded-lg hover:bg-muted dark:hover:bg-secondary transition-colors cursor-pointer"
 						>
 							{{ __("Clear Filters") }}
 						</button>
@@ -172,7 +170,7 @@
 								marketplacePricingFilter ||
 								marketplaceTagFilter
 							"
-							class="text-sm text-slate-500 dark:text-slate-400 ml-auto"
+							class="text-sm text-muted-foreground ml-auto"
 						>
 							{{ filteredMarketplaceApps.length }} {{ __("of") }}
 							{{ marketplaceApps.length }} {{ __("apps") }}

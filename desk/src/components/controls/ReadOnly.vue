@@ -3,7 +3,7 @@
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
-			class="font-medium text-sm text-slate-700 dark:text-white"
+			class="font-medium text-sm text-foreground"
 		>
 			{{ field.label }}
 		</label>
@@ -12,9 +12,12 @@
 			:value="modelValue"
 			readonly
 			type="text"
-			class="w-full px-3 py-2.5 border border-[#ddd] dark:border-none rounded bg-gray-100 dark:bg-slate-900/50 cursor-not-allowed text-[0.95rem] transition-colors duration-200 dark:text-white"
+			class="w-full px-3 py-2.5 border border-input rounded bg-muted/50 cursor-not-allowed text-[0.95rem] transition-colors duration-200"
 		/>
-		<small v-if="field.description" class="block text-gray-600 text-[0.85rem] leading-relaxed">
+		<small
+			v-if="field.description"
+			class="block text-muted-foreground text-[0.85rem] leading-relaxed"
+		>
 			{{ field.description }}
 		</small>
 	</div>

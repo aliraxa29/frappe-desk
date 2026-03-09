@@ -44,24 +44,24 @@ const props = withDefaults(
 );
 
 const baseClasses =
-	"inline-flex items-center rounded-full font-medium transition-all duration-200 select-none";
+	"inline-flex items-center rounded-md border font-semibold transition-colors select-none";
 
 const variantClasses: Record<PillVariant, string> = {
-	primary: "bg-violet-100 dark:bg-violet-900 text-violet-700 dark:text-violet-200",
-	success: "bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-200",
-	warning: "bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-200",
-	danger: "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200",
-	neutral: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
-	orange: "bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-200",
+	primary: "border-transparent bg-primary text-primary-foreground shadow",
+	success: "border-transparent bg-emerald-500/15 text-emerald-700 dark:text-emerald-400",
+	warning: "border-transparent bg-amber-500/15 text-amber-700 dark:text-amber-400",
+	danger: "border-transparent bg-destructive text-destructive-foreground shadow",
+	neutral: "border-transparent bg-secondary text-secondary-foreground",
+	orange: "border-transparent bg-amber-500/15 text-amber-700 dark:text-amber-400",
 };
 
 const sizeClasses: Record<PillSize, string> = {
-	sm: "h-6 px-2.5 text-xs",
-	md: "h-7 px-3 text-sm",
+	sm: "px-2 py-0.5 text-xs",
+	md: "px-2.5 py-0.5 text-xs",
 };
 
 const interactiveClasses =
-	"cursor-pointer hover:brightness-95 active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-offset-1";
+	"cursor-pointer hover:brightness-95 active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2";
 
 const pillClasses = computed(() => [
 	baseClasses,

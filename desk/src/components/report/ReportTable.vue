@@ -3,10 +3,10 @@
 		<!-- Global Search -->
 		<div
 			v-if="enableGlobalFilter"
-			class="flex items-center gap-2 px-4 py-2 border-b border-slate-200 dark:border-slate-800"
+			class="flex items-center gap-2 px-4 py-2 border-b border-border"
 		>
 			<svg
-				class="w-4 h-4 text-slate-400"
+				class="w-4 h-4 text-muted-foreground"
 				fill="none"
 				viewBox="0 0 24 24"
 				stroke="currentColor"
@@ -22,7 +22,7 @@
 				v-model="globalFilter"
 				type="text"
 				:placeholder="__('Search in report...')"
-				class="flex-1 bg-transparent border-none outline-none text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400"
+				class="flex-1 bg-transparent border-none outline-none text-sm text-foreground placeholder-slate-400"
 				@input="onGlobalFilterChange"
 			/>
 			<button
@@ -31,10 +31,10 @@
 					globalFilter = '';
 					onGlobalFilterChange();
 				"
-				class="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+				class="p-1 rounded hover:bg-muted dark:hover:bg-secondary transition-colors"
 			>
 				<svg
-					class="w-3.5 h-3.5 text-slate-400"
+					class="w-3.5 h-3.5 text-muted-foreground"
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke="currentColor"
@@ -56,30 +56,30 @@
 		>
 			<table class="w-full border-collapse" :class="{ 'text-sm': dense }">
 				<!-- Header -->
-				<thead class="sticky top-0 z-10 bg-slate-50 dark:bg-slate-900/80 backdrop-blur-sm">
+				<thead class="sticky top-0 z-10 bg-secondary dark:bg-muted backdrop-blur-sm">
 					<tr
 						v-for="headerGroup in table.getHeaderGroups()"
 						:key="headerGroup.id"
-						class="border-b border-slate-200 dark:border-slate-800"
+						class="border-b border-border"
 					>
 						<!-- Selection checkbox header -->
 						<th
 							v-if="enableRowSelection"
-							class="w-10 px-3 py-2.5 sticky left-0 bg-slate-50 dark:bg-slate-900/80"
+							class="w-10 px-3 py-2.5 sticky left-0 bg-secondary dark:bg-muted"
 						>
 							<input
 								type="checkbox"
 								:checked="table.getIsAllRowsSelected()"
 								:indeterminate="table.getIsSomeRowsSelected()"
 								@change="table.toggleAllRowsSelected()"
-								class="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
+								class="w-4 h-4 rounded border-border text-blue-600 focus:ring-ring focus:ring-offset-0 cursor-pointer"
 							/>
 						</th>
 
 						<!-- Row number header -->
 						<th
 							v-if="showRowNumbers"
-							class="w-12 px-2 py-2.5 text-left text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider"
+							class="w-12 px-2 py-2.5 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider"
 						>
 							#
 						</th>
@@ -88,11 +88,11 @@
 						<th
 							v-for="header in headerGroup.headers"
 							:key="header.id"
-							class="px-3 py-2.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider select-none group transition-colors"
+							class="px-3 py-2.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider select-none group transition-colors"
 							:class="[
 								getHeaderAlignment(header),
 								{
-									'cursor-pointer hover:text-slate-700 dark:hover:text-slate-200':
+									'cursor-pointer hover:text-foreground dark:hover:text-muted-foreground':
 										header.column.getCanSort(),
 								},
 								getPinnedClass(header.column),
@@ -134,7 +134,7 @@
 									</span>
 									<span
 										v-else
-										class="text-slate-300 dark:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity"
+										class="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
 									>
 										&#9650;
 									</span>
@@ -156,7 +156,7 @@
 				</thead>
 
 				<!-- Body -->
-				<tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">
+				<tbody class="divide-y divide-border dark:divide-border">
 					<tr
 						v-for="row in table.getRowModel().rows"
 						:key="row.id"
@@ -174,14 +174,14 @@
 								type="checkbox"
 								:checked="row.getIsSelected()"
 								@change="row.toggleSelected()"
-								class="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
+								class="w-4 h-4 rounded border-border text-blue-600 focus:ring-ring focus:ring-offset-0 cursor-pointer"
 							/>
 						</td>
 
 						<!-- Row number -->
 						<td
 							v-if="showRowNumbers"
-							class="px-2 py-2 text-xs text-slate-400 dark:text-slate-500 tabular-nums"
+							class="px-2 py-2 text-xs text-muted-foreground tabular-nums"
 						>
 							{{ row.index + 1 + pagination.pageIndex * pagination.pageSize }}
 						</td>
@@ -195,10 +195,9 @@
 								getCellAlignment(cell),
 								getPinnedClass(cell.column),
 								{
-									'font-semibold bg-slate-50/50 dark:bg-slate-800/30':
+									'font-semibold bg-secondary/50/30':
 										row.original.__is_total_row,
-									'text-slate-700 dark:text-slate-200':
-										!row.original.__is_total_row,
+									'text-foreground': !row.original.__is_total_row,
 								},
 							]"
 							:style="{ width: `${cell.column.getSize()}px` }"
@@ -224,7 +223,7 @@
 									:class="
 										cell.getValue()
 											? 'text-green-600 bg-green-50 dark:bg-green-900/20'
-											: 'text-slate-300 dark:text-slate-600'
+											: 'text-muted-foreground'
 									"
 								>
 									{{ cell.getValue() ? "✓" : "—" }}
@@ -255,7 +254,7 @@
 					<tr v-if="table.getRowModel().rows.length === 0">
 						<td
 							:colspan="totalColumnCount"
-							class="px-6 py-16 text-center text-sm text-slate-400 dark:text-slate-500"
+							class="px-6 py-16 text-center text-sm text-muted-foreground"
 						>
 							<div class="flex flex-col items-center gap-3">
 								<div class="text-4xl">📋</div>
@@ -271,7 +270,7 @@
 				<!-- Totals footer -->
 				<tfoot
 					v-if="totalsRow && table.getRowModel().rows.length > 0"
-					class="sticky bottom-0 bg-slate-50 dark:bg-slate-900/90 backdrop-blur-sm border-t-2 border-slate-300 dark:border-slate-700"
+					class="sticky bottom-0 bg-secondary/90 backdrop-blur-sm border-t-2 border-border"
 				>
 					<tr>
 						<td v-if="enableRowSelection" class="px-3 py-2.5" />
@@ -282,8 +281,8 @@
 							class="px-3 py-2.5 text-sm font-semibold"
 							:class="[
 								getColumnAlignClass(col),
-								{ 'text-slate-800 dark:text-slate-100': idx === 0 },
-								{ 'tabular-nums text-slate-700 dark:text-slate-200': idx > 0 },
+								{ 'text-foreground': idx === 0 },
+								{ 'tabular-nums text-foreground': idx > 0 },
 							]"
 						>
 							{{ idx === 0 ? __("Totals") : formatTotalValue(col) }}
@@ -296,15 +295,15 @@
 		<!-- Pagination -->
 		<div
 			v-if="showPagination"
-			class="flex items-center justify-between px-4 py-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-gray-950"
+			class="flex items-center justify-between px-4 py-3 border-t border-border bg-background"
 		>
-			<div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+			<div class="flex items-center gap-2 text-sm text-muted-foreground">
 				<span>{{ __("Showing") }}</span>
-				<span class="font-medium text-slate-700 dark:text-slate-200">
+				<span class="font-medium text-foreground">
 					{{ paginationInfo.from }}-{{ paginationInfo.to }}
 				</span>
 				<span>{{ __("of") }}</span>
-				<span class="font-medium text-slate-700 dark:text-slate-200">
+				<span class="font-medium text-foreground">
 					{{ paginationInfo.total }}
 				</span>
 
@@ -312,7 +311,7 @@
 				<select
 					v-model.number="pagination.pageSize"
 					@change="onPageSizeChange"
-					class="ml-4 text-xs border border-slate-200 dark:border-slate-700 rounded bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 px-2 py-1"
+					class="ml-4 text-xs border border-border rounded bg-background"
 				>
 					<option v-for="size in pageSizeOptions" :key="size" :value="size">
 						{{ size }} {{ __("rows") }}
@@ -322,14 +321,14 @@
 
 			<div class="flex items-center gap-1.5">
 				<button
-					class="px-2.5 py-1.5 text-xs rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+					class="px-2.5 py-1.5 text-xs rounded border border-border hover:bg-secondary dark:hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
 					:disabled="!table.getCanPreviousPage()"
 					@click="table.setPageIndex(0)"
 				>
 					{{ __("First") }}
 				</button>
 				<button
-					class="px-2.5 py-1.5 text-xs rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+					class="px-2.5 py-1.5 text-xs rounded border border-border hover:bg-secondary dark:hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
 					:disabled="!table.getCanPreviousPage()"
 					@click="table.previousPage()"
 				>
@@ -344,24 +343,24 @@
 						:class="
 							page === pagination.pageIndex + 1
 								? 'bg-blue-600 text-white border-blue-600'
-								: 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
+								: 'border-border hover:bg-secondary dark:hover:bg-secondary text-muted-foreground'
 						"
 						@click="table.setPageIndex(Number(page) - 1)"
 					>
 						{{ page }}
 					</button>
-					<span v-else class="px-1 text-slate-400">…</span>
+					<span v-else class="px-1 text-muted-foreground">…</span>
 				</template>
 
 				<button
-					class="px-2.5 py-1.5 text-xs rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+					class="px-2.5 py-1.5 text-xs rounded border border-border hover:bg-secondary dark:hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
 					:disabled="!table.getCanNextPage()"
 					@click="table.nextPage()"
 				>
 					{{ __("Next") }} ›
 				</button>
 				<button
-					class="px-2.5 py-1.5 text-xs rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+					class="px-2.5 py-1.5 text-xs rounded border border-border hover:bg-secondary dark:hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
 					:disabled="!table.getCanNextPage()"
 					@click="table.setPageIndex(table.getPageCount() - 1)"
 				>
@@ -646,23 +645,23 @@ function getColumnAlignClass(col: ReportColumn): string {
 
 function getPinnedClass(column: Column<ReportRow, any>): string {
 	const pinned = column.getIsPinned();
-	if (pinned === "left") return "sticky left-0 bg-white dark:bg-gray-950 z-[5]";
-	if (pinned === "right") return "sticky right-0 bg-white dark:bg-gray-950 z-[5]";
+	if (pinned === "left") return "sticky left-0 bg-background";
+	if (pinned === "right") return "sticky right-0 bg-background";
 	return "";
 }
 
 function getRowClass(row: Row<ReportRow>): string {
 	const classes: string[] = [];
 	if (row.original.__is_total_row) {
-		classes.push("bg-slate-50 dark:bg-slate-800/40 font-semibold");
+		classes.push("bg-secondary/40 font-semibold");
 	} else if (row.getIsSelected()) {
 		classes.push(
 			"bg-blue-50/60 dark:bg-blue-900/15 hover:bg-blue-50 dark:hover:bg-blue-900/20",
 		);
 	} else {
-		classes.push("hover:bg-slate-50 dark:hover:bg-slate-800/50");
+		classes.push("hover:bg-secondary dark:hover:bg-secondary/50");
 		if (props.striped && row.index % 2 === 1) {
-			classes.push("bg-slate-25 dark:bg-slate-900/30");
+			classes.push("bg-muted");
 		}
 	}
 	if (props.onRowClick && !row.original.__is_total_row) {

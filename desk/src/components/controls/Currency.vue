@@ -3,14 +3,14 @@
 		<label
 			v-if="field.label"
 			:for="`field-${field.fieldname}`"
-			class="font-medium text-sm text-slate-700 dark:text-slate-300"
+			class="font-medium text-sm text-foreground"
 		>
 			{{ field.label }}
 			<span v-if="field.reqd" class="text-red-600 dark:text-red-500 ml-1">*</span>
 		</label>
 		<div class="relative">
 			<span
-				class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500 dark:text-slate-400 pointer-events-none"
+				class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none"
 			>
 				{{ currencySymbol }}
 			</span>
@@ -21,7 +21,7 @@
 				:required="field.reqd"
 				type="text"
 				inputmode="decimal"
-				class="w-full pl-8 pr-3 py-2.5 border border-slate-300 dark:border-slate-600 rounded text-[0.95rem] transition-colors bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-right focus:outline-none focus:border-blue-600 dark:focus:border-blue-500 focus:ring-1 focus:ring-blue-600/10 dark:focus:ring-blue-500/20 read-only:bg-slate-50 dark:read-only:bg-slate-900/50 read-only:cursor-not-allowed disabled:opacity-50"
+				class="w-full pl-8 pr-3 py-2.5 border border-border rounded text-[0.95rem] transition-colors bg-background"
 				@input="onInput"
 				@blur="onBlur"
 				@keydown="validateKeypress"
@@ -29,7 +29,7 @@
 		</div>
 		<small
 			v-if="field.description"
-			class="block text-slate-600 dark:text-slate-300 text-[0.85rem] leading-relaxed"
+			class="block text-muted-foreground text-[0.85rem] leading-relaxed"
 		>
 			{{ __(field.description) }}
 		</small>

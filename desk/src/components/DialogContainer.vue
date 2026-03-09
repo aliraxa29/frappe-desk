@@ -4,13 +4,13 @@
 			<div
 				v-for="dialog in dialogs"
 				:key="dialog.id"
-				class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm"
+				class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
 				@click.self="handleBackdropClick(dialog)"
 			>
 				<Transition name="dialog" appear>
 					<div
 						:class="[
-							'bg-white dark:bg-slate-900 rounded-lg shadow-2xl max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col',
+							'bg-background rounded-lg shadow-2xl max-h-[calc(100vh-2rem)] overflow-hidden flex flex-col',
 							dialog.size === 'sm'
 								? 'w-full max-w-sm'
 								: dialog.size === 'lg'
@@ -21,9 +21,7 @@
 						]"
 					>
 						<!-- Header -->
-						<div
-							class="flex items-start justify-between p-5 border-b border-slate-200 dark:border-slate-700"
-						>
+						<div class="flex items-start justify-between p-5 border-b border-border">
 							<div class="flex items-center gap-3">
 								<!-- Icon -->
 								<div
@@ -60,14 +58,14 @@
 									<InfoCircle v-else class="w-12 h-12 text-blue-400" />
 								</div>
 								<h2
-									class="text-lg font-semibold text-slate-900 dark:text-slate-50"
+									class="text-lg font-semibold text-foreground dark:text-accent-foreground"
 								>
 									{{ dialog.title }}
 								</h2>
 							</div>
 							<button
 								v-if="dialog.showClose !== false"
-								class="flex items-center justify-center w-8 h-8 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-300 rounded transition-colors shrink-0"
+								class="flex items-center justify-center w-8 h-8 text-muted-foreground hover:text-muted-foreground hover:bg-muted dark:hover:bg-secondary dark:hover:text-muted-foreground rounded transition-colors shrink-0"
 								@click="handleCancel(dialog)"
 								aria-label="Close"
 							>
@@ -90,7 +88,7 @@
 								<p
 									v-if="dialog.message"
 									:class="[
-										'text-sm text-slate-600 dark:text-slate-400 m-0 leading-relaxed',
+										'text-sm text-muted-foreground m-0 leading-relaxed',
 										{ 'p-0': dialog.isHtml },
 									]"
 								>
@@ -109,7 +107,7 @@
 								<div v-if="dialog.type === 'prompt'" class="mt-4 space-y-3">
 									<label
 										v-if="dialog.inputLabel"
-										class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+										class="block text-sm font-medium text-foreground"
 									>
 										{{ dialog.inputLabel }}
 										<span v-if="dialog.inputRequired" class="text-red-500"
@@ -119,7 +117,7 @@
 									<textarea
 										v-if="dialog.inputType === 'textarea'"
 										v-model="dialog.inputValue"
-										class="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+										class="w-full px-3 py-2 text-sm border border-border rounded-md bg-background"
 										:placeholder="dialog.inputPlaceholder"
 										rows="4"
 										@keydown.enter.ctrl="handlePrimaryAction(dialog)"
@@ -127,7 +125,7 @@
 									<input
 										v-else
 										v-model="dialog.inputValue"
-										class="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+										class="w-full px-3 py-2 text-sm border border-border rounded-md bg-background"
 										:type="dialog.inputType || 'text'"
 										:placeholder="dialog.inputPlaceholder"
 										@keydown.enter="handlePrimaryAction(dialog)"
@@ -139,7 +137,7 @@
 						<!-- Footer -->
 						<div
 							v-if="dialog.type !== 'custom'"
-							class="flex items-center justify-end gap-3 p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800"
+							class="flex items-center justify-end gap-3 p-4 border-t border-border bg-secondary"
 						>
 							<button
 								v-if="dialog.secondaryButton"
@@ -150,8 +148,8 @@
 										: dialog.secondaryButton.variant === 'danger'
 										  ? 'bg-red-600 text-white hover:bg-red-700'
 										  : dialog.secondaryButton.variant === 'ghost'
-										    ? 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-										    : 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600',
+										    ? 'text-foreground hover:bg-muted dark:hover:bg-secondary'
+										    : 'bg-background text-foreground border border-border hover:bg-secondary dark:hover:bg-muted',
 								]"
 								@click="handleSecondaryAction(dialog)"
 							>
@@ -162,11 +160,11 @@
 								:class="[
 									'px-4 py-2 text-sm font-medium rounded-md transition-colors',
 									dialog.primaryButton.variant === 'secondary'
-										? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-600'
+										? 'bg-background text-foreground border border-border hover:bg-secondary dark:hover:bg-muted'
 										: dialog.primaryButton.variant === 'danger'
 										  ? 'bg-red-600 text-white hover:bg-red-700'
 										  : dialog.primaryButton.variant === 'ghost'
-										    ? 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+										    ? 'text-foreground hover:bg-muted dark:hover:bg-secondary'
 										    : 'bg-blue-600 text-white hover:bg-blue-700',
 								]"
 								@click="handlePrimaryAction(dialog)"

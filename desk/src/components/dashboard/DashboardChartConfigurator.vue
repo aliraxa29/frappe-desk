@@ -4,7 +4,7 @@
 	<div class="space-y-6">
 		<!-- Chart Type Selection -->
 		<div class="space-y-3">
-			<label class="text-sm font-semibold text-slate-900 dark:text-white">Chart Type</label>
+			<label class="text-sm font-semibold text-foreground">Chart Type</label>
 			<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
 				<button
 					v-for="type in chartTypes"
@@ -14,7 +14,7 @@
 						'p-4 rounded-lg border-2 transition-all duration-200 flex flex-col items-center gap-2',
 						selectedType === type.value
 							? 'border-blue-500 bg-blue-50 dark:bg-blue-900'
-							: 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600',
+							: 'border-border bg-background hover:border-border dark:hover:border-border',
 					]"
 				>
 					<component :is="type.iconComponent" class="w-6 h-6" />
@@ -25,10 +25,8 @@
 
 		<!-- Chart Configuration Preview -->
 		<div v-if="selectedType" class="space-y-3">
-			<label class="text-sm font-semibold text-slate-900 dark:text-white">Preview</label>
-			<div
-				class="border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 p-6 min-h-96"
-			>
+			<label class="text-sm font-semibold text-foreground">Preview</label>
+			<div class="border border-border rounded-lg bg-secondary p-6 min-h-96">
 				<ApexChart
 					:type="selectedType as any"
 					:options="previewOptions"
@@ -40,31 +38,27 @@
 
 		<!-- Configuration Options -->
 		<div class="space-y-4">
-			<h4 class="text-sm font-semibold text-slate-900 dark:text-white">Configuration</h4>
+			<h4 class="text-sm font-semibold text-foreground">Configuration</h4>
 
 			<!-- Title -->
 			<div class="space-y-2">
-				<label class="text-sm font-medium text-slate-700 dark:text-slate-300"
-					>Chart Title</label
-				>
+				<label class="text-sm font-medium text-foreground">Chart Title</label>
 				<input
 					v-model="config.title"
 					type="text"
 					placeholder="Enter chart title"
-					class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+					class="w-full px-3 py-2 border border-border rounded-lg bg-background"
 				/>
 			</div>
 
 			<!-- Data Source -->
 			<div class="space-y-2">
-				<label class="text-sm font-medium text-slate-700 dark:text-slate-300"
-					>Data Source (DocType)</label
-				>
+				<label class="text-sm font-medium text-foreground">Data Source (DocType)</label>
 				<input
 					v-model="config.source"
 					type="text"
 					placeholder="e.g., Invoice, Sales Order"
-					class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+					class="w-full px-3 py-2 border border-border rounded-lg bg-background"
 				/>
 			</div>
 
@@ -74,12 +68,9 @@
 					v-model="config.showValues"
 					type="checkbox"
 					id="showValues"
-					class="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-blue-600"
+					class="w-4 h-4 rounded border-border text-blue-600"
 				/>
-				<label
-					for="showValues"
-					class="text-sm font-medium text-slate-700 dark:text-slate-300"
-				>
+				<label for="showValues" class="text-sm font-medium text-foreground">
 					Show values on chart
 				</label>
 			</div>
@@ -90,51 +81,44 @@
 					v-model="config.timeseries"
 					type="checkbox"
 					id="timeseries"
-					class="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-blue-600"
+					class="w-4 h-4 rounded border-border text-blue-600"
 				/>
-				<label
-					for="timeseries"
-					class="text-sm font-medium text-slate-700 dark:text-slate-300"
-				>
+				<label for="timeseries" class="text-sm font-medium text-foreground">
 					Time series data
 				</label>
 			</div>
 
 			<!-- Colors -->
 			<div class="space-y-2">
-				<label class="text-sm font-medium text-slate-700 dark:text-slate-300"
+				<label class="text-sm font-medium text-foreground"
 					>Colors (comma separated hex)</label
 				>
 				<input
 					v-model="config.colors"
 					type="text"
 					placeholder="#3b82f6,#ef4444,#10b981"
-					class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+					class="w-full px-3 py-2 border border-border rounded-lg bg-background"
 				/>
 			</div>
 
 			<!-- Height -->
 			<div class="space-y-2">
-				<label class="text-sm font-medium text-slate-700 dark:text-slate-300"
-					>Chart Height (px)</label
-				>
+				<label class="text-sm font-medium text-foreground">Chart Height (px)</label>
 				<input
 					v-model.number="config.height"
 					type="number"
 					min="200"
 					max="1000"
-					class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+					class="w-full px-3 py-2 border border-border rounded-lg bg-background"
 				/>
 			</div>
 		</div>
 
 		<!-- Generated JSON -->
 		<div class="space-y-3">
-			<label class="text-sm font-semibold text-slate-900 dark:text-white"
-				>Generated Configuration</label
-			>
-			<div class="bg-slate-900 dark:bg-slate-950 rounded-lg p-4">
-				<pre class="text-xs text-slate-100 overflow-x-auto scroll-area">{{
+			<label class="text-sm font-semibold text-foreground">Generated Configuration</label>
+			<div class="bg-foreground dark:bg-background rounded-lg p-4">
+				<pre class="text-xs text-muted-foreground overflow-x-auto scroll-area">{{
 					JSON.stringify(generatedConfig, null, 2)
 				}}</pre>
 			</div>

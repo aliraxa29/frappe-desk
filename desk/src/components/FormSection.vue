@@ -25,14 +25,11 @@
 		</Accordion>
 
 		<template v-else>
-			<div v-if="label" class="mb-4 pb-3 border-b border-slate-200 dark:border-slate-700">
-				<h3 class="text-[0.9375rem] font-semibold text-slate-800 dark:text-slate-200 m-0">
+			<div v-if="label" class="mb-4 pb-3 border-b border-border">
+				<h3 class="text-[0.9375rem] font-semibold text-foreground m-0">
 					{{ label }}
 				</h3>
-				<p
-					v-if="description"
-					class="text-[0.8125rem] text-slate-500 dark:text-slate-400 mt-1 mb-0"
-				>
+				<p v-if="description" class="text-[0.8125rem] text-muted-foreground mt-1 mb-0">
 					{{ description }}
 				</p>
 			</div>

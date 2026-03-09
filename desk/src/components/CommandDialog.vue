@@ -12,19 +12,17 @@
 				@click="close"
 			>
 				<div
-					class="w-full max-w-xl max-h-[70vh] max-sm:max-h-[80vh] mx-4 flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl dark:bg-slate-800 dark:border-slate-700"
+					class="w-full max-w-xl max-h-[70vh] max-sm:max-h-[80vh] mx-4 flex flex-col overflow-hidden rounded-xl border border-border bg-background shadow-2xl"
 					@click.stop
 				>
 					<!-- Search Input -->
-					<div
-						class="flex items-center gap-3 p-4 border-b border-slate-200 dark:border-slate-700"
-					>
-						<Search class="w-5 h-5 text-slate-500 dark:text-slate-400 shrink-0" />
+					<div class="flex items-center gap-3 p-4 border-b border-border">
+						<Search class="w-5 h-5 text-muted-foreground shrink-0" />
 						<input
 							v-model="searchQuery"
 							type="text"
 							:placeholder="__('Search or type a command...')"
-							class="flex-1 bg-transparent text-base text-slate-900 placeholder-slate-400 outline-none dark:text-slate-100 dark:placeholder-slate-400"
+							class="flex-1 bg-transparent text-base text-foreground placeholder-slate-400 outline-none dark:placeholder-muted-foreground"
 							@input="handleSearch"
 							@keydown.down.prevent="selectNext"
 							@keydown.up.prevent="selectPrev"
@@ -34,7 +32,7 @@
 							autofocus
 						/>
 						<kbd
-							class="px-2 py-1 text-xs font-mono rounded border border-slate-200 bg-slate-100 text-slate-500 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300"
+							class="px-2 py-1 text-xs font-mono rounded border border-border bg-muted text-muted-foreground"
 						>
 							ESC
 						</kbd>
@@ -45,10 +43,10 @@
 						<!-- Loading state -->
 						<div
 							v-if="loading"
-							class="flex flex-col items-center justify-center gap-3 p-12 text-slate-500 dark:text-slate-400"
+							class="flex flex-col items-center justify-center gap-3 p-12 text-muted-foreground"
 						>
 							<div
-								class="w-6 h-6 rounded-full border-2 border-slate-200 border-t-blue-500 animate-spin dark:border-slate-600"
+								class="w-6 h-6 rounded-full border-2 border-border border-t-blue-500 animate-spin"
 							></div>
 							<span>{{ __("Searching...") }}</span>
 						</div>
@@ -59,45 +57,45 @@
 							class="flex flex-col items-center p-8 text-center"
 						>
 							<div class="text-5xl mb-3 opacity-50">⌘</div>
-							<p class="mb-6 text-sm text-slate-500 dark:text-slate-400">
+							<p class="mb-6 text-sm text-muted-foreground">
 								{{ __("Start typing to search") }}
 							</p>
 							<div class="grid grid-cols-2 max-sm:grid-cols-1 gap-3 w-full max-w-xs">
 								<div
-									class="flex items-center gap-2 px-3 py-2 rounded text-xs text-slate-500 bg-slate-50 dark:bg-slate-700 dark:text-slate-300"
+									class="flex items-center gap-2 px-3 py-2 rounded text-xs text-muted-foreground bg-secondary"
 								>
 									<kbd
-										class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-slate-300 bg-slate-200 text-slate-600 dark:bg-slate-600 dark:border-slate-500 dark:text-slate-100"
+										class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-border bg-muted text-muted-foreground"
 									>
 										new
 									</kbd>
 									<span>{{ __("Create new") }}</span>
 								</div>
 								<div
-									class="flex items-center gap-2 px-3 py-2 rounded text-xs text-slate-500 bg-slate-50 dark:bg-slate-700 dark:text-slate-300"
+									class="flex items-center gap-2 px-3 py-2 rounded text-xs text-muted-foreground bg-secondary"
 								>
 									<kbd
-										class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-slate-300 bg-slate-200 text-slate-600 dark:bg-slate-600 dark:border-slate-500 dark:text-slate-100"
+										class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-border bg-muted text-muted-foreground"
 									>
 										in
 									</kbd>
 									<span>{{ __("Search in") }}</span>
 								</div>
 								<div
-									class="flex items-center gap-2 px-3 py-2 rounded text-xs text-slate-500 bg-slate-50 dark:bg-slate-700 dark:text-slate-300"
+									class="flex items-center gap-2 px-3 py-2 rounded text-xs text-muted-foreground bg-secondary"
 								>
 									<kbd
-										class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-slate-300 bg-slate-200 text-slate-600 dark:bg-slate-600 dark:border-slate-500 dark:text-slate-100"
+										class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-border bg-muted text-muted-foreground"
 									>
 										=
 									</kbd>
 									<span>{{ __("Calculate") }}</span>
 								</div>
 								<div
-									class="flex items-center gap-2 px-3 py-2 rounded text-xs text-slate-500 bg-slate-50 dark:bg-slate-700 dark:text-slate-300"
+									class="flex items-center gap-2 px-3 py-2 rounded text-xs text-muted-foreground bg-secondary"
 								>
 									<kbd
-										class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-slate-300 bg-slate-200 text-slate-600 dark:bg-slate-600 dark:border-slate-500 dark:text-slate-100"
+										class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-border bg-muted text-muted-foreground"
 									>
 										?
 									</kbd>
@@ -109,7 +107,7 @@
 						<!-- No results -->
 						<div
 							v-else-if="!loading && searchQuery && totalResults === 0"
-							class="flex flex-col items-center p-12 text-center text-slate-500 dark:text-slate-400"
+							class="flex flex-col items-center p-12 text-center text-muted-foreground"
 						>
 							<div class="text-3xl mb-3">🔍</div>
 							<p>{{ __('No results found for "{0}"', [searchQuery]) }}</p>
@@ -121,8 +119,8 @@
 								v-for="(item, index) in flatItems"
 								:key="`${item.type}-${item.name}-${index}`"
 								:class="[
-									'flex items-center gap-3 w-full px-4 py-2.5 text-left transition-colors text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer',
-									{ 'bg-slate-100 dark:bg-slate-700': selectedIndex === index },
+									'flex items-center gap-3 w-full px-4 py-2.5 text-left transition-colors text-foreground hover:bg-muted dark:hover:bg-secondary cursor-pointer',
+									{ 'bg-muted': selectedIndex === index },
 								]"
 								@click="item.type === 'help' ? showHelpDialog() : selectItem(item)"
 								@mouseenter="selectedIndex = index"
@@ -130,7 +128,7 @@
 							>
 								<div
 									:class="[
-										'w-8 h-8 flex items-center justify-center rounded-md text-base bg-slate-100 dark:bg-slate-600',
+										'w-8 h-8 flex items-center justify-center rounded-md text-base bg-muted',
 										item.type === 'new' &&
 											'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-300',
 										item.type === 'calculator' &&
@@ -148,14 +146,14 @@
 									></div>
 									<div
 										v-if="item.description"
-										class="mt-0.5 text-xs text-slate-500 dark:text-slate-400 truncate"
+										class="mt-0.5 text-xs text-muted-foreground truncate"
 									>
 										{{ item.description }}
 									</div>
 								</div>
 								<div
 									v-if="searchQuery"
-									class="text-[11px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300"
+									class="text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
 								>
 									{{ Math.round(item.score) }}
 								</div>
@@ -165,38 +163,32 @@
 
 					<!-- Footer -->
 					<div
-						class="flex items-center justify-center gap-6 max-sm:gap-3 px-4 py-3 border-t border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900"
+						class="flex items-center justify-center gap-6 max-sm:gap-3 px-4 py-3 border-t border-border bg-secondary"
 					>
-						<div
-							class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400"
-						>
+						<div class="flex items-center gap-2 text-xs text-muted-foreground">
 							<kbd
-								class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-slate-300 bg-slate-200 text-slate-600 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300"
+								class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-border bg-muted text-muted-foreground"
 							>
 								↑
 							</kbd>
 							<kbd
-								class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-slate-300 bg-slate-200 text-slate-600 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300"
+								class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-border bg-muted text-muted-foreground"
 							>
 								↓
 							</kbd>
 							<span>{{ __("Navigate") }}</span>
 						</div>
-						<div
-							class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400"
-						>
+						<div class="flex items-center gap-2 text-xs text-muted-foreground">
 							<kbd
-								class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-slate-300 bg-slate-200 text-slate-600 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300"
+								class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-border bg-muted text-muted-foreground"
 							>
 								↵
 							</kbd>
 							<span>{{ __("Select") }}</span>
 						</div>
-						<div
-							class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400"
-						>
+						<div class="flex items-center gap-2 text-xs text-muted-foreground">
 							<kbd
-								class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-slate-300 bg-slate-200 text-slate-600 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-300"
+								class="px-1.5 py-0.5 text-[11px] font-mono rounded border border-border bg-muted text-muted-foreground"
 							>
 								esc
 							</kbd>
@@ -208,98 +200,98 @@
 				<!-- Help Dialog -->
 				<div
 					v-if="showHelp"
-					class="absolute top-1/2 left-1/2 w-[90%] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl border border-slate-200 bg-white shadow-2xl dark:bg-slate-800 dark:border-slate-700"
+					class="absolute top-1/2 left-1/2 w-[90%] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border bg-background shadow-2xl"
 					@click.stop
 				>
 					<div
-						class="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-700"
+						class="flex items-center justify-between px-5 py-4 border-b border-border"
 					>
-						<h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">
+						<h3 class="text-base font-semibold text-foreground">
 							{{ __("Search Help") }}
 						</h3>
 						<button
 							@click="showHelp = false"
-							class="w-7 h-7 flex items-center justify-center text-slate-500 rounded hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
+							class="w-7 h-7 flex items-center justify-center text-muted-foreground rounded hover:bg-muted dark:hover:bg-secondary"
 						>
 							×
 						</button>
 					</div>
 					<div class="p-5">
 						<table class="w-full text-sm">
-							<tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+							<tbody class="divide-y divide-border dark:divide-border">
 								<tr>
-									<td class="py-2 text-slate-900 dark:text-slate-100 w-[45%]">
+									<td class="py-2 text-foreground w-[45%]">
 										<strong>{{ __("Create a new record") }}</strong>
 									</td>
-									<td class="py-2 text-slate-900 dark:text-slate-100">
+									<td class="py-2 text-foreground">
 										<code
-											class="px-1.5 py-0.5 text-[13px] font-mono rounded bg-slate-100 text-slate-900 dark:bg-slate-700 dark:text-slate-100"
+											class="px-1.5 py-0.5 text-[13px] font-mono rounded bg-muted text-foreground"
 										>
 											new {{ __("[doctype name]") }}
 										</code>
 									</td>
 								</tr>
 								<tr>
-									<td class="py-2 text-slate-900 dark:text-slate-100 w-[45%]">
+									<td class="py-2 text-foreground w-[45%]">
 										<strong>{{ __("List a document type") }}</strong>
 									</td>
-									<td class="py-2 text-slate-900 dark:text-slate-100">
+									<td class="py-2 text-foreground">
 										<code
-											class="px-1.5 py-0.5 text-[13px] font-mono rounded bg-slate-100 text-slate-900 dark:bg-slate-700 dark:text-slate-100"
+											class="px-1.5 py-0.5 text-[13px] font-mono rounded bg-muted text-foreground"
 										>
 											{{ __("[doctype name]") }}
 										</code>
 									</td>
 								</tr>
 								<tr>
-									<td class="py-2 text-slate-900 dark:text-slate-100 w-[45%]">
+									<td class="py-2 text-foreground w-[45%]">
 										<strong>{{ __("Search in a document type") }}</strong>
 									</td>
-									<td class="py-2 text-slate-900 dark:text-slate-100">
+									<td class="py-2 text-foreground">
 										<code
-											class="px-1.5 py-0.5 text-[13px] font-mono rounded bg-slate-100 text-slate-900 dark:bg-slate-700 dark:text-slate-100"
+											class="px-1.5 py-0.5 text-[13px] font-mono rounded bg-muted text-foreground"
 										>
 											{{ __("[text] in [doctype]") }}
 										</code>
 									</td>
 								</tr>
 								<tr>
-									<td class="py-2 text-slate-900 dark:text-slate-100 w-[45%]">
+									<td class="py-2 text-foreground w-[45%]">
 										<strong>{{ __("Open a report") }}</strong>
 									</td>
-									<td class="py-2 text-slate-900 dark:text-slate-100">
+									<td class="py-2 text-foreground">
 										<code
-											class="px-1.5 py-0.5 text-[13px] font-mono rounded bg-slate-100 text-slate-900 dark:bg-slate-700 dark:text-slate-100"
+											class="px-1.5 py-0.5 text-[13px] font-mono rounded bg-muted text-foreground"
 										>
 											{{ __("[report name]") }}
 										</code>
 									</td>
 								</tr>
 								<tr>
-									<td class="py-2 text-slate-900 dark:text-slate-100 w-[45%]">
+									<td class="py-2 text-foreground w-[45%]">
 										<strong>{{ __("Open a workspace") }}</strong>
 									</td>
-									<td class="py-2 text-slate-900 dark:text-slate-100">
+									<td class="py-2 text-foreground">
 										<code
-											class="px-1.5 py-0.5 text-[13px] font-mono rounded bg-slate-100 text-slate-900 dark:bg-slate-700 dark:text-slate-100"
+											class="px-1.5 py-0.5 text-[13px] font-mono rounded bg-muted text-foreground"
 										>
 											{{ __("[workspace name]") }}
 										</code>
 									</td>
 								</tr>
 								<tr>
-									<td class="py-2 text-slate-900 dark:text-slate-100 w-[45%]">
+									<td class="py-2 text-foreground w-[45%]">
 										<strong>{{ __("Calculate") }}</strong>
 									</td>
-									<td class="py-2 text-slate-900 dark:text-slate-100">
+									<td class="py-2 text-foreground">
 										<code
-											class="px-1.5 py-0.5 text-[13px] font-mono rounded bg-slate-100 text-slate-900 dark:bg-slate-700 dark:text-slate-100"
+											class="px-1.5 py-0.5 text-[13px] font-mono rounded bg-muted text-foreground"
 										>
 											(55 + 434) / 4
 										</code>
 										{{ __("or") }}
 										<code
-											class="px-1.5 py-0.5 text-[13px] font-mono rounded bg-slate-100 text-slate-900 dark:bg-slate-700 dark:text-slate-100"
+											class="px-1.5 py-0.5 text-[13px] font-mono rounded bg-muted text-foreground"
 										>
 											=Math.sin(Math.PI/2)
 										</code>

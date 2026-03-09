@@ -2,11 +2,11 @@
 	<Transition name="slide-up">
 		<div
 			v-if="show"
-			class="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 shadow-lg z-15 transition-all duration-300"
+			class="fixed bottom-0 left-0 right-0 bg-background border-t border-slate-200 dark:border-slate-700"
 			:style="{ marginLeft: sidebarVisible ? '16rem' : '2rem' }"
 		>
 			<div class="px-6 py-4 flex items-center justify-between">
-				<p class="text-slate-700 dark:text-slate-200 font-medium">{{ message }}</p>
+				<p class="text-foreground font-medium">{{ message }}</p>
 				<div class="flex gap-3">
 					<Button
 						@click="$emit('discard')"

@@ -1,20 +1,16 @@
 <template>
-	<div
-		class="rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-600 dark:bg-slate-800/70 shadow-sm mb-4"
-	>
+	<div class="rounded-2xl border border-border bg-secondary/70 shadow-sm mb-4">
 		<button
 			type="button"
-			class="flex items-center justify-between w-full px-6 py-4 bg-slate-100 dark:bg-slate-900/60 hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer text-left transition-colors duration-200 rounded-2xl"
-			:class="{ 'border-b border-slate-200 dark:border-slate-700': isOpen }"
+			class="flex items-center justify-between w-full px-6 py-4 bg-muted dark:bg-muted hover:bg-muted dark:hover:bg-secondary cursor-pointer text-left transition-colors duration-200 rounded-2xl"
+			:class="{ 'border-b border-border': isOpen }"
 			@click="toggle"
 		>
-			<div
-				class="flex items-center gap-2 font-bold text-base text-slate-800 dark:text-white"
-			>
+			<div class="flex items-center gap-2 font-bold text-base text-foreground">
 				<slot name="icon">
 					<ChevronRight
 						v-if="showIcon"
-						class="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0 transition-transform duration-200"
+						class="w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-200"
 						:class="{ 'rotate-90': isOpen }"
 					/>
 				</slot>
